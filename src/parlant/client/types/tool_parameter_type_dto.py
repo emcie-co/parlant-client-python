@@ -2,6 +2,6 @@
 
 import typing
 
-Type = typing.Union[
+ToolParameterTypeDto = typing.Union[
     typing.Literal["string", "number", "integer", "boolean"], typing.Any
 ]

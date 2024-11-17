@@ -24,9 +24,6 @@ from .types.guideline_with_connections_and_tool_associations import (
 from .types.delete_guideline_response import DeleteGuidelineResponse
 from .types.guideline_connections_patch import GuidelineConnectionsPatch
 from .types.guideline_tool_associations_patch import GuidelineToolAssociationsPatch
-from .types.guideline_payload import GuidelinePayload
-from .types.create_evaluation_response import CreateEvaluationResponse
-from .types.read_evaluation_response import ReadEvaluationResponse
 from .types.list_terms_response import ListTermsResponse
 from .types.create_term_response import CreateTermResponse
 from .types.term import Term
@@ -59,6 +56,9 @@ from .types.delete_events_response import DeleteEventsResponse
 from .types.list_interactions_response import ListInteractionsResponse
 from .types.create_interactions_response import CreateInteractionsResponse
 from .types.read_interaction_response import ReadInteractionResponse
+from .types.guideline_payload import GuidelinePayload
+from .types.create_evaluation_response import CreateEvaluationResponse
+from .types.read_evaluation_response import ReadEvaluationResponse
 from .types.service import Service
 from .types.request import Request
 from .types.create_service_response import CreateServiceResponse
@@ -745,146 +745,6 @@ class ParlantClient:
                     GuidelineWithConnectionsAndToolAssociations,
                     parse_obj_as(
                         type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def create_evaluation(
-        self,
-        agent_id: str,
-        *,
-        payloads: typing.Sequence[GuidelinePayload],
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateEvaluationResponse:
-        """
-        Parameters
-        ----------
-        agent_id : str
-
-        payloads : typing.Sequence[GuidelinePayload]
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        CreateEvaluationResponse
-            Successful Response
-
-        Examples
-        --------
-        from parlant.client import ParlantClient, GuidelineContent, GuidelinePayload
-
-        client = ParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-        client.create_evaluation(
-            agent_id="agent_id",
-            payloads=[
-                GuidelinePayload(
-                    content=GuidelineContent(
-                        predicate="predicate",
-                        action="action",
-                    ),
-                    operation="add",
-                    coherence_check=True,
-                    connection_proposition=True,
-                )
-            ],
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/index/evaluations",
-            method="POST",
-            json={
-                "payloads": convert_and_respect_annotation_metadata(
-                    object_=payloads,
-                    annotation=typing.Sequence[GuidelinePayload],
-                    direction="write",
-                ),
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    CreateEvaluationResponse,
-                    parse_obj_as(
-                        type_=CreateEvaluationResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def read_evaluation(
-        self,
-        evaluation_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> ReadEvaluationResponse:
-        """
-        Parameters
-        ----------
-        evaluation_id : str
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        ReadEvaluationResponse
-            Successful Response
-
-        Examples
-        --------
-        from parlant.client import ParlantClient
-
-        client = ParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-        client.read_evaluation(
-            evaluation_id="evaluation_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"agents/index/evaluations/{jsonable_encoder(evaluation_id)}",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ReadEvaluationResponse,
-                    parse_obj_as(
-                        type_=ReadEvaluationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2589,6 +2449,147 @@ class ParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def create_evaluation(
+        self,
+        *,
+        agent_id: str,
+        payloads: typing.Sequence[GuidelinePayload],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> CreateEvaluationResponse:
+        """
+        Parameters
+        ----------
+        agent_id : str
+
+        payloads : typing.Sequence[GuidelinePayload]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        CreateEvaluationResponse
+            Successful Response
+
+        Examples
+        --------
+        from parlant.client import ParlantClient, GuidelineContent, GuidelinePayload
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.create_evaluation(
+            agent_id="agent_id",
+            payloads=[
+                GuidelinePayload(
+                    content=GuidelineContent(
+                        predicate="predicate",
+                        action="action",
+                    ),
+                    operation="add",
+                    coherence_check=True,
+                    connection_proposition=True,
+                )
+            ],
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "index/evaluations",
+            method="POST",
+            json={
+                "agent_id": agent_id,
+                "payloads": convert_and_respect_annotation_metadata(
+                    object_=payloads,
+                    annotation=typing.Sequence[GuidelinePayload],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    CreateEvaluationResponse,
+                    parse_obj_as(
+                        type_=CreateEvaluationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        parse_obj_as(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def read_evaluation(
+        self,
+        evaluation_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ReadEvaluationResponse:
+        """
+        Parameters
+        ----------
+        evaluation_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ReadEvaluationResponse
+            Successful Response
+
+        Examples
+        --------
+        from parlant.client import ParlantClient
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.read_evaluation(
+            evaluation_id="evaluation_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"index/evaluations/{jsonable_encoder(evaluation_id)}",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    ReadEvaluationResponse,
+                    parse_obj_as(
+                        type_=ReadEvaluationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        parse_obj_as(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def read_service(
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Service:
@@ -2669,16 +2670,15 @@ class ParlantClient:
 
         Examples
         --------
-        from parlant.client import ParlantClient, Request_Openapi
+        from parlant.client import CreateSdkServiceRequest, ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
         client.upsert_service(
             name="name",
-            request=Request_Openapi(
-                url="string",
-                source="string",
+            request=CreateSdkServiceRequest(
+                url="url",
             ),
         )
         """
@@ -3569,162 +3569,6 @@ class AsyncParlantClient:
                     GuidelineWithConnectionsAndToolAssociations,
                     parse_obj_as(
                         type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def create_evaluation(
-        self,
-        agent_id: str,
-        *,
-        payloads: typing.Sequence[GuidelinePayload],
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateEvaluationResponse:
-        """
-        Parameters
-        ----------
-        agent_id : str
-
-        payloads : typing.Sequence[GuidelinePayload]
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        CreateEvaluationResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from parlant.client import AsyncParlantClient, GuidelineContent, GuidelinePayload
-
-        client = AsyncParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-
-
-        async def main() -> None:
-            await client.create_evaluation(
-                agent_id="agent_id",
-                payloads=[
-                    GuidelinePayload(
-                        content=GuidelineContent(
-                            predicate="predicate",
-                            action="action",
-                        ),
-                        operation="add",
-                        coherence_check=True,
-                        connection_proposition=True,
-                    )
-                ],
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/index/evaluations",
-            method="POST",
-            json={
-                "payloads": convert_and_respect_annotation_metadata(
-                    object_=payloads,
-                    annotation=typing.Sequence[GuidelinePayload],
-                    direction="write",
-                ),
-            },
-            request_options=request_options,
-            omit=OMIT,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    CreateEvaluationResponse,
-                    parse_obj_as(
-                        type_=CreateEvaluationResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def read_evaluation(
-        self,
-        evaluation_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> ReadEvaluationResponse:
-        """
-        Parameters
-        ----------
-        evaluation_id : str
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        ReadEvaluationResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from parlant.client import AsyncParlantClient
-
-        client = AsyncParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-
-
-        async def main() -> None:
-            await client.read_evaluation(
-                evaluation_id="evaluation_id",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"agents/index/evaluations/{jsonable_encoder(evaluation_id)}",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ReadEvaluationResponse,
-                    parse_obj_as(
-                        type_=ReadEvaluationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5629,6 +5473,163 @@ class AsyncParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    async def create_evaluation(
+        self,
+        *,
+        agent_id: str,
+        payloads: typing.Sequence[GuidelinePayload],
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> CreateEvaluationResponse:
+        """
+        Parameters
+        ----------
+        agent_id : str
+
+        payloads : typing.Sequence[GuidelinePayload]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        CreateEvaluationResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient, GuidelineContent, GuidelinePayload
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.create_evaluation(
+                agent_id="agent_id",
+                payloads=[
+                    GuidelinePayload(
+                        content=GuidelineContent(
+                            predicate="predicate",
+                            action="action",
+                        ),
+                        operation="add",
+                        coherence_check=True,
+                        connection_proposition=True,
+                    )
+                ],
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "index/evaluations",
+            method="POST",
+            json={
+                "agent_id": agent_id,
+                "payloads": convert_and_respect_annotation_metadata(
+                    object_=payloads,
+                    annotation=typing.Sequence[GuidelinePayload],
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    CreateEvaluationResponse,
+                    parse_obj_as(
+                        type_=CreateEvaluationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        parse_obj_as(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def read_evaluation(
+        self,
+        evaluation_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> ReadEvaluationResponse:
+        """
+        Parameters
+        ----------
+        evaluation_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        ReadEvaluationResponse
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.read_evaluation(
+                evaluation_id="evaluation_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"index/evaluations/{jsonable_encoder(evaluation_id)}",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    ReadEvaluationResponse,
+                    parse_obj_as(
+                        type_=ReadEvaluationResponse,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        parse_obj_as(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     async def read_service(
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Service:
@@ -5719,7 +5720,7 @@ class AsyncParlantClient:
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, Request_Openapi
+        from parlant.client import AsyncParlantClient, CreateSdkServiceRequest
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -5729,9 +5730,8 @@ class AsyncParlantClient:
         async def main() -> None:
             await client.upsert_service(
                 name="name",
-                request=Request_Openapi(
-                    url="string",
-                    source="string",
+                request=CreateSdkServiceRequest(
+                    url="url",
                 ),
             )
 

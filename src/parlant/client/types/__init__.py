@@ -2,9 +2,10 @@
 
 from .agent import Agent
 from .coherence_check import CoherenceCheck
+from .coherence_check_kind_dto import CoherenceCheckKindDto
 from .connection_kind_dto import ConnectionKindDto
 from .connection_proposition import ConnectionProposition
-from .connection_proposition_dto_check_kind import ConnectionPropositionDtoCheckKind
+from .connection_proposition_kind_dto import ConnectionPropositionKindDto
 from .consumption_offsets import ConsumptionOffsets
 from .consumption_offsets_patch import ConsumptionOffsetsPatch
 from .context_variable import ContextVariable
@@ -49,6 +50,7 @@ from .guideline_content import GuidelineContent
 from .guideline_invoice import GuidelineInvoice
 from .guideline_invoice_data import GuidelineInvoiceData
 from .guideline_payload import GuidelinePayload
+from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
 from .guideline_proposition import GuidelineProposition
 from .guideline_tool_association import GuidelineToolAssociation
 from .guideline_tool_associations_patch import GuidelineToolAssociationsPatch
@@ -57,8 +59,8 @@ from .guideline_with_connections_and_tool_associations import (
 )
 from .http_validation_error import HttpValidationError
 from .interaction import Interaction
+from .interaction_kind_dto import InteractionKindDto
 from .invoice import Invoice
-from .kind import Kind
 from .list_agents_response import ListAgentsResponse
 from .list_context_variables_response import ListContextVariablesResponse
 from .list_events_response import ListEventsResponse
@@ -69,13 +71,12 @@ from .list_sessions_response import ListSessionsResponse
 from .list_terms_response import ListTermsResponse
 from .message_generation_inspection import MessageGenerationInspection
 from .moderation import Moderation
-from .operation import Operation
 from .payload_kind_dto import PayloadKindDto
 from .preparation_iteration import PreparationIteration
 from .read_context_variable_response import ReadContextVariableResponse
 from .read_evaluation_response import ReadEvaluationResponse
 from .read_interaction_response import ReadInteractionResponse
-from .request import Request, Request_Openapi, Request_Sdk
+from .request import Request
 from .service import Service
 from .session import Session
 from .term import Term
@@ -84,9 +85,9 @@ from .tool_call import ToolCall
 from .tool_id import ToolId
 from .tool_parameter import ToolParameter
 from .tool_parameter_dto_enum_item import ToolParameterDtoEnumItem
+from .tool_parameter_type_dto import ToolParameterTypeDto
 from .tool_result import ToolResult
-from .tool_service_kind import ToolServiceKind
-from .type import Type
+from .tool_service_kind_dto import ToolServiceKindDto
 from .update_context_variable_value_request_data_five_value import (
     UpdateContextVariableValueRequestDataFiveValue,
 )
@@ -101,9 +102,10 @@ from .validation_error_loc_item import ValidationErrorLocItem
 __all__ = [
     "Agent",
     "CoherenceCheck",
+    "CoherenceCheckKindDto",
     "ConnectionKindDto",
     "ConnectionProposition",
-    "ConnectionPropositionDtoCheckKind",
+    "ConnectionPropositionKindDto",
     "ConsumptionOffsets",
     "ConsumptionOffsetsPatch",
     "ContextVariable",
@@ -146,14 +148,15 @@ __all__ = [
     "GuidelineInvoice",
     "GuidelineInvoiceData",
     "GuidelinePayload",
+    "GuidelinePayloadOperationDto",
     "GuidelineProposition",
     "GuidelineToolAssociation",
     "GuidelineToolAssociationsPatch",
     "GuidelineWithConnectionsAndToolAssociations",
     "HttpValidationError",
     "Interaction",
+    "InteractionKindDto",
     "Invoice",
-    "Kind",
     "ListAgentsResponse",
     "ListContextVariablesResponse",
     "ListEventsResponse",
@@ -164,15 +167,12 @@ __all__ = [
     "ListTermsResponse",
     "MessageGenerationInspection",
     "Moderation",
-    "Operation",
     "PayloadKindDto",
     "PreparationIteration",
     "ReadContextVariableResponse",
     "ReadEvaluationResponse",
     "ReadInteractionResponse",
     "Request",
-    "Request_Openapi",
-    "Request_Sdk",
     "Service",
     "Session",
     "Term",
@@ -181,9 +181,9 @@ __all__ = [
     "ToolId",
     "ToolParameter",
     "ToolParameterDtoEnumItem",
+    "ToolParameterTypeDto",
     "ToolResult",
-    "ToolServiceKind",
-    "Type",
+    "ToolServiceKindDto",
     "UpdateContextVariableValueRequestDataFiveValue",
     "UpdateContextVariableValueRequestDataItem",
     "UpdateContextVariableValueResponse",

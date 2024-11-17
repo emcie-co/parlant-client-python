@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "parlant-client"
-version = "0.1.1"
+version = "0.1.4"
 description = "Parlant Client SDK"
 authors = ["MCNatsu <nathan@emcie.co>"]
 readme = "README.md"
@@ -13,7 +13,6 @@ python = "^3.12"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.1"
-pytest = "^8.3.3"
 ruff = "^0.5.6"
 
 [build-system]

@@ -2,7 +2,7 @@
 
 import typing
 
-ConnectionPropositionDtoCheckKind = typing.Union[
+ConnectionPropositionKindDto = typing.Union[
     typing.Literal[
         "connection_with_existing_guideline",
         "connection_with_another_evaluated_guideline",

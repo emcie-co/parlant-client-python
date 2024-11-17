@@ -2,4 +2,4 @@
 
 import typing
 
-ToolParameterDtoEnumItem = typing.Union[str, int, float, bool]
+ToolParameterDtoEnumItem = typing.Union[str, int]

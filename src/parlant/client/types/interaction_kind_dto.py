@@ -2,4 +2,4 @@
 
 import typing
 
-Operation = typing.Union[typing.Literal["add", "update"], typing.Any]
+InteractionKindDto = typing.Literal["message"]

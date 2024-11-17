@@ -3,7 +3,7 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 from .payload_kind_dto import PayloadKindDto
 from .guideline_content import GuidelineContent
-from .operation import Operation
+from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
 import typing
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
@@ -12,7 +12,7 @@ import pydantic
 class GuidelinePayload(UniversalBaseModel):
     kind: PayloadKindDto = "guideline"
     content: GuidelineContent
-    operation: Operation
+    operation: GuidelinePayloadOperationDto
     updated_id: typing.Optional[str] = None
     coherence_check: bool
     connection_proposition: bool
