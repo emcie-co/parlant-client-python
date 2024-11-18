@@ -8,7 +8,7 @@ import pydantic
 
 class Guideline(UniversalBaseModel):
     id: str
-    predicate: str
+    condition: str
     action: str
 
     if IS_PYDANTIC_V2:

@@ -472,11 +472,11 @@ class ParlantClient:
         --------
         from parlant.client import (
             CoherenceCheck,
-            ParlantClient,
             GuidelineContent,
             GuidelineInvoice,
             GuidelineInvoiceData,
             GuidelinePayload,
+            ParlantClient,
         )
 
         client = ParlantClient(
@@ -488,7 +488,7 @@ class ParlantClient:
                 GuidelineInvoice(
                     payload=GuidelinePayload(
                         content=GuidelineContent(
-                            predicate="predicate",
+                            condition="condition",
                             action="action",
                         ),
                         operation="add",
@@ -502,11 +502,11 @@ class ParlantClient:
                             CoherenceCheck(
                                 kind="contradiction_with_existing_guideline",
                                 first=GuidelineContent(
-                                    predicate="predicate",
+                                    condition="condition",
                                     action="action",
                                 ),
                                 second=GuidelineContent(
-                                    predicate="predicate",
+                                    condition="condition",
                                     action="action",
                                 ),
                                 issue="issue",
@@ -2473,7 +2473,7 @@ class ParlantClient:
 
         Examples
         --------
-        from parlant.client import ParlantClient, GuidelineContent, GuidelinePayload
+        from parlant.client import GuidelineContent, GuidelinePayload, ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -2483,7 +2483,7 @@ class ParlantClient:
             payloads=[
                 GuidelinePayload(
                     content=GuidelineContent(
-                        predicate="predicate",
+                        condition="condition",
                         action="action",
                     ),
                     operation="add",
@@ -3285,7 +3285,7 @@ class AsyncParlantClient:
                     GuidelineInvoice(
                         payload=GuidelinePayload(
                             content=GuidelineContent(
-                                predicate="predicate",
+                                condition="condition",
                                 action="action",
                             ),
                             operation="add",
@@ -3299,11 +3299,11 @@ class AsyncParlantClient:
                                 CoherenceCheck(
                                     kind="contradiction_with_existing_guideline",
                                     first=GuidelineContent(
-                                        predicate="predicate",
+                                        condition="condition",
                                         action="action",
                                     ),
                                     second=GuidelineContent(
-                                        predicate="predicate",
+                                        condition="condition",
                                         action="action",
                                     ),
                                     issue="issue",
@@ -5512,7 +5512,7 @@ class AsyncParlantClient:
                 payloads=[
                     GuidelinePayload(
                         content=GuidelineContent(
-                            predicate="predicate",
+                            condition="condition",
                             action="action",
                         ),
                         operation="add",

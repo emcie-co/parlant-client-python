@@ -7,7 +7,7 @@ import pydantic
 
 
 class GuidelineContent(UniversalBaseModel):
-    predicate: str
+    condition: str
     action: str
 
     if IS_PYDANTIC_V2:

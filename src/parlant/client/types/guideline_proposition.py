@@ -8,7 +8,7 @@ import pydantic
 
 class GuidelineProposition(UniversalBaseModel):
     guideline_id: str
-    predicate: str
+    condition: str
     action: str
     score: int
     rationale: str
