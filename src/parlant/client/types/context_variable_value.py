@@ -2,16 +2,15 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import datetime as dt
-from .data import Data
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
 class ContextVariableValue(UniversalBaseModel):
     id: str
     last_modified: dt.datetime
-    data: Data
+    data: typing.Optional[typing.Any] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

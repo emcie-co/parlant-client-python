@@ -20,20 +20,9 @@ from .context_variable_value import ContextVariableValue
 from .context_variable_value_deletion_response import (
     ContextVariableValueDeletionResponse,
 )
-from .context_variable_value_dto_data_five_value import (
-    ContextVariableValueDtoDataFiveValue,
-)
-from .context_variable_value_dto_data_item import ContextVariableValueDtoDataItem
-from .context_variable_value_update_params_dto_data_five_value import (
-    ContextVariableValueUpdateParamsDtoDataFiveValue,
-)
-from .context_variable_value_update_params_dto_data_item import (
-    ContextVariableValueUpdateParamsDtoDataItem,
-)
 from .context_variable_value_update_response import ContextVariableValueUpdateResponse
 from .create_session_response import CreateSessionResponse
 from .create_term_response import CreateTermResponse
-from .data import Data
 from .day_of_week_dto import DayOfWeekDto
 from .delete_session_response import DeleteSessionResponse
 from .evaluation_creation_response import EvaluationCreationResponse
@@ -74,10 +63,12 @@ from .interaction_kind_dto import InteractionKindDto
 from .interaction_list_response import InteractionListResponse
 from .interaction_read_response import InteractionReadResponse
 from .invoice import Invoice
+from .invoice_data import InvoiceData
 from .list_sessions_response import ListSessionsResponse
 from .message_generation_inspection import MessageGenerationInspection
 from .moderation import Moderation
 from .open_api_service_params import OpenApiServiceParams
+from .payload import Payload
 from .payload_kind_dto import PayloadKindDto
 from .preparation_iteration import PreparationIteration
 from .sdk_service_params import SdkServiceParams
@@ -120,14 +111,9 @@ __all__ = [
     "ContextVariableReadResponse",
     "ContextVariableValue",
     "ContextVariableValueDeletionResponse",
-    "ContextVariableValueDtoDataFiveValue",
-    "ContextVariableValueDtoDataItem",
-    "ContextVariableValueUpdateParamsDtoDataFiveValue",
-    "ContextVariableValueUpdateParamsDtoDataItem",
     "ContextVariableValueUpdateResponse",
     "CreateSessionResponse",
     "CreateTermResponse",
-    "Data",
     "DayOfWeekDto",
     "DeleteSessionResponse",
     "EvaluationCreationResponse",
@@ -164,10 +150,12 @@ __all__ = [
     "InteractionListResponse",
     "InteractionReadResponse",
     "Invoice",
+    "InvoiceData",
     "ListSessionsResponse",
     "MessageGenerationInspection",
     "Moderation",
     "OpenApiServiceParams",
+    "Payload",
     "PayloadKindDto",
     "PreparationIteration",
     "SdkServiceParams",
