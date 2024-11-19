@@ -7,63 +7,64 @@ from .core.request_options import RequestOptions
 from .core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from .core.api_error import ApiError
-from .types.list_agents_response import ListAgentsResponse
-from .types.create_agent_request import CreateAgentRequest
-from .types.create_agent_response import CreateAgentResponse
-from .core.serialization import convert_and_respect_annotation_metadata
+from .types.agent_list_response import AgentListResponse
+from .types.agent_creation_response import AgentCreationResponse
 from .errors.unprocessable_entity_error import UnprocessableEntityError
 from .types.http_validation_error import HttpValidationError
 from .types.agent import Agent
 from .core.jsonable_encoder import jsonable_encoder
-from .types.list_guidelines_response import ListGuidelinesResponse
+from .types.guideline_list_response import GuidelineListResponse
 from .types.guideline_invoice import GuidelineInvoice
-from .types.create_guidelines_response import CreateGuidelinesResponse
+from .types.guideline_creation_response import GuidelineCreationResponse
+from .core.serialization import convert_and_respect_annotation_metadata
 from .types.guideline_with_connections_and_tool_associations import (
     GuidelineWithConnectionsAndToolAssociations,
 )
-from .types.delete_guideline_response import DeleteGuidelineResponse
-from .types.guideline_connections_patch import GuidelineConnectionsPatch
-from .types.guideline_tool_associations_patch import GuidelineToolAssociationsPatch
-from .types.list_terms_response import ListTermsResponse
+from .types.guideline_deletion_response import GuidelineDeletionResponse
+from .types.guideline_connection_update_params import GuidelineConnectionUpdateParams
+from .types.guideline_tool_association_update_params import (
+    GuidelineToolAssociationUpdateParams,
+)
+from .types.term_list_response import TermListResponse
 from .types.create_term_response import CreateTermResponse
 from .types.term import Term
-from .types.delete_term_response import DeleteTermResponse
-from .types.list_context_variables_response import ListContextVariablesResponse
+from .types.term_deletion_response import TermDeletionResponse
+from .types.context_variable_list_response import ContextVariableListResponse
 from .types.tool_id import ToolId
 from .types.freshness_rules import FreshnessRules
-from .types.create_context_variable_response import CreateContextVariableResponse
-from .types.read_context_variable_response import ReadContextVariableResponse
-from .types.delete_context_variable_reponse import DeleteContextVariableReponse
+from .types.context_variable_creation_response import ContextVariableCreationResponse
+from .types.context_variable_read_response import ContextVariableReadResponse
+from .types.context_variable_deletion_response import ContextVariableDeletionResponse
 from .types.context_variable_value import ContextVariableValue
 from .types.data import Data
-from .types.update_context_variable_value_response import (
-    UpdateContextVariableValueResponse,
+from .types.context_variable_value_update_response import (
+    ContextVariableValueUpdateResponse,
 )
-from .types.delete_context_variable_value_response import (
-    DeleteContextVariableValueResponse,
+from .types.context_variable_value_deletion_response import (
+    ContextVariableValueDeletionResponse,
 )
 from .types.list_sessions_response import ListSessionsResponse
 from .types.create_session_response import CreateSessionResponse
 from .types.session import Session
 from .types.delete_session_response import DeleteSessionResponse
-from .types.consumption_offsets_patch import ConsumptionOffsetsPatch
-from .types.list_events_response import ListEventsResponse
+from .types.consumption_offsets_update_params import ConsumptionOffsetsUpdateParams
+from .types.event_list_response import EventListResponse
 from .types.event_kind_dto import EventKindDto
 from .types.event_source_dto import EventSourceDto
 from .types.moderation import Moderation
-from .types.create_event_response import CreateEventResponse
-from .types.delete_events_response import DeleteEventsResponse
-from .types.list_interactions_response import ListInteractionsResponse
-from .types.create_interactions_response import CreateInteractionsResponse
-from .types.read_interaction_response import ReadInteractionResponse
+from .types.event_creation_response import EventCreationResponse
+from .types.event_deletion_response import EventDeletionResponse
+from .types.interaction_list_response import InteractionListResponse
+from .types.interaction_creation_response import InteractionCreationResponse
+from .types.interaction_read_response import InteractionReadResponse
 from .types.guideline_payload import GuidelinePayload
-from .types.create_evaluation_response import CreateEvaluationResponse
-from .types.read_evaluation_response import ReadEvaluationResponse
+from .types.evaluation_creation_response import EvaluationCreationResponse
+from .types.evaluation_read_response import EvaluationReadResponse
 from .types.service import Service
-from .types.request import Request
-from .types.create_service_response import CreateServiceResponse
-from .types.delete_service_response import DeleteServiceResponse
-from .types.list_services_response import ListServicesResponse
+from .types.params import Params
+from .types.service_creation_response import ServiceCreationResponse
+from .types.service_deletion_response import ServiceDeletionResponse
+from .types.service_list_response import ServiceListResponse
 from .core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -163,7 +164,7 @@ class ParlantClient:
 
     def list_agents(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListAgentsResponse:
+    ) -> AgentListResponse:
         """
         Parameters
         ----------
@@ -172,7 +173,7 @@ class ParlantClient:
 
         Returns
         -------
-        ListAgentsResponse
+        AgentListResponse
             Successful Response
 
         Examples
@@ -192,9 +193,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListAgentsResponse,
+                    AgentListResponse,
                     parse_obj_as(
-                        type_=ListAgentsResponse,  # type: ignore
+                        type_=AgentListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -206,20 +207,26 @@ class ParlantClient:
     def create_agent(
         self,
         *,
-        request: typing.Optional[CreateAgentRequest] = None,
+        name: str,
+        description: typing.Optional[str] = OMIT,
+        max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateAgentResponse:
+    ) -> AgentCreationResponse:
         """
         Parameters
         ----------
-        request : typing.Optional[CreateAgentRequest]
+        name : str
+
+        description : typing.Optional[str]
+
+        max_engine_iterations : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        CreateAgentResponse
+        AgentCreationResponse
             Successful Response
 
         Examples
@@ -229,23 +236,27 @@ class ParlantClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.create_agent()
+        client.create_agent(
+            name="name",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "agents/",
             method="POST",
-            json=convert_and_respect_annotation_metadata(
-                object_=request, annotation=CreateAgentRequest, direction="write"
-            ),
+            json={
+                "name": name,
+                "description": description,
+                "max_engine_iterations": max_engine_iterations,
+            },
             request_options=request_options,
             omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateAgentResponse,
+                    AgentCreationResponse,
                     parse_obj_as(
-                        type_=CreateAgentResponse,  # type: ignore
+                        type_=AgentCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -320,7 +331,7 @@ class ParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def patch_agent(
+    def update_agent(
         self,
         agent_id: str,
         *,
@@ -352,7 +363,7 @@ class ParlantClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.patch_agent(
+        client.update_agent(
             agent_id="agent_id",
         )
         """
@@ -392,7 +403,7 @@ class ParlantClient:
 
     def list_guidelines(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListGuidelinesResponse:
+    ) -> GuidelineListResponse:
         """
         Parameters
         ----------
@@ -403,7 +414,7 @@ class ParlantClient:
 
         Returns
         -------
-        ListGuidelinesResponse
+        GuidelineListResponse
             Successful Response
 
         Examples
@@ -425,9 +436,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListGuidelinesResponse,
+                    GuidelineListResponse,
                     parse_obj_as(
-                        type_=ListGuidelinesResponse,  # type: ignore
+                        type_=GuidelineListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -452,7 +463,7 @@ class ParlantClient:
         *,
         invoices: typing.Sequence[GuidelineInvoice],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateGuidelinesResponse:
+    ) -> GuidelineCreationResponse:
         """
         Parameters
         ----------
@@ -465,7 +476,7 @@ class ParlantClient:
 
         Returns
         -------
-        CreateGuidelinesResponse
+        GuidelineCreationResponse
             Successful Response
 
         Examples
@@ -534,9 +545,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateGuidelinesResponse,
+                    GuidelineCreationResponse,
                     parse_obj_as(
-                        type_=CreateGuidelinesResponse,  # type: ignore
+                        type_=GuidelineCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -624,7 +635,7 @@ class ParlantClient:
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteGuidelineResponse:
+    ) -> GuidelineDeletionResponse:
         """
         Parameters
         ----------
@@ -637,7 +648,7 @@ class ParlantClient:
 
         Returns
         -------
-        DeleteGuidelineResponse
+        GuidelineDeletionResponse
             Successful Response
 
         Examples
@@ -660,9 +671,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteGuidelineResponse,
+                    GuidelineDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteGuidelineResponse,  # type: ignore
+                        type_=GuidelineDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -681,13 +692,13 @@ class ParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def patch_guideline(
+    def update_guideline(
         self,
         agent_id: str,
         guideline_id: str,
         *,
-        connections: typing.Optional[GuidelineConnectionsPatch] = OMIT,
-        tool_associations: typing.Optional[GuidelineToolAssociationsPatch] = OMIT,
+        connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
+        tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithConnectionsAndToolAssociations:
         """
@@ -697,9 +708,9 @@ class ParlantClient:
 
         guideline_id : str
 
-        connections : typing.Optional[GuidelineConnectionsPatch]
+        connections : typing.Optional[GuidelineConnectionUpdateParams]
 
-        tool_associations : typing.Optional[GuidelineToolAssociationsPatch]
+        tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -716,7 +727,7 @@ class ParlantClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.patch_guideline(
+        client.update_guideline(
             agent_id="agent_id",
             guideline_id="guideline_id",
         )
@@ -727,12 +738,12 @@ class ParlantClient:
             json={
                 "connections": convert_and_respect_annotation_metadata(
                     object_=connections,
-                    annotation=GuidelineConnectionsPatch,
+                    annotation=GuidelineConnectionUpdateParams,
                     direction="write",
                 ),
                 "tool_associations": convert_and_respect_annotation_metadata(
                     object_=tool_associations,
-                    annotation=GuidelineToolAssociationsPatch,
+                    annotation=GuidelineToolAssociationUpdateParams,
                     direction="write",
                 ),
             },
@@ -765,7 +776,7 @@ class ParlantClient:
 
     def list_terms(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListTermsResponse:
+    ) -> TermListResponse:
         """
         Parameters
         ----------
@@ -776,7 +787,7 @@ class ParlantClient:
 
         Returns
         -------
-        ListTermsResponse
+        TermListResponse
             Successful Response
 
         Examples
@@ -798,9 +809,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListTermsResponse,
+                    TermListResponse,
                     parse_obj_as(
-                        type_=ListTermsResponse,  # type: ignore
+                        type_=TermListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -964,7 +975,7 @@ class ParlantClient:
         term_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteTermResponse:
+    ) -> TermDeletionResponse:
         """
         Parameters
         ----------
@@ -977,7 +988,7 @@ class ParlantClient:
 
         Returns
         -------
-        DeleteTermResponse
+        TermDeletionResponse
             Successful Response
 
         Examples
@@ -1000,9 +1011,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteTermResponse,
+                    TermDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteTermResponse,  # type: ignore
+                        type_=TermDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1021,7 +1032,7 @@ class ParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def patch_term(
+    def update_term(
         self,
         agent_id: str,
         term_id: str,
@@ -1059,7 +1070,7 @@ class ParlantClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.patch_term(
+        client.update_term(
             agent_id="agent_id",
             term_id="term_id",
         )
@@ -1101,7 +1112,7 @@ class ParlantClient:
 
     def list_variables(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListContextVariablesResponse:
+    ) -> ContextVariableListResponse:
         """
         Parameters
         ----------
@@ -1112,7 +1123,7 @@ class ParlantClient:
 
         Returns
         -------
-        ListContextVariablesResponse
+        ContextVariableListResponse
             Successful Response
 
         Examples
@@ -1134,9 +1145,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListContextVariablesResponse,
+                    ContextVariableListResponse,
                     parse_obj_as(
-                        type_=ListContextVariablesResponse,  # type: ignore
+                        type_=ContextVariableListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1164,7 +1175,7 @@ class ParlantClient:
         tool_id: typing.Optional[ToolId] = OMIT,
         freshness_rules: typing.Optional[FreshnessRules] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateContextVariableResponse:
+    ) -> ContextVariableCreationResponse:
         """
         Parameters
         ----------
@@ -1183,7 +1194,7 @@ class ParlantClient:
 
         Returns
         -------
-        CreateContextVariableResponse
+        ContextVariableCreationResponse
             Successful Response
 
         Examples
@@ -1219,9 +1230,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateContextVariableResponse,
+                    ContextVariableCreationResponse,
                     parse_obj_as(
-                        type_=CreateContextVariableResponse,  # type: ignore
+                        type_=ContextVariableCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1296,7 +1307,7 @@ class ParlantClient:
         *,
         include_values: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ReadContextVariableResponse:
+    ) -> ContextVariableReadResponse:
         """
         Parameters
         ----------
@@ -1311,7 +1322,7 @@ class ParlantClient:
 
         Returns
         -------
-        ReadContextVariableResponse
+        ContextVariableReadResponse
             Successful Response
 
         Examples
@@ -1337,9 +1348,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ReadContextVariableResponse,
+                    ContextVariableReadResponse,
                     parse_obj_as(
-                        type_=ReadContextVariableResponse,  # type: ignore
+                        type_=ContextVariableReadResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1364,7 +1375,7 @@ class ParlantClient:
         variable_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteContextVariableReponse:
+    ) -> ContextVariableDeletionResponse:
         """
         Parameters
         ----------
@@ -1377,7 +1388,7 @@ class ParlantClient:
 
         Returns
         -------
-        DeleteContextVariableReponse
+        ContextVariableDeletionResponse
             Successful Response
 
         Examples
@@ -1400,9 +1411,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteContextVariableReponse,
+                    ContextVariableDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteContextVariableReponse,  # type: ignore
+                        type_=ContextVariableDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1496,7 +1507,7 @@ class ParlantClient:
         *,
         data: Data,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> UpdateContextVariableValueResponse:
+    ) -> ContextVariableValueUpdateResponse:
         """
         Parameters
         ----------
@@ -1513,7 +1524,7 @@ class ParlantClient:
 
         Returns
         -------
-        UpdateContextVariableValueResponse
+        ContextVariableValueUpdateResponse
             Successful Response
 
         Examples
@@ -1544,9 +1555,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    UpdateContextVariableValueResponse,
+                    ContextVariableValueUpdateResponse,
                     parse_obj_as(
-                        type_=UpdateContextVariableValueResponse,  # type: ignore
+                        type_=ContextVariableValueUpdateResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1572,7 +1583,7 @@ class ParlantClient:
         key: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteContextVariableValueResponse:
+    ) -> ContextVariableValueDeletionResponse:
         """
         Parameters
         ----------
@@ -1587,7 +1598,7 @@ class ParlantClient:
 
         Returns
         -------
-        DeleteContextVariableValueResponse
+        ContextVariableValueDeletionResponse
             Successful Response
 
         Examples
@@ -1611,9 +1622,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteContextVariableValueResponse,
+                    ContextVariableValueDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteContextVariableValueResponse,  # type: ignore
+                        type_=ContextVariableValueDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1949,11 +1960,11 @@ class ParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def patch_session(
+    def update_session(
         self,
         session_id: str,
         *,
-        consumption_offsets: typing.Optional[ConsumptionOffsetsPatch] = OMIT,
+        consumption_offsets: typing.Optional[ConsumptionOffsetsUpdateParams] = OMIT,
         title: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Optional[typing.Any]:
@@ -1962,7 +1973,7 @@ class ParlantClient:
         ----------
         session_id : str
 
-        consumption_offsets : typing.Optional[ConsumptionOffsetsPatch]
+        consumption_offsets : typing.Optional[ConsumptionOffsetsUpdateParams]
 
         title : typing.Optional[str]
 
@@ -1981,7 +1992,7 @@ class ParlantClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.patch_session(
+        client.update_session(
             session_id="session_id",
         )
         """
@@ -1991,7 +2002,7 @@ class ParlantClient:
             json={
                 "consumption_offsets": convert_and_respect_annotation_metadata(
                     object_=consumption_offsets,
-                    annotation=ConsumptionOffsetsPatch,
+                    annotation=ConsumptionOffsetsUpdateParams,
                     direction="write",
                 ),
                 "title": title,
@@ -2031,7 +2042,7 @@ class ParlantClient:
         kinds: typing.Optional[str] = None,
         wait: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListEventsResponse:
+    ) -> EventListResponse:
         """
         Parameters
         ----------
@@ -2049,7 +2060,7 @@ class ParlantClient:
 
         Returns
         -------
-        ListEventsResponse
+        EventListResponse
             Successful Response
 
         Examples
@@ -2076,9 +2087,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListEventsResponse,
+                    EventListResponse,
                     parse_obj_as(
-                        type_=ListEventsResponse,  # type: ignore
+                        type_=EventListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2106,7 +2117,7 @@ class ParlantClient:
         content: str,
         moderation: typing.Optional[Moderation] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateEventResponse:
+    ) -> EventCreationResponse:
         """
         Parameters
         ----------
@@ -2125,7 +2136,7 @@ class ParlantClient:
 
         Returns
         -------
-        CreateEventResponse
+        EventCreationResponse
             Successful Response
 
         Examples
@@ -2159,9 +2170,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateEventResponse,
+                    EventCreationResponse,
                     parse_obj_as(
-                        type_=CreateEventResponse,  # type: ignore
+                        type_=EventCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2186,7 +2197,7 @@ class ParlantClient:
         *,
         min_offset: int,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteEventsResponse:
+    ) -> EventDeletionResponse:
         """
         Parameters
         ----------
@@ -2199,7 +2210,7 @@ class ParlantClient:
 
         Returns
         -------
-        DeleteEventsResponse
+        EventDeletionResponse
             Successful Response
 
         Examples
@@ -2225,9 +2236,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteEventsResponse,
+                    EventDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteEventsResponse,  # type: ignore
+                        type_=EventDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2254,7 +2265,7 @@ class ParlantClient:
         source: EventSourceDto,
         wait: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListInteractionsResponse:
+    ) -> InteractionListResponse:
         """
         Parameters
         ----------
@@ -2271,7 +2282,7 @@ class ParlantClient:
 
         Returns
         -------
-        ListInteractionsResponse
+        InteractionListResponse
             Successful Response
 
         Examples
@@ -2300,9 +2311,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListInteractionsResponse,
+                    InteractionListResponse,
                     parse_obj_as(
-                        type_=ListInteractionsResponse,  # type: ignore
+                        type_=InteractionListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2327,7 +2338,7 @@ class ParlantClient:
         *,
         moderation: typing.Optional[Moderation] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateInteractionsResponse:
+    ) -> InteractionCreationResponse:
         """
         Parameters
         ----------
@@ -2340,7 +2351,7 @@ class ParlantClient:
 
         Returns
         -------
-        CreateInteractionsResponse
+        InteractionCreationResponse
             Successful Response
 
         Examples
@@ -2365,9 +2376,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateInteractionsResponse,
+                    InteractionCreationResponse,
                     parse_obj_as(
-                        type_=CreateInteractionsResponse,  # type: ignore
+                        type_=InteractionCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2392,7 +2403,7 @@ class ParlantClient:
         correlation_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ReadInteractionResponse:
+    ) -> InteractionReadResponse:
         """
         Parameters
         ----------
@@ -2405,7 +2416,7 @@ class ParlantClient:
 
         Returns
         -------
-        ReadInteractionResponse
+        InteractionReadResponse
             Successful Response
 
         Examples
@@ -2428,9 +2439,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ReadInteractionResponse,
+                    InteractionReadResponse,
                     parse_obj_as(
-                        type_=ReadInteractionResponse,  # type: ignore
+                        type_=InteractionReadResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2455,7 +2466,7 @@ class ParlantClient:
         agent_id: str,
         payloads: typing.Sequence[GuidelinePayload],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateEvaluationResponse:
+    ) -> EvaluationCreationResponse:
         """
         Parameters
         ----------
@@ -2468,7 +2479,7 @@ class ParlantClient:
 
         Returns
         -------
-        CreateEvaluationResponse
+        EvaluationCreationResponse
             Successful Response
 
         Examples
@@ -2510,9 +2521,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateEvaluationResponse,
+                    EvaluationCreationResponse,
                     parse_obj_as(
-                        type_=CreateEvaluationResponse,  # type: ignore
+                        type_=EvaluationCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2536,7 +2547,7 @@ class ParlantClient:
         evaluation_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ReadEvaluationResponse:
+    ) -> EvaluationReadResponse:
         """
         Parameters
         ----------
@@ -2547,7 +2558,7 @@ class ParlantClient:
 
         Returns
         -------
-        ReadEvaluationResponse
+        EvaluationReadResponse
             Successful Response
 
         Examples
@@ -2569,9 +2580,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ReadEvaluationResponse,
+                    EvaluationReadResponse,
                     parse_obj_as(
-                        type_=ReadEvaluationResponse,  # type: ignore
+                        type_=EvaluationReadResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2646,38 +2657,38 @@ class ParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def upsert_service(
+    def update_service(
         self,
         name: str,
         *,
-        request: Request,
+        request: Params,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateServiceResponse:
+    ) -> ServiceCreationResponse:
         """
         Parameters
         ----------
         name : str
 
-        request : Request
+        request : Params
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        CreateServiceResponse
+        ServiceCreationResponse
             Successful Response
 
         Examples
         --------
-        from parlant.client import CreateSdkServiceRequest, ParlantClient
+        from parlant.client import ParlantClient, SdkServiceParams
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.upsert_service(
+        client.update_service(
             name="name",
-            request=CreateSdkServiceRequest(
+            request=SdkServiceParams(
                 url="url",
             ),
         )
@@ -2686,7 +2697,7 @@ class ParlantClient:
             f"services/{jsonable_encoder(name)}",
             method="PUT",
             json=convert_and_respect_annotation_metadata(
-                object_=request, annotation=Request, direction="write"
+                object_=request, annotation=Params, direction="write"
             ),
             request_options=request_options,
             omit=OMIT,
@@ -2694,9 +2705,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateServiceResponse,
+                    ServiceCreationResponse,
                     parse_obj_as(
-                        type_=CreateServiceResponse,  # type: ignore
+                        type_=ServiceCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2717,7 +2728,7 @@ class ParlantClient:
 
     def delete_service(
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteServiceResponse:
+    ) -> ServiceDeletionResponse:
         """
         Parameters
         ----------
@@ -2728,7 +2739,7 @@ class ParlantClient:
 
         Returns
         -------
-        DeleteServiceResponse
+        ServiceDeletionResponse
             Successful Response
 
         Examples
@@ -2750,9 +2761,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteServiceResponse,
+                    ServiceDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteServiceResponse,  # type: ignore
+                        type_=ServiceDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2773,7 +2784,7 @@ class ParlantClient:
 
     def list_services(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListServicesResponse:
+    ) -> ServiceListResponse:
         """
         Parameters
         ----------
@@ -2782,7 +2793,7 @@ class ParlantClient:
 
         Returns
         -------
-        ListServicesResponse
+        ServiceListResponse
             Successful Response
 
         Examples
@@ -2802,9 +2813,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListServicesResponse,
+                    ServiceListResponse,
                     parse_obj_as(
-                        type_=ListServicesResponse,  # type: ignore
+                        type_=ServiceListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2915,7 +2926,7 @@ class AsyncParlantClient:
 
     async def list_agents(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListAgentsResponse:
+    ) -> AgentListResponse:
         """
         Parameters
         ----------
@@ -2924,7 +2935,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        ListAgentsResponse
+        AgentListResponse
             Successful Response
 
         Examples
@@ -2952,9 +2963,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListAgentsResponse,
+                    AgentListResponse,
                     parse_obj_as(
-                        type_=ListAgentsResponse,  # type: ignore
+                        type_=AgentListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -2966,20 +2977,26 @@ class AsyncParlantClient:
     async def create_agent(
         self,
         *,
-        request: typing.Optional[CreateAgentRequest] = None,
+        name: str,
+        description: typing.Optional[str] = OMIT,
+        max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateAgentResponse:
+    ) -> AgentCreationResponse:
         """
         Parameters
         ----------
-        request : typing.Optional[CreateAgentRequest]
+        name : str
+
+        description : typing.Optional[str]
+
+        max_engine_iterations : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        CreateAgentResponse
+        AgentCreationResponse
             Successful Response
 
         Examples
@@ -2994,7 +3011,9 @@ class AsyncParlantClient:
 
 
         async def main() -> None:
-            await client.create_agent()
+            await client.create_agent(
+                name="name",
+            )
 
 
         asyncio.run(main())
@@ -3002,18 +3021,20 @@ class AsyncParlantClient:
         _response = await self._client_wrapper.httpx_client.request(
             "agents/",
             method="POST",
-            json=convert_and_respect_annotation_metadata(
-                object_=request, annotation=CreateAgentRequest, direction="write"
-            ),
+            json={
+                "name": name,
+                "description": description,
+                "max_engine_iterations": max_engine_iterations,
+            },
             request_options=request_options,
             omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateAgentResponse,
+                    AgentCreationResponse,
                     parse_obj_as(
-                        type_=CreateAgentResponse,  # type: ignore
+                        type_=AgentCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -3096,7 +3117,7 @@ class AsyncParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def patch_agent(
+    async def update_agent(
         self,
         agent_id: str,
         *,
@@ -3133,7 +3154,7 @@ class AsyncParlantClient:
 
 
         async def main() -> None:
-            await client.patch_agent(
+            await client.update_agent(
                 agent_id="agent_id",
             )
 
@@ -3176,7 +3197,7 @@ class AsyncParlantClient:
 
     async def list_guidelines(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListGuidelinesResponse:
+    ) -> GuidelineListResponse:
         """
         Parameters
         ----------
@@ -3187,7 +3208,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        ListGuidelinesResponse
+        GuidelineListResponse
             Successful Response
 
         Examples
@@ -3217,9 +3238,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListGuidelinesResponse,
+                    GuidelineListResponse,
                     parse_obj_as(
-                        type_=ListGuidelinesResponse,  # type: ignore
+                        type_=GuidelineListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -3244,7 +3265,7 @@ class AsyncParlantClient:
         *,
         invoices: typing.Sequence[GuidelineInvoice],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateGuidelinesResponse:
+    ) -> GuidelineCreationResponse:
         """
         Parameters
         ----------
@@ -3257,7 +3278,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        CreateGuidelinesResponse
+        GuidelineCreationResponse
             Successful Response
 
         Examples
@@ -3334,9 +3355,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateGuidelinesResponse,
+                    GuidelineCreationResponse,
                     parse_obj_as(
-                        type_=CreateGuidelinesResponse,  # type: ignore
+                        type_=GuidelineCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -3432,7 +3453,7 @@ class AsyncParlantClient:
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteGuidelineResponse:
+    ) -> GuidelineDeletionResponse:
         """
         Parameters
         ----------
@@ -3445,7 +3466,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        DeleteGuidelineResponse
+        GuidelineDeletionResponse
             Successful Response
 
         Examples
@@ -3476,9 +3497,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteGuidelineResponse,
+                    GuidelineDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteGuidelineResponse,  # type: ignore
+                        type_=GuidelineDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -3497,13 +3518,13 @@ class AsyncParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def patch_guideline(
+    async def update_guideline(
         self,
         agent_id: str,
         guideline_id: str,
         *,
-        connections: typing.Optional[GuidelineConnectionsPatch] = OMIT,
-        tool_associations: typing.Optional[GuidelineToolAssociationsPatch] = OMIT,
+        connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
+        tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithConnectionsAndToolAssociations:
         """
@@ -3513,9 +3534,9 @@ class AsyncParlantClient:
 
         guideline_id : str
 
-        connections : typing.Optional[GuidelineConnectionsPatch]
+        connections : typing.Optional[GuidelineConnectionUpdateParams]
 
-        tool_associations : typing.Optional[GuidelineToolAssociationsPatch]
+        tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -3537,7 +3558,7 @@ class AsyncParlantClient:
 
 
         async def main() -> None:
-            await client.patch_guideline(
+            await client.update_guideline(
                 agent_id="agent_id",
                 guideline_id="guideline_id",
             )
@@ -3551,12 +3572,12 @@ class AsyncParlantClient:
             json={
                 "connections": convert_and_respect_annotation_metadata(
                     object_=connections,
-                    annotation=GuidelineConnectionsPatch,
+                    annotation=GuidelineConnectionUpdateParams,
                     direction="write",
                 ),
                 "tool_associations": convert_and_respect_annotation_metadata(
                     object_=tool_associations,
-                    annotation=GuidelineToolAssociationsPatch,
+                    annotation=GuidelineToolAssociationUpdateParams,
                     direction="write",
                 ),
             },
@@ -3589,7 +3610,7 @@ class AsyncParlantClient:
 
     async def list_terms(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListTermsResponse:
+    ) -> TermListResponse:
         """
         Parameters
         ----------
@@ -3600,7 +3621,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        ListTermsResponse
+        TermListResponse
             Successful Response
 
         Examples
@@ -3630,9 +3651,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListTermsResponse,
+                    TermListResponse,
                     parse_obj_as(
-                        type_=ListTermsResponse,  # type: ignore
+                        type_=TermListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -3812,7 +3833,7 @@ class AsyncParlantClient:
         term_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteTermResponse:
+    ) -> TermDeletionResponse:
         """
         Parameters
         ----------
@@ -3825,7 +3846,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        DeleteTermResponse
+        TermDeletionResponse
             Successful Response
 
         Examples
@@ -3856,9 +3877,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteTermResponse,
+                    TermDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteTermResponse,  # type: ignore
+                        type_=TermDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -3877,7 +3898,7 @@ class AsyncParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def patch_term(
+    async def update_term(
         self,
         agent_id: str,
         term_id: str,
@@ -3920,7 +3941,7 @@ class AsyncParlantClient:
 
 
         async def main() -> None:
-            await client.patch_term(
+            await client.update_term(
                 agent_id="agent_id",
                 term_id="term_id",
             )
@@ -3965,7 +3986,7 @@ class AsyncParlantClient:
 
     async def list_variables(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListContextVariablesResponse:
+    ) -> ContextVariableListResponse:
         """
         Parameters
         ----------
@@ -3976,7 +3997,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        ListContextVariablesResponse
+        ContextVariableListResponse
             Successful Response
 
         Examples
@@ -4006,9 +4027,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListContextVariablesResponse,
+                    ContextVariableListResponse,
                     parse_obj_as(
-                        type_=ListContextVariablesResponse,  # type: ignore
+                        type_=ContextVariableListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -4036,7 +4057,7 @@ class AsyncParlantClient:
         tool_id: typing.Optional[ToolId] = OMIT,
         freshness_rules: typing.Optional[FreshnessRules] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateContextVariableResponse:
+    ) -> ContextVariableCreationResponse:
         """
         Parameters
         ----------
@@ -4055,7 +4076,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        CreateContextVariableResponse
+        ContextVariableCreationResponse
             Successful Response
 
         Examples
@@ -4099,9 +4120,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateContextVariableResponse,
+                    ContextVariableCreationResponse,
                     parse_obj_as(
-                        type_=CreateContextVariableResponse,  # type: ignore
+                        type_=ContextVariableCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -4184,7 +4205,7 @@ class AsyncParlantClient:
         *,
         include_values: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ReadContextVariableResponse:
+    ) -> ContextVariableReadResponse:
         """
         Parameters
         ----------
@@ -4199,7 +4220,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        ReadContextVariableResponse
+        ContextVariableReadResponse
             Successful Response
 
         Examples
@@ -4233,9 +4254,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ReadContextVariableResponse,
+                    ContextVariableReadResponse,
                     parse_obj_as(
-                        type_=ReadContextVariableResponse,  # type: ignore
+                        type_=ContextVariableReadResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -4260,7 +4281,7 @@ class AsyncParlantClient:
         variable_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteContextVariableReponse:
+    ) -> ContextVariableDeletionResponse:
         """
         Parameters
         ----------
@@ -4273,7 +4294,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        DeleteContextVariableReponse
+        ContextVariableDeletionResponse
             Successful Response
 
         Examples
@@ -4304,9 +4325,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteContextVariableReponse,
+                    ContextVariableDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteContextVariableReponse,  # type: ignore
+                        type_=ContextVariableDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -4408,7 +4429,7 @@ class AsyncParlantClient:
         *,
         data: Data,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> UpdateContextVariableValueResponse:
+    ) -> ContextVariableValueUpdateResponse:
         """
         Parameters
         ----------
@@ -4425,7 +4446,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        UpdateContextVariableValueResponse
+        ContextVariableValueUpdateResponse
             Successful Response
 
         Examples
@@ -4464,9 +4485,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    UpdateContextVariableValueResponse,
+                    ContextVariableValueUpdateResponse,
                     parse_obj_as(
-                        type_=UpdateContextVariableValueResponse,  # type: ignore
+                        type_=ContextVariableValueUpdateResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -4492,7 +4513,7 @@ class AsyncParlantClient:
         key: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteContextVariableValueResponse:
+    ) -> ContextVariableValueDeletionResponse:
         """
         Parameters
         ----------
@@ -4507,7 +4528,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        DeleteContextVariableValueResponse
+        ContextVariableValueDeletionResponse
             Successful Response
 
         Examples
@@ -4539,9 +4560,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteContextVariableValueResponse,
+                    ContextVariableValueDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteContextVariableValueResponse,  # type: ignore
+                        type_=ContextVariableValueDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -4917,11 +4938,11 @@ class AsyncParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def patch_session(
+    async def update_session(
         self,
         session_id: str,
         *,
-        consumption_offsets: typing.Optional[ConsumptionOffsetsPatch] = OMIT,
+        consumption_offsets: typing.Optional[ConsumptionOffsetsUpdateParams] = OMIT,
         title: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.Optional[typing.Any]:
@@ -4930,7 +4951,7 @@ class AsyncParlantClient:
         ----------
         session_id : str
 
-        consumption_offsets : typing.Optional[ConsumptionOffsetsPatch]
+        consumption_offsets : typing.Optional[ConsumptionOffsetsUpdateParams]
 
         title : typing.Optional[str]
 
@@ -4954,7 +4975,7 @@ class AsyncParlantClient:
 
 
         async def main() -> None:
-            await client.patch_session(
+            await client.update_session(
                 session_id="session_id",
             )
 
@@ -4967,7 +4988,7 @@ class AsyncParlantClient:
             json={
                 "consumption_offsets": convert_and_respect_annotation_metadata(
                     object_=consumption_offsets,
-                    annotation=ConsumptionOffsetsPatch,
+                    annotation=ConsumptionOffsetsUpdateParams,
                     direction="write",
                 ),
                 "title": title,
@@ -5007,7 +5028,7 @@ class AsyncParlantClient:
         kinds: typing.Optional[str] = None,
         wait: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListEventsResponse:
+    ) -> EventListResponse:
         """
         Parameters
         ----------
@@ -5025,7 +5046,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        ListEventsResponse
+        EventListResponse
             Successful Response
 
         Examples
@@ -5060,9 +5081,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListEventsResponse,
+                    EventListResponse,
                     parse_obj_as(
-                        type_=ListEventsResponse,  # type: ignore
+                        type_=EventListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5090,7 +5111,7 @@ class AsyncParlantClient:
         content: str,
         moderation: typing.Optional[Moderation] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateEventResponse:
+    ) -> EventCreationResponse:
         """
         Parameters
         ----------
@@ -5109,7 +5130,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        CreateEventResponse
+        EventCreationResponse
             Successful Response
 
         Examples
@@ -5151,9 +5172,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateEventResponse,
+                    EventCreationResponse,
                     parse_obj_as(
-                        type_=CreateEventResponse,  # type: ignore
+                        type_=EventCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5178,7 +5199,7 @@ class AsyncParlantClient:
         *,
         min_offset: int,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteEventsResponse:
+    ) -> EventDeletionResponse:
         """
         Parameters
         ----------
@@ -5191,7 +5212,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        DeleteEventsResponse
+        EventDeletionResponse
             Successful Response
 
         Examples
@@ -5225,9 +5246,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteEventsResponse,
+                    EventDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteEventsResponse,  # type: ignore
+                        type_=EventDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5254,7 +5275,7 @@ class AsyncParlantClient:
         source: EventSourceDto,
         wait: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListInteractionsResponse:
+    ) -> InteractionListResponse:
         """
         Parameters
         ----------
@@ -5271,7 +5292,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        ListInteractionsResponse
+        InteractionListResponse
             Successful Response
 
         Examples
@@ -5308,9 +5329,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListInteractionsResponse,
+                    InteractionListResponse,
                     parse_obj_as(
-                        type_=ListInteractionsResponse,  # type: ignore
+                        type_=InteractionListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5335,7 +5356,7 @@ class AsyncParlantClient:
         *,
         moderation: typing.Optional[Moderation] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateInteractionsResponse:
+    ) -> InteractionCreationResponse:
         """
         Parameters
         ----------
@@ -5348,7 +5369,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        CreateInteractionsResponse
+        InteractionCreationResponse
             Successful Response
 
         Examples
@@ -5381,9 +5402,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateInteractionsResponse,
+                    InteractionCreationResponse,
                     parse_obj_as(
-                        type_=CreateInteractionsResponse,  # type: ignore
+                        type_=InteractionCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5408,7 +5429,7 @@ class AsyncParlantClient:
         correlation_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ReadInteractionResponse:
+    ) -> InteractionReadResponse:
         """
         Parameters
         ----------
@@ -5421,7 +5442,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        ReadInteractionResponse
+        InteractionReadResponse
             Successful Response
 
         Examples
@@ -5452,9 +5473,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ReadInteractionResponse,
+                    InteractionReadResponse,
                     parse_obj_as(
-                        type_=ReadInteractionResponse,  # type: ignore
+                        type_=InteractionReadResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5479,7 +5500,7 @@ class AsyncParlantClient:
         agent_id: str,
         payloads: typing.Sequence[GuidelinePayload],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateEvaluationResponse:
+    ) -> EvaluationCreationResponse:
         """
         Parameters
         ----------
@@ -5492,7 +5513,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        CreateEvaluationResponse
+        EvaluationCreationResponse
             Successful Response
 
         Examples
@@ -5542,9 +5563,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateEvaluationResponse,
+                    EvaluationCreationResponse,
                     parse_obj_as(
-                        type_=CreateEvaluationResponse,  # type: ignore
+                        type_=EvaluationCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5568,7 +5589,7 @@ class AsyncParlantClient:
         evaluation_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ReadEvaluationResponse:
+    ) -> EvaluationReadResponse:
         """
         Parameters
         ----------
@@ -5579,7 +5600,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        ReadEvaluationResponse
+        EvaluationReadResponse
             Successful Response
 
         Examples
@@ -5609,9 +5630,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ReadEvaluationResponse,
+                    EvaluationReadResponse,
                     parse_obj_as(
-                        type_=ReadEvaluationResponse,  # type: ignore
+                        type_=EvaluationReadResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5694,33 +5715,33 @@ class AsyncParlantClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def upsert_service(
+    async def update_service(
         self,
         name: str,
         *,
-        request: Request,
+        request: Params,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateServiceResponse:
+    ) -> ServiceCreationResponse:
         """
         Parameters
         ----------
         name : str
 
-        request : Request
+        request : Params
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        CreateServiceResponse
+        ServiceCreationResponse
             Successful Response
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, CreateSdkServiceRequest
+        from parlant.client import AsyncParlantClient, SdkServiceParams
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -5728,9 +5749,9 @@ class AsyncParlantClient:
 
 
         async def main() -> None:
-            await client.upsert_service(
+            await client.update_service(
                 name="name",
-                request=CreateSdkServiceRequest(
+                request=SdkServiceParams(
                     url="url",
                 ),
             )
@@ -5742,7 +5763,7 @@ class AsyncParlantClient:
             f"services/{jsonable_encoder(name)}",
             method="PUT",
             json=convert_and_respect_annotation_metadata(
-                object_=request, annotation=Request, direction="write"
+                object_=request, annotation=Params, direction="write"
             ),
             request_options=request_options,
             omit=OMIT,
@@ -5750,9 +5771,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateServiceResponse,
+                    ServiceCreationResponse,
                     parse_obj_as(
-                        type_=CreateServiceResponse,  # type: ignore
+                        type_=ServiceCreationResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5773,7 +5794,7 @@ class AsyncParlantClient:
 
     async def delete_service(
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteServiceResponse:
+    ) -> ServiceDeletionResponse:
         """
         Parameters
         ----------
@@ -5784,7 +5805,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        DeleteServiceResponse
+        ServiceDeletionResponse
             Successful Response
 
         Examples
@@ -5814,9 +5835,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteServiceResponse,
+                    ServiceDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteServiceResponse,  # type: ignore
+                        type_=ServiceDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5837,7 +5858,7 @@ class AsyncParlantClient:
 
     async def list_services(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListServicesResponse:
+    ) -> ServiceListResponse:
         """
         Parameters
         ----------
@@ -5846,7 +5867,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        ListServicesResponse
+        ServiceListResponse
             Successful Response
 
         Examples
@@ -5874,9 +5895,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListServicesResponse,
+                    ServiceListResponse,
                     parse_obj_as(
-                        type_=ListServicesResponse,  # type: ignore
+                        type_=ServiceListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
