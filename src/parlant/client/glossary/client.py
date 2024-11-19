@@ -23,7 +23,7 @@ class GlossaryClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(
+    def list_terms(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> TermListResponse:
         """
@@ -46,7 +46,7 @@ class GlossaryClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.glossary.list(
+        client.glossary.list_terms(
             agent_id="agent_id",
         )
         """
@@ -79,7 +79,7 @@ class GlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create(
+    def create_term(
         self,
         agent_id: str,
         *,
@@ -114,7 +114,7 @@ class GlossaryClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.glossary.create(
+        client.glossary.create_term(
             agent_id="agent_id",
             name="name",
             description="description",
@@ -155,7 +155,7 @@ class GlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def retrieve(
+    def retrieve_term(
         self,
         agent_id: str,
         term_id: str,
@@ -184,7 +184,7 @@ class GlossaryClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.glossary.retrieve(
+        client.glossary.retrieve_term(
             agent_id="agent_id",
             term_id="term_id",
         )
@@ -218,7 +218,7 @@ class GlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(
+    def delete_term(
         self,
         agent_id: str,
         term_id: str,
@@ -247,7 +247,7 @@ class GlossaryClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.glossary.delete(
+        client.glossary.delete_term(
             agent_id="agent_id",
             term_id="term_id",
         )
@@ -281,7 +281,7 @@ class GlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(
+    def update_term(
         self,
         agent_id: str,
         term_id: str,
@@ -319,7 +319,7 @@ class GlossaryClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.glossary.update(
+        client.glossary.update_term(
             agent_id="agent_id",
             term_id="term_id",
         )
@@ -364,7 +364,7 @@ class AsyncGlossaryClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list(
+    async def list_terms(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> TermListResponse:
         """
@@ -392,7 +392,7 @@ class AsyncGlossaryClient:
 
 
         async def main() -> None:
-            await client.glossary.list(
+            await client.glossary.list_terms(
                 agent_id="agent_id",
             )
 
@@ -428,7 +428,7 @@ class AsyncGlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create(
+    async def create_term(
         self,
         agent_id: str,
         *,
@@ -468,7 +468,7 @@ class AsyncGlossaryClient:
 
 
         async def main() -> None:
-            await client.glossary.create(
+            await client.glossary.create_term(
                 agent_id="agent_id",
                 name="name",
                 description="description",
@@ -512,7 +512,7 @@ class AsyncGlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def retrieve(
+    async def retrieve_term(
         self,
         agent_id: str,
         term_id: str,
@@ -546,7 +546,7 @@ class AsyncGlossaryClient:
 
 
         async def main() -> None:
-            await client.glossary.retrieve(
+            await client.glossary.retrieve_term(
                 agent_id="agent_id",
                 term_id="term_id",
             )
@@ -583,7 +583,7 @@ class AsyncGlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(
+    async def delete_term(
         self,
         agent_id: str,
         term_id: str,
@@ -617,7 +617,7 @@ class AsyncGlossaryClient:
 
 
         async def main() -> None:
-            await client.glossary.delete(
+            await client.glossary.delete_term(
                 agent_id="agent_id",
                 term_id="term_id",
             )
@@ -654,7 +654,7 @@ class AsyncGlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(
+    async def update_term(
         self,
         agent_id: str,
         term_id: str,
@@ -697,7 +697,7 @@ class AsyncGlossaryClient:
 
 
         async def main() -> None:
-            await client.glossary.update(
+            await client.glossary.update_term(
                 agent_id="agent_id",
                 term_id="term_id",
             )
