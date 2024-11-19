@@ -7,7 +7,7 @@ import typing
 import pydantic
 
 
-class ServiceCreationResponse(UniversalBaseModel):
+class ServiceUpdateResponse(UniversalBaseModel):
     name: str
     kind: ToolServiceKindDto
     url: str

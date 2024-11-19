@@ -78,14 +78,13 @@ from .list_sessions_response import ListSessionsResponse
 from .message_generation_inspection import MessageGenerationInspection
 from .moderation import Moderation
 from .open_api_service_params import OpenApiServiceParams
-from .params import Params
 from .payload_kind_dto import PayloadKindDto
 from .preparation_iteration import PreparationIteration
 from .sdk_service_params import SdkServiceParams
 from .service import Service
-from .service_creation_response import ServiceCreationResponse
 from .service_deletion_response import ServiceDeletionResponse
 from .service_list_response import ServiceListResponse
+from .service_update_response import ServiceUpdateResponse
 from .session import Session
 from .term import Term
 from .term_deletion_response import TermDeletionResponse
@@ -169,14 +168,13 @@ __all__ = [
     "MessageGenerationInspection",
     "Moderation",
     "OpenApiServiceParams",
-    "Params",
     "PayloadKindDto",
     "PreparationIteration",
     "SdkServiceParams",
     "Service",
-    "ServiceCreationResponse",
     "ServiceDeletionResponse",
     "ServiceListResponse",
+    "ServiceUpdateResponse",
     "Session",
     "Term",
     "TermDeletionResponse",

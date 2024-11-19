@@ -61,8 +61,10 @@ from .types.guideline_payload import GuidelinePayload
 from .types.evaluation_creation_response import EvaluationCreationResponse
 from .types.evaluation_read_response import EvaluationReadResponse
 from .types.service import Service
-from .types.params import Params
-from .types.service_creation_response import ServiceCreationResponse
+from .types.tool_service_kind_dto import ToolServiceKindDto
+from .types.sdk_service_params import SdkServiceParams
+from .types.open_api_service_params import OpenApiServiceParams
+from .types.service_update_response import ServiceUpdateResponse
 from .types.service_deletion_response import ServiceDeletionResponse
 from .types.service_list_response import ServiceListResponse
 from .core.client_wrapper import AsyncClientWrapper
@@ -2661,53 +2663,63 @@ class ParlantClient:
         self,
         name: str,
         *,
-        request: Params,
+        kind: ToolServiceKindDto,
+        sdk: typing.Optional[SdkServiceParams] = OMIT,
+        openapi: typing.Optional[OpenApiServiceParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ServiceCreationResponse:
+    ) -> ServiceUpdateResponse:
         """
         Parameters
         ----------
         name : str
 
-        request : Params
+        kind : ToolServiceKindDto
+
+        sdk : typing.Optional[SdkServiceParams]
+
+        openapi : typing.Optional[OpenApiServiceParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        ServiceCreationResponse
+        ServiceUpdateResponse
             Successful Response
 
         Examples
         --------
-        from parlant.client import ParlantClient, SdkServiceParams
+        from parlant.client import ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
         client.update_service(
             name="name",
-            request=SdkServiceParams(
-                url="url",
-            ),
+            kind="sdk",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
             f"services/{jsonable_encoder(name)}",
             method="PUT",
-            json=convert_and_respect_annotation_metadata(
-                object_=request, annotation=Params, direction="write"
-            ),
+            json={
+                "kind": kind,
+                "sdk": convert_and_respect_annotation_metadata(
+                    object_=sdk, annotation=SdkServiceParams, direction="write"
+                ),
+                "openapi": convert_and_respect_annotation_metadata(
+                    object_=openapi, annotation=OpenApiServiceParams, direction="write"
+                ),
+            },
             request_options=request_options,
             omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceCreationResponse,
+                    ServiceUpdateResponse,
                     parse_obj_as(
-                        type_=ServiceCreationResponse,  # type: ignore
+                        type_=ServiceUpdateResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -5719,29 +5731,35 @@ class AsyncParlantClient:
         self,
         name: str,
         *,
-        request: Params,
+        kind: ToolServiceKindDto,
+        sdk: typing.Optional[SdkServiceParams] = OMIT,
+        openapi: typing.Optional[OpenApiServiceParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ServiceCreationResponse:
+    ) -> ServiceUpdateResponse:
         """
         Parameters
         ----------
         name : str
 
-        request : Params
+        kind : ToolServiceKindDto
+
+        sdk : typing.Optional[SdkServiceParams]
+
+        openapi : typing.Optional[OpenApiServiceParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        ServiceCreationResponse
+        ServiceUpdateResponse
             Successful Response
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, SdkServiceParams
+        from parlant.client import AsyncParlantClient
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -5751,9 +5769,7 @@ class AsyncParlantClient:
         async def main() -> None:
             await client.update_service(
                 name="name",
-                request=SdkServiceParams(
-                    url="url",
-                ),
+                kind="sdk",
             )
 
 
@@ -5762,18 +5778,24 @@ class AsyncParlantClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"services/{jsonable_encoder(name)}",
             method="PUT",
-            json=convert_and_respect_annotation_metadata(
-                object_=request, annotation=Params, direction="write"
-            ),
+            json={
+                "kind": kind,
+                "sdk": convert_and_respect_annotation_metadata(
+                    object_=sdk, annotation=SdkServiceParams, direction="write"
+                ),
+                "openapi": convert_and_respect_annotation_metadata(
+                    object_=openapi, annotation=OpenApiServiceParams, direction="write"
+                ),
+            },
             request_options=request_options,
             omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceCreationResponse,
+                    ServiceUpdateResponse,
                     parse_obj_as(
-                        type_=ServiceCreationResponse,  # type: ignore
+                        type_=ServiceUpdateResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
