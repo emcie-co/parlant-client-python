@@ -7,8 +7,5 @@
 @plug:
   poetry run python tests/example_plugin.py
 
-@serv:
-  poetry run parlant-server -p 8012
-
 @clean:
   rm -rf .parlant-cache

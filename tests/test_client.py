@@ -1,8 +1,10 @@
 import tempfile
 import time
+from multiprocessing import Process
 from pathlib import Path
 from pytest import fixture
-from typing import Iterator
+from typing import Any, Generator, Iterator
+import uvicorn
 
 from parlant.client import (
     Agent,
@@ -11,17 +13,30 @@ from parlant.client import (
     GuidelinePayload,
     GuidelineToolAssociationUpdateParams,
     GuidelineWithConnectionsAndToolAssociations,
+    OpenApiServiceParams,
     ParlantClient,
     Payload,
-    SdkServiceParams,
     Term,
     ToolId,
 )
-
-from example_plugin import (
-    PLUGIN_ADDRESS,
-)
+from conftest import app
 from test_utilities import ContextOfTest
+
+PLUGIN_PORT = 8002
+PLUGIN_ADDRESS = f"http://localhost:{PLUGIN_PORT}"
+
+
+def mock_tool() -> None:
+    uvicorn.run(app, port=PLUGIN_PORT)
+
+
+@fixture(scope="session", autouse=True)
+def setup() -> Generator[None, Any, None]:
+    proc = Process(target=mock_tool)
+    proc.start()
+    time.sleep(1)
+    yield
+    proc.terminate()
 
 
 @fixture
@@ -32,7 +47,6 @@ def context() -> Iterator[ContextOfTest]:
         yield ContextOfTest(home_dir=home_dir_path)
 
 
-REASONABLE_AMOUNT_OF_TIME = 15
 SERVER_PORT = 8012
 SERVER_ADDRESS = f"http://localhost:{SERVER_PORT}"
 CLI_PLUGIN_PATH = "tests/example_plugin.py"
@@ -47,7 +61,6 @@ CLI_PLUGIN_PATH = "tests/example_plugin.py"
 #     finally:
 #         _plugin_process.kill()
 #         await _plugin_process.wait()
-
 #         _server_process.kill()
 #         await _server_process.wait()
 
@@ -83,8 +96,8 @@ async def test_parlant_client_happy_path(context: ContextOfTest) -> None:
     )
 
     create_session_response = client.sessions.create(
-        end_user_id="end_user",
         agent_id=agent.id,
+        end_user_id="end_user",
     )
     assert create_session_response
     demo_session = create_session_response.session
@@ -214,13 +227,16 @@ def make_service_tool_association(
 ) -> None:
     _create_service_response = client.services.create_or_update(
         tool_name,
-        kind="sdk",
-        sdk=SdkServiceParams(url=service_url),
+        kind="openapi",
+        openapi=OpenApiServiceParams(
+            url="http://localhost:8002",
+            source="http://localhost:8002/openapi.json",
+        ),
     )
     service = client.services.retrieve(tool_name)
     assert service.tools
-    tool_randoms_flip = service.tools[1]
-    tool_randoms_roll = service.tools[2]
+    tool_randoms_flip = service.tools[0]
+    tool_randoms_roll = service.tools[1]
     print("Got tools from service.")
     _ = client.guidelines.update(
         agent_id,
