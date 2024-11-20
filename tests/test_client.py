@@ -1,8 +1,7 @@
-import asyncio
-from signal import SIGINT
 import tempfile
 import time
 from pathlib import Path
+from pytest import fixture
 from typing import Iterator
 
 from parlant.client import (
@@ -18,13 +17,11 @@ from parlant.client import (
     Term,
     ToolId,
 )
-from pytest import fixture
 
 from example_plugin import (
     PLUGIN_ADDRESS,
-    PLUGIN_PORT,
 )
-from test_utilities import ContextOfTest, run_cli
+from test_utilities import ContextOfTest
 
 
 @fixture
@@ -41,21 +38,21 @@ SERVER_ADDRESS = f"http://localhost:{SERVER_PORT}"
 CLI_PLUGIN_PATH = "tests/example_plugin.py"
 
 
-async def test_parlant_client_happy_path_with_server_and_plugin(context: ContextOfTest) -> None:
-    _server_process = await run_cli("parlant-server", "-p", str(SERVER_PORT))
-    _plugin_process = await run_cli("python", CLI_PLUGIN_PATH, str(PLUGIN_PORT))
-    try:
-        await asyncio.sleep(REASONABLE_AMOUNT_OF_TIME)
-        await _test_parlant_client_happy_path(context)
-    finally:
-        _plugin_process.kill()
-        await _plugin_process.wait()
+# async def test_parlant_client_happy_path_with_server_and_plugin(context: ContextOfTest) -> None:
+#     _server_process = await run_cli("parlant-server", "-p", str(SERVER_PORT))
+#     _plugin_process = await run_cli("python", CLI_PLUGIN_PATH, str(PLUGIN_PORT))
+#     try:
+#         await asyncio.sleep(REASONABLE_AMOUNT_OF_TIME)
+#         await _test_parlant_client_happy_path(context)
+#     finally:
+#         _plugin_process.kill()
+#         await _plugin_process.wait()
 
-        _server_process.kill()
-        await _server_process.wait()
+#         _server_process.kill()
+#         await _server_process.wait()
 
 
-async def _test_parlant_client_happy_path(context: ContextOfTest) -> None:
+async def test_parlant_client_happy_path(context: ContextOfTest) -> None:
     client = make_parlant_client(base_url=SERVER_ADDRESS)
 
     agent = make_api_agent(client=client, name="demo-agent")
