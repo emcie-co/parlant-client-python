@@ -3,18 +3,17 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import datetime as dt
 import typing
-from .consumption_offsets import ConsumptionOffsets
+from .customer_dto_extra_value import CustomerDtoExtraValue
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class Session(UniversalBaseModel):
+class Customer(UniversalBaseModel):
     id: str
-    agent_id: str
-    customer_id: str
     creation_utc: dt.datetime
-    title: typing.Optional[str] = None
-    consumption_offsets: ConsumptionOffsets
+    name: str
+    extra: typing.Dict[str, CustomerDtoExtraValue]
+    tags: typing.List[str]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
