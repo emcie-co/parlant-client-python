@@ -24,7 +24,6 @@ from .context_variable_value_update_response import ContextVariableValueUpdateRe
 from .create_session_response import CreateSessionResponse
 from .create_term_response import CreateTermResponse
 from .day_of_week_dto import DayOfWeekDto
-from .delete_session_response import DeleteSessionResponse
 from .evaluation_creation_response import EvaluationCreationResponse
 from .evaluation_read_response import EvaluationReadResponse
 from .evaluation_status_dto import EvaluationStatusDto
@@ -33,7 +32,9 @@ from .event_creation_response import EventCreationResponse
 from .event_deletion_response import EventDeletionResponse
 from .event_kind_dto import EventKindDto
 from .event_list_response import EventListResponse
+from .event_read_response import EventReadResponse
 from .event_source_dto import EventSourceDto
+from .event_trace import EventTrace
 from .freshness_rules import FreshnessRules
 from .generation_info import GenerationInfo
 from .guideline import Guideline
@@ -49,6 +50,7 @@ from .guideline_list_response import GuidelineListResponse
 from .guideline_payload import GuidelinePayload
 from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
 from .guideline_proposition import GuidelineProposition
+from .guideline_proposition_inspection import GuidelinePropositionInspection
 from .guideline_tool_association import GuidelineToolAssociation
 from .guideline_tool_association_update_params import (
     GuidelineToolAssociationUpdateParams,
@@ -57,26 +59,23 @@ from .guideline_with_connections_and_tool_associations import (
     GuidelineWithConnectionsAndToolAssociations,
 )
 from .http_validation_error import HttpValidationError
-from .interaction import Interaction
-from .interaction_creation_response import InteractionCreationResponse
-from .interaction_kind_dto import InteractionKindDto
-from .interaction_list_response import InteractionListResponse
-from .interaction_read_response import InteractionReadResponse
 from .invoice import Invoice
 from .invoice_data import InvoiceData
-from .list_sessions_response import ListSessionsResponse
 from .message_generation_inspection import MessageGenerationInspection
 from .moderation import Moderation
 from .open_api_service_params import OpenApiServiceParams
 from .payload import Payload
 from .payload_kind_dto import PayloadKindDto
 from .preparation_iteration import PreparationIteration
+from .preparation_iteration_generations import PreparationIterationGenerations
 from .sdk_service_params import SdkServiceParams
 from .service import Service
 from .service_deletion_response import ServiceDeletionResponse
 from .service_list_response import ServiceListResponse
 from .service_update_response import ServiceUpdateResponse
 from .session import Session
+from .session_deletion_response import SessionDeletionResponse
+from .session_list_response import SessionListResponse
 from .term import Term
 from .term_deletion_response import TermDeletionResponse
 from .term_list_response import TermListResponse
@@ -115,7 +114,6 @@ __all__ = [
     "CreateSessionResponse",
     "CreateTermResponse",
     "DayOfWeekDto",
-    "DeleteSessionResponse",
     "EvaluationCreationResponse",
     "EvaluationReadResponse",
     "EvaluationStatusDto",
@@ -124,7 +122,9 @@ __all__ = [
     "EventDeletionResponse",
     "EventKindDto",
     "EventListResponse",
+    "EventReadResponse",
     "EventSourceDto",
+    "EventTrace",
     "FreshnessRules",
     "GenerationInfo",
     "Guideline",
@@ -140,30 +140,28 @@ __all__ = [
     "GuidelinePayload",
     "GuidelinePayloadOperationDto",
     "GuidelineProposition",
+    "GuidelinePropositionInspection",
     "GuidelineToolAssociation",
     "GuidelineToolAssociationUpdateParams",
     "GuidelineWithConnectionsAndToolAssociations",
     "HttpValidationError",
-    "Interaction",
-    "InteractionCreationResponse",
-    "InteractionKindDto",
-    "InteractionListResponse",
-    "InteractionReadResponse",
     "Invoice",
     "InvoiceData",
-    "ListSessionsResponse",
     "MessageGenerationInspection",
     "Moderation",
     "OpenApiServiceParams",
     "Payload",
     "PayloadKindDto",
     "PreparationIteration",
+    "PreparationIterationGenerations",
     "SdkServiceParams",
     "Service",
     "ServiceDeletionResponse",
     "ServiceListResponse",
     "ServiceUpdateResponse",
     "Session",
+    "SessionDeletionResponse",
+    "SessionListResponse",
     "Term",
     "TermDeletionResponse",
     "TermListResponse",

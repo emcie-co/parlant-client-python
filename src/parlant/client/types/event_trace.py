@@ -2,14 +2,17 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .interaction import Interaction
+from .tool_call import ToolCall
+from .message_generation_inspection import MessageGenerationInspection
+from .preparation_iteration import PreparationIteration
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class InteractionListResponse(UniversalBaseModel):
-    session_id: str
-    interactions: typing.List[Interaction]
+class EventTrace(UniversalBaseModel):
+    tool_calls: typing.List[ToolCall]
+    message_generations: typing.List[MessageGenerationInspection]
+    preparation_iterations: typing.List[PreparationIteration]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
