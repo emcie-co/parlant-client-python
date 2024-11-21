@@ -2,14 +2,13 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .event import Event
+from .tag import Tag
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class EventListResponse(UniversalBaseModel):
-    session_id: str
-    events: typing.List[Event]
+class ListTagsResult(UniversalBaseModel):
+    tags: typing.List[Tag]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

@@ -3,16 +3,16 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.list_tags_response import ListTagsResponse
+from ..types.list_tags_result import ListTagsResult
 from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.create_tag_response import CreateTagResponse
+from ..types.create_tag_result import CreateTagResult
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from ..types.tag import Tag
 from ..core.jsonable_encoder import jsonable_encoder
-from ..types.delete_tag_response import DeleteTagResponse
+from ..types.delete_tag_result import DeleteTagResult
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -25,7 +25,7 @@ class TagsClient:
 
     def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListTagsResponse:
+    ) -> ListTagsResult:
         """
         Parameters
         ----------
@@ -34,7 +34,7 @@ class TagsClient:
 
         Returns
         -------
-        ListTagsResponse
+        ListTagsResult
             Successful Response
 
         Examples
@@ -54,9 +54,9 @@ class TagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListTagsResponse,
+                    ListTagsResult,
                     parse_obj_as(
-                        type_=ListTagsResponse,  # type: ignore
+                        type_=ListTagsResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -67,7 +67,7 @@ class TagsClient:
 
     def create(
         self, *, name: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> CreateTagResponse:
+    ) -> CreateTagResult:
         """
         Parameters
         ----------
@@ -78,7 +78,7 @@ class TagsClient:
 
         Returns
         -------
-        CreateTagResponse
+        CreateTagResult
             Successful Response
 
         Examples
@@ -104,9 +104,9 @@ class TagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateTagResponse,
+                    CreateTagResult,
                     parse_obj_as(
-                        type_=CreateTagResponse,  # type: ignore
+                        type_=CreateTagResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -183,7 +183,7 @@ class TagsClient:
 
     def delete(
         self, tag_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteTagResponse:
+    ) -> DeleteTagResult:
         """
         Parameters
         ----------
@@ -194,7 +194,7 @@ class TagsClient:
 
         Returns
         -------
-        DeleteTagResponse
+        DeleteTagResult
             Successful Response
 
         Examples
@@ -216,9 +216,9 @@ class TagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteTagResponse,
+                    DeleteTagResult,
                     parse_obj_as(
-                        type_=DeleteTagResponse,  # type: ignore
+                        type_=DeleteTagResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -243,7 +243,7 @@ class TagsClient:
         *,
         name: str,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Optional[typing.Any]:
+    ) -> None:
         """
         Parameters
         ----------
@@ -256,8 +256,7 @@ class TagsClient:
 
         Returns
         -------
-        typing.Optional[typing.Any]
-            Successful Response
+        None
 
         Examples
         --------
@@ -282,13 +281,7 @@ class TagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.Optional[typing.Any],
-                    parse_obj_as(
-                        type_=typing.Optional[typing.Any],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -311,7 +304,7 @@ class AsyncTagsClient:
 
     async def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListTagsResponse:
+    ) -> ListTagsResult:
         """
         Parameters
         ----------
@@ -320,7 +313,7 @@ class AsyncTagsClient:
 
         Returns
         -------
-        ListTagsResponse
+        ListTagsResult
             Successful Response
 
         Examples
@@ -348,9 +341,9 @@ class AsyncTagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListTagsResponse,
+                    ListTagsResult,
                     parse_obj_as(
-                        type_=ListTagsResponse,  # type: ignore
+                        type_=ListTagsResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -361,7 +354,7 @@ class AsyncTagsClient:
 
     async def create(
         self, *, name: str, request_options: typing.Optional[RequestOptions] = None
-    ) -> CreateTagResponse:
+    ) -> CreateTagResult:
         """
         Parameters
         ----------
@@ -372,7 +365,7 @@ class AsyncTagsClient:
 
         Returns
         -------
-        CreateTagResponse
+        CreateTagResult
             Successful Response
 
         Examples
@@ -406,9 +399,9 @@ class AsyncTagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateTagResponse,
+                    CreateTagResult,
                     parse_obj_as(
-                        type_=CreateTagResponse,  # type: ignore
+                        type_=CreateTagResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -493,7 +486,7 @@ class AsyncTagsClient:
 
     async def delete(
         self, tag_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteTagResponse:
+    ) -> DeleteTagResult:
         """
         Parameters
         ----------
@@ -504,7 +497,7 @@ class AsyncTagsClient:
 
         Returns
         -------
-        DeleteTagResponse
+        DeleteTagResult
             Successful Response
 
         Examples
@@ -534,9 +527,9 @@ class AsyncTagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteTagResponse,
+                    DeleteTagResult,
                     parse_obj_as(
-                        type_=DeleteTagResponse,  # type: ignore
+                        type_=DeleteTagResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -561,7 +554,7 @@ class AsyncTagsClient:
         *,
         name: str,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Optional[typing.Any]:
+    ) -> None:
         """
         Parameters
         ----------
@@ -574,8 +567,7 @@ class AsyncTagsClient:
 
         Returns
         -------
-        typing.Optional[typing.Any]
-            Successful Response
+        None
 
         Examples
         --------
@@ -608,13 +600,7 @@ class AsyncTagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.Optional[typing.Any],
-                    parse_obj_as(
-                        type_=typing.Optional[typing.Any],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

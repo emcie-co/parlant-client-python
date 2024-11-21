@@ -2,13 +2,13 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .customer import Customer
+from .context_variable import ContextVariable
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class ListCustomersResponse(UniversalBaseModel):
-    customers: typing.List[Customer]
+class ContextVariableListResult(UniversalBaseModel):
+    context_variables: typing.List[ContextVariable]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

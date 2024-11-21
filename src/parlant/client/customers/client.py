@@ -3,11 +3,11 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.list_customers_response import ListCustomersResponse
+from ..types.list_customers_result import ListCustomersResult
 from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.create_customer_response import CreateCustomerResponse
+from ..types.create_customer_result import CreateCustomerResult
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from ..types.customer import Customer
@@ -27,7 +27,7 @@ class CustomersClient:
 
     def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListCustomersResponse:
+    ) -> ListCustomersResult:
         """
         Parameters
         ----------
@@ -36,7 +36,7 @@ class CustomersClient:
 
         Returns
         -------
-        ListCustomersResponse
+        ListCustomersResult
             Successful Response
 
         Examples
@@ -56,9 +56,9 @@ class CustomersClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListCustomersResponse,
+                    ListCustomersResult,
                     parse_obj_as(
-                        type_=ListCustomersResponse,  # type: ignore
+                        type_=ListCustomersResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -73,7 +73,7 @@ class CustomersClient:
         name: str,
         extra: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateCustomerResponse:
+    ) -> CreateCustomerResult:
         """
         Parameters
         ----------
@@ -86,7 +86,7 @@ class CustomersClient:
 
         Returns
         -------
-        CreateCustomerResponse
+        CreateCustomerResult
             Successful Response
 
         Examples
@@ -113,9 +113,9 @@ class CustomersClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateCustomerResponse,
+                    CreateCustomerResult,
                     parse_obj_as(
-                        type_=CreateCustomerResponse,  # type: ignore
+                        type_=CreateCustomerResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -201,7 +201,7 @@ class CustomersClient:
         extra: typing.Optional[ExtraUpdate] = OMIT,
         tags: typing.Optional[TagsUpdate] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Optional[typing.Any]:
+    ) -> None:
         """
         Parameters
         ----------
@@ -218,8 +218,7 @@ class CustomersClient:
 
         Returns
         -------
-        typing.Optional[typing.Any]
-            Successful Response
+        None
 
         Examples
         --------
@@ -249,13 +248,7 @@ class CustomersClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.Optional[typing.Any],
-                    parse_obj_as(
-                        type_=typing.Optional[typing.Any],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -278,7 +271,7 @@ class AsyncCustomersClient:
 
     async def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ListCustomersResponse:
+    ) -> ListCustomersResult:
         """
         Parameters
         ----------
@@ -287,7 +280,7 @@ class AsyncCustomersClient:
 
         Returns
         -------
-        ListCustomersResponse
+        ListCustomersResult
             Successful Response
 
         Examples
@@ -315,9 +308,9 @@ class AsyncCustomersClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListCustomersResponse,
+                    ListCustomersResult,
                     parse_obj_as(
-                        type_=ListCustomersResponse,  # type: ignore
+                        type_=ListCustomersResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -332,7 +325,7 @@ class AsyncCustomersClient:
         name: str,
         extra: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateCustomerResponse:
+    ) -> CreateCustomerResult:
         """
         Parameters
         ----------
@@ -345,7 +338,7 @@ class AsyncCustomersClient:
 
         Returns
         -------
-        CreateCustomerResponse
+        CreateCustomerResult
             Successful Response
 
         Examples
@@ -380,9 +373,9 @@ class AsyncCustomersClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateCustomerResponse,
+                    CreateCustomerResult,
                     parse_obj_as(
-                        type_=CreateCustomerResponse,  # type: ignore
+                        type_=CreateCustomerResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -476,7 +469,7 @@ class AsyncCustomersClient:
         extra: typing.Optional[ExtraUpdate] = OMIT,
         tags: typing.Optional[TagsUpdate] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Optional[typing.Any]:
+    ) -> None:
         """
         Parameters
         ----------
@@ -493,8 +486,7 @@ class AsyncCustomersClient:
 
         Returns
         -------
-        typing.Optional[typing.Any]
-            Successful Response
+        None
 
         Examples
         --------
@@ -532,13 +524,7 @@ class AsyncCustomersClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.Optional[typing.Any],
-                    parse_obj_as(
-                        type_=typing.Optional[typing.Any],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

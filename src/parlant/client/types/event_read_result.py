@@ -8,7 +8,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class EventReadResponse(UniversalBaseModel):
+class EventReadResult(UniversalBaseModel):
     session_id: str
     event: Event
     trace: typing.Optional[EventTrace] = None

@@ -2,13 +2,15 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .term import Term
+from .guideline_with_connections_and_tool_associations import (
+    GuidelineWithConnectionsAndToolAssociations,
+)
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class TermListResponse(UniversalBaseModel):
-    terms: typing.List[Term]
+class GuidelineCreationResult(UniversalBaseModel):
+    items: typing.List[GuidelineWithConnectionsAndToolAssociations]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

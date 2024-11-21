@@ -4,14 +4,14 @@ import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..types.payload import Payload
 from ..core.request_options import RequestOptions
-from ..types.evaluation_creation_response import EvaluationCreationResponse
+from ..types.evaluation_creation_result import EvaluationCreationResult
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.evaluation_read_response import EvaluationReadResponse
+from ..types.evaluation_read_result import EvaluationReadResult
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -29,7 +29,7 @@ class EvaluationsClient:
         agent_id: str,
         payloads: typing.Sequence[Payload],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EvaluationCreationResponse:
+    ) -> EvaluationCreationResult:
         """
         Parameters
         ----------
@@ -42,7 +42,7 @@ class EvaluationsClient:
 
         Returns
         -------
-        EvaluationCreationResponse
+        EvaluationCreationResult
             Successful Response
 
         Examples
@@ -74,9 +74,9 @@ class EvaluationsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EvaluationCreationResponse,
+                    EvaluationCreationResult,
                     parse_obj_as(
-                        type_=EvaluationCreationResponse,  # type: ignore
+                        type_=EvaluationCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -100,7 +100,7 @@ class EvaluationsClient:
         evaluation_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EvaluationReadResponse:
+    ) -> EvaluationReadResult:
         """
         Parameters
         ----------
@@ -111,7 +111,7 @@ class EvaluationsClient:
 
         Returns
         -------
-        EvaluationReadResponse
+        EvaluationReadResult
             Successful Response
 
         Examples
@@ -133,9 +133,9 @@ class EvaluationsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EvaluationReadResponse,
+                    EvaluationReadResult,
                     parse_obj_as(
-                        type_=EvaluationReadResponse,  # type: ignore
+                        type_=EvaluationReadResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -165,7 +165,7 @@ class AsyncEvaluationsClient:
         agent_id: str,
         payloads: typing.Sequence[Payload],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EvaluationCreationResponse:
+    ) -> EvaluationCreationResult:
         """
         Parameters
         ----------
@@ -178,7 +178,7 @@ class AsyncEvaluationsClient:
 
         Returns
         -------
-        EvaluationCreationResponse
+        EvaluationCreationResult
             Successful Response
 
         Examples
@@ -218,9 +218,9 @@ class AsyncEvaluationsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EvaluationCreationResponse,
+                    EvaluationCreationResult,
                     parse_obj_as(
-                        type_=EvaluationCreationResponse,  # type: ignore
+                        type_=EvaluationCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -244,7 +244,7 @@ class AsyncEvaluationsClient:
         evaluation_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EvaluationReadResponse:
+    ) -> EvaluationReadResult:
         """
         Parameters
         ----------
@@ -255,7 +255,7 @@ class AsyncEvaluationsClient:
 
         Returns
         -------
-        EvaluationReadResponse
+        EvaluationReadResult
             Successful Response
 
         Examples
@@ -285,9 +285,9 @@ class AsyncEvaluationsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EvaluationReadResponse,
+                    EvaluationReadResult,
                     parse_obj_as(
-                        type_=EvaluationReadResponse,  # type: ignore
+                        type_=EvaluationReadResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

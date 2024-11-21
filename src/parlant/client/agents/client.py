@@ -3,11 +3,11 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.agent_list_response import AgentListResponse
+from ..types.agent_list_result import AgentListResult
 from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.agent_creation_response import AgentCreationResponse
+from ..types.agent_creation_result import AgentCreationResult
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from ..types.agent import Agent
@@ -24,7 +24,7 @@ class AgentsClient:
 
     def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> AgentListResponse:
+    ) -> AgentListResult:
         """
         Parameters
         ----------
@@ -33,7 +33,7 @@ class AgentsClient:
 
         Returns
         -------
-        AgentListResponse
+        AgentListResult
             Successful Response
 
         Examples
@@ -53,9 +53,9 @@ class AgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    AgentListResponse,
+                    AgentListResult,
                     parse_obj_as(
-                        type_=AgentListResponse,  # type: ignore
+                        type_=AgentListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -71,7 +71,7 @@ class AgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AgentCreationResponse:
+    ) -> AgentCreationResult:
         """
         Parameters
         ----------
@@ -86,7 +86,7 @@ class AgentsClient:
 
         Returns
         -------
-        AgentCreationResponse
+        AgentCreationResult
             Successful Response
 
         Examples
@@ -114,9 +114,9 @@ class AgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    AgentCreationResponse,
+                    AgentCreationResult,
                     parse_obj_as(
-                        type_=AgentCreationResponse,  # type: ignore
+                        type_=AgentCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -198,7 +198,7 @@ class AgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Optional[typing.Any]:
+    ) -> None:
         """
         Parameters
         ----------
@@ -213,8 +213,7 @@ class AgentsClient:
 
         Returns
         -------
-        typing.Optional[typing.Any]
-            Successful Response
+        None
 
         Examples
         --------
@@ -239,13 +238,7 @@ class AgentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.Optional[typing.Any],
-                    parse_obj_as(
-                        type_=typing.Optional[typing.Any],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -268,7 +261,7 @@ class AsyncAgentsClient:
 
     async def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> AgentListResponse:
+    ) -> AgentListResult:
         """
         Parameters
         ----------
@@ -277,7 +270,7 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        AgentListResponse
+        AgentListResult
             Successful Response
 
         Examples
@@ -305,9 +298,9 @@ class AsyncAgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    AgentListResponse,
+                    AgentListResult,
                     parse_obj_as(
-                        type_=AgentListResponse,  # type: ignore
+                        type_=AgentListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -323,7 +316,7 @@ class AsyncAgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AgentCreationResponse:
+    ) -> AgentCreationResult:
         """
         Parameters
         ----------
@@ -338,7 +331,7 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        AgentCreationResponse
+        AgentCreationResult
             Successful Response
 
         Examples
@@ -374,9 +367,9 @@ class AsyncAgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    AgentCreationResponse,
+                    AgentCreationResult,
                     parse_obj_as(
-                        type_=AgentCreationResponse,  # type: ignore
+                        type_=AgentCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -466,7 +459,7 @@ class AsyncAgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Optional[typing.Any]:
+    ) -> None:
         """
         Parameters
         ----------
@@ -481,8 +474,7 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        typing.Optional[typing.Any]
-            Successful Response
+        None
 
         Examples
         --------
@@ -515,13 +507,7 @@ class AsyncAgentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.Optional[typing.Any],
-                    parse_obj_as(
-                        type_=typing.Optional[typing.Any],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

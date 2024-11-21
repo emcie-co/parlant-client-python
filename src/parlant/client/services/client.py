@@ -13,10 +13,10 @@ from ..core.api_error import ApiError
 from ..types.tool_service_kind_dto import ToolServiceKindDto
 from ..types.sdk_service_params import SdkServiceParams
 from ..types.open_api_service_params import OpenApiServiceParams
-from ..types.service_update_response import ServiceUpdateResponse
+from ..types.service_update_result import ServiceUpdateResult
 from ..core.serialization import convert_and_respect_annotation_metadata
-from ..types.service_deletion_response import ServiceDeletionResponse
-from ..types.service_list_response import ServiceListResponse
+from ..types.service_deletion_result import ServiceDeletionResult
+from ..types.service_list_result import ServiceListResult
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -91,7 +91,7 @@ class ServicesClient:
         sdk: typing.Optional[SdkServiceParams] = OMIT,
         openapi: typing.Optional[OpenApiServiceParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ServiceUpdateResponse:
+    ) -> ServiceUpdateResult:
         """
         Parameters
         ----------
@@ -108,7 +108,7 @@ class ServicesClient:
 
         Returns
         -------
-        ServiceUpdateResponse
+        ServiceUpdateResult
             Successful Response
 
         Examples
@@ -141,9 +141,9 @@ class ServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceUpdateResponse,
+                    ServiceUpdateResult,
                     parse_obj_as(
-                        type_=ServiceUpdateResponse,  # type: ignore
+                        type_=ServiceUpdateResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -164,7 +164,7 @@ class ServicesClient:
 
     def delete(
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ServiceDeletionResponse:
+    ) -> ServiceDeletionResult:
         """
         Parameters
         ----------
@@ -175,7 +175,7 @@ class ServicesClient:
 
         Returns
         -------
-        ServiceDeletionResponse
+        ServiceDeletionResult
             Successful Response
 
         Examples
@@ -197,9 +197,9 @@ class ServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceDeletionResponse,
+                    ServiceDeletionResult,
                     parse_obj_as(
-                        type_=ServiceDeletionResponse,  # type: ignore
+                        type_=ServiceDeletionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -220,7 +220,7 @@ class ServicesClient:
 
     def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ServiceListResponse:
+    ) -> ServiceListResult:
         """
         Parameters
         ----------
@@ -229,7 +229,7 @@ class ServicesClient:
 
         Returns
         -------
-        ServiceListResponse
+        ServiceListResult
             Successful Response
 
         Examples
@@ -249,9 +249,9 @@ class ServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceListResponse,
+                    ServiceListResult,
                     parse_obj_as(
-                        type_=ServiceListResponse,  # type: ignore
+                        type_=ServiceListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -337,7 +337,7 @@ class AsyncServicesClient:
         sdk: typing.Optional[SdkServiceParams] = OMIT,
         openapi: typing.Optional[OpenApiServiceParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ServiceUpdateResponse:
+    ) -> ServiceUpdateResult:
         """
         Parameters
         ----------
@@ -354,7 +354,7 @@ class AsyncServicesClient:
 
         Returns
         -------
-        ServiceUpdateResponse
+        ServiceUpdateResult
             Successful Response
 
         Examples
@@ -395,9 +395,9 @@ class AsyncServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceUpdateResponse,
+                    ServiceUpdateResult,
                     parse_obj_as(
-                        type_=ServiceUpdateResponse,  # type: ignore
+                        type_=ServiceUpdateResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -418,7 +418,7 @@ class AsyncServicesClient:
 
     async def delete(
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ServiceDeletionResponse:
+    ) -> ServiceDeletionResult:
         """
         Parameters
         ----------
@@ -429,7 +429,7 @@ class AsyncServicesClient:
 
         Returns
         -------
-        ServiceDeletionResponse
+        ServiceDeletionResult
             Successful Response
 
         Examples
@@ -459,9 +459,9 @@ class AsyncServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceDeletionResponse,
+                    ServiceDeletionResult,
                     parse_obj_as(
-                        type_=ServiceDeletionResponse,  # type: ignore
+                        type_=ServiceDeletionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -482,7 +482,7 @@ class AsyncServicesClient:
 
     async def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ServiceListResponse:
+    ) -> ServiceListResult:
         """
         Parameters
         ----------
@@ -491,7 +491,7 @@ class AsyncServicesClient:
 
         Returns
         -------
-        ServiceListResponse
+        ServiceListResult
             Successful Response
 
         Examples
@@ -519,9 +519,9 @@ class AsyncServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceListResponse,
+                    ServiceListResult,
                     parse_obj_as(
-                        type_=ServiceListResponse,  # type: ignore
+                        type_=ServiceListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

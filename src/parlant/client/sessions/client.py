@@ -3,25 +3,25 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.session_list_response import SessionListResponse
+from ..types.session_list_result import SessionListResult
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.create_session_response import CreateSessionResponse
+from ..types.create_session_result import CreateSessionResult
 from ..types.session import Session
 from ..core.jsonable_encoder import jsonable_encoder
-from ..types.session_deletion_response import SessionDeletionResponse
+from ..types.session_deletion_result import SessionDeletionResult
 from ..types.consumption_offsets_update_params import ConsumptionOffsetsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
-from ..types.event_list_response import EventListResponse
+from ..types.event_list_result import EventListResult
 from ..types.event_kind_dto import EventKindDto
 from ..types.event_source_dto import EventSourceDto
 from ..types.moderation import Moderation
-from ..types.event_creation_response import EventCreationResponse
-from ..types.event_deletion_response import EventDeletionResponse
-from ..types.event_read_response import EventReadResponse
+from ..types.event_creation_result import EventCreationResult
+from ..types.event_deletion_result import EventDeletionResult
+from ..types.event_read_result import EventReadResult
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -38,7 +38,7 @@ class SessionsClient:
         agent_id: typing.Optional[str] = None,
         customer_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> SessionListResponse:
+    ) -> SessionListResult:
         """
         Parameters
         ----------
@@ -51,7 +51,7 @@ class SessionsClient:
 
         Returns
         -------
-        SessionListResponse
+        SessionListResult
             Successful Response
 
         Examples
@@ -75,9 +75,9 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    SessionListResponse,
+                    SessionListResult,
                     parse_obj_as(
-                        type_=SessionListResponse,  # type: ignore
+                        type_=SessionListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -104,7 +104,7 @@ class SessionsClient:
         customer_id: typing.Optional[str] = OMIT,
         title: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateSessionResponse:
+    ) -> CreateSessionResult:
         """
         Parameters
         ----------
@@ -121,7 +121,7 @@ class SessionsClient:
 
         Returns
         -------
-        CreateSessionResponse
+        CreateSessionResult
             Successful Response
 
         Examples
@@ -152,9 +152,9 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateSessionResponse,
+                    CreateSessionResult,
                     parse_obj_as(
-                        type_=CreateSessionResponse,  # type: ignore
+                        type_=CreateSessionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -294,7 +294,7 @@ class SessionsClient:
         session_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> SessionDeletionResponse:
+    ) -> SessionDeletionResult:
         """
         Parameters
         ----------
@@ -305,7 +305,7 @@ class SessionsClient:
 
         Returns
         -------
-        SessionDeletionResponse
+        SessionDeletionResult
             Successful Response
 
         Examples
@@ -327,9 +327,9 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    SessionDeletionResponse,
+                    SessionDeletionResult,
                     parse_obj_as(
-                        type_=SessionDeletionResponse,  # type: ignore
+                        type_=SessionDeletionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -423,7 +423,7 @@ class SessionsClient:
         kinds: typing.Optional[str] = None,
         wait: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventListResponse:
+    ) -> EventListResult:
         """
         Parameters
         ----------
@@ -441,7 +441,7 @@ class SessionsClient:
 
         Returns
         -------
-        EventListResponse
+        EventListResult
             Successful Response
 
         Examples
@@ -468,9 +468,9 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EventListResponse,
+                    EventListResult,
                     parse_obj_as(
-                        type_=EventListResponse,  # type: ignore
+                        type_=EventListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -498,7 +498,7 @@ class SessionsClient:
         moderation: typing.Optional[Moderation] = None,
         data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventCreationResponse:
+    ) -> EventCreationResult:
         """
         Parameters
         ----------
@@ -517,7 +517,7 @@ class SessionsClient:
 
         Returns
         -------
-        EventCreationResponse
+        EventCreationResult
             Successful Response
 
         Examples
@@ -550,9 +550,9 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EventCreationResponse,
+                    EventCreationResult,
                     parse_obj_as(
-                        type_=EventCreationResponse,  # type: ignore
+                        type_=EventCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -577,7 +577,7 @@ class SessionsClient:
         *,
         min_offset: int,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventDeletionResponse:
+    ) -> EventDeletionResult:
         """
         Parameters
         ----------
@@ -590,7 +590,7 @@ class SessionsClient:
 
         Returns
         -------
-        EventDeletionResponse
+        EventDeletionResult
             Successful Response
 
         Examples
@@ -616,9 +616,9 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EventDeletionResponse,
+                    EventDeletionResult,
                     parse_obj_as(
-                        type_=EventDeletionResponse,  # type: ignore
+                        type_=EventDeletionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -643,7 +643,7 @@ class SessionsClient:
         event_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventReadResponse:
+    ) -> EventReadResult:
         """
         Parameters
         ----------
@@ -656,7 +656,7 @@ class SessionsClient:
 
         Returns
         -------
-        EventReadResponse
+        EventReadResult
             Successful Response
 
         Examples
@@ -679,9 +679,9 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EventReadResponse,
+                    EventReadResult,
                     parse_obj_as(
-                        type_=EventReadResponse,  # type: ignore
+                        type_=EventReadResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -711,7 +711,7 @@ class AsyncSessionsClient:
         agent_id: typing.Optional[str] = None,
         customer_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> SessionListResponse:
+    ) -> SessionListResult:
         """
         Parameters
         ----------
@@ -724,7 +724,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        SessionListResponse
+        SessionListResult
             Successful Response
 
         Examples
@@ -756,9 +756,9 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    SessionListResponse,
+                    SessionListResult,
                     parse_obj_as(
-                        type_=SessionListResponse,  # type: ignore
+                        type_=SessionListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -785,7 +785,7 @@ class AsyncSessionsClient:
         customer_id: typing.Optional[str] = OMIT,
         title: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateSessionResponse:
+    ) -> CreateSessionResult:
         """
         Parameters
         ----------
@@ -802,7 +802,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        CreateSessionResponse
+        CreateSessionResult
             Successful Response
 
         Examples
@@ -841,9 +841,9 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateSessionResponse,
+                    CreateSessionResult,
                     parse_obj_as(
-                        type_=CreateSessionResponse,  # type: ignore
+                        type_=CreateSessionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -999,7 +999,7 @@ class AsyncSessionsClient:
         session_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> SessionDeletionResponse:
+    ) -> SessionDeletionResult:
         """
         Parameters
         ----------
@@ -1010,7 +1010,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        SessionDeletionResponse
+        SessionDeletionResult
             Successful Response
 
         Examples
@@ -1040,9 +1040,9 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    SessionDeletionResponse,
+                    SessionDeletionResult,
                     parse_obj_as(
-                        type_=SessionDeletionResponse,  # type: ignore
+                        type_=SessionDeletionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1144,7 +1144,7 @@ class AsyncSessionsClient:
         kinds: typing.Optional[str] = None,
         wait: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventListResponse:
+    ) -> EventListResult:
         """
         Parameters
         ----------
@@ -1162,7 +1162,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        EventListResponse
+        EventListResult
             Successful Response
 
         Examples
@@ -1197,9 +1197,9 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EventListResponse,
+                    EventListResult,
                     parse_obj_as(
-                        type_=EventListResponse,  # type: ignore
+                        type_=EventListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1227,7 +1227,7 @@ class AsyncSessionsClient:
         moderation: typing.Optional[Moderation] = None,
         data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventCreationResponse:
+    ) -> EventCreationResult:
         """
         Parameters
         ----------
@@ -1246,7 +1246,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        EventCreationResponse
+        EventCreationResult
             Successful Response
 
         Examples
@@ -1287,9 +1287,9 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EventCreationResponse,
+                    EventCreationResult,
                     parse_obj_as(
-                        type_=EventCreationResponse,  # type: ignore
+                        type_=EventCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1314,7 +1314,7 @@ class AsyncSessionsClient:
         *,
         min_offset: int,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventDeletionResponse:
+    ) -> EventDeletionResult:
         """
         Parameters
         ----------
@@ -1327,7 +1327,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        EventDeletionResponse
+        EventDeletionResult
             Successful Response
 
         Examples
@@ -1361,9 +1361,9 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EventDeletionResponse,
+                    EventDeletionResult,
                     parse_obj_as(
-                        type_=EventDeletionResponse,  # type: ignore
+                        type_=EventDeletionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1388,7 +1388,7 @@ class AsyncSessionsClient:
         event_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventReadResponse:
+    ) -> EventReadResult:
         """
         Parameters
         ----------
@@ -1401,7 +1401,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        EventReadResponse
+        EventReadResult
             Successful Response
 
         Examples
@@ -1432,9 +1432,9 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    EventReadResponse,
+                    EventReadResult,
                     parse_obj_as(
-                        type_=EventReadResponse,  # type: ignore
+                        type_=EventReadResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

@@ -6,8 +6,8 @@ import typing
 import pydantic
 
 
-class GuidelineDeletionResponse(UniversalBaseModel):
-    guideline_id: str
+class ServiceDeletionResult(UniversalBaseModel):
+    name: str
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

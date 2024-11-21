@@ -3,7 +3,7 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.guideline_list_response import GuidelineListResponse
+from ..types.guideline_list_result import GuidelineListResult
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
@@ -11,12 +11,12 @@ from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..types.guideline_invoice import GuidelineInvoice
-from ..types.guideline_creation_response import GuidelineCreationResponse
+from ..types.guideline_creation_result import GuidelineCreationResult
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.guideline_with_connections_and_tool_associations import (
     GuidelineWithConnectionsAndToolAssociations,
 )
-from ..types.guideline_deletion_response import GuidelineDeletionResponse
+from ..types.guideline_deletion_result import GuidelineDeletionResult
 from ..types.guideline_connection_update_params import GuidelineConnectionUpdateParams
 from ..types.guideline_tool_association_update_params import (
     GuidelineToolAssociationUpdateParams,
@@ -33,7 +33,7 @@ class GuidelinesClient:
 
     def list(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> GuidelineListResponse:
+    ) -> GuidelineListResult:
         """
         Parameters
         ----------
@@ -44,7 +44,7 @@ class GuidelinesClient:
 
         Returns
         -------
-        GuidelineListResponse
+        GuidelineListResult
             Successful Response
 
         Examples
@@ -66,9 +66,9 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineListResponse,
+                    GuidelineListResult,
                     parse_obj_as(
-                        type_=GuidelineListResponse,  # type: ignore
+                        type_=GuidelineListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -93,7 +93,7 @@ class GuidelinesClient:
         *,
         invoices: typing.Sequence[GuidelineInvoice],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineCreationResponse:
+    ) -> GuidelineCreationResult:
         """
         Parameters
         ----------
@@ -106,7 +106,7 @@ class GuidelinesClient:
 
         Returns
         -------
-        GuidelineCreationResponse
+        GuidelineCreationResult
             Successful Response
 
         Examples
@@ -175,9 +175,9 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineCreationResponse,
+                    GuidelineCreationResult,
                     parse_obj_as(
-                        type_=GuidelineCreationResponse,  # type: ignore
+                        type_=GuidelineCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -265,7 +265,7 @@ class GuidelinesClient:
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineDeletionResponse:
+    ) -> GuidelineDeletionResult:
         """
         Parameters
         ----------
@@ -278,7 +278,7 @@ class GuidelinesClient:
 
         Returns
         -------
-        GuidelineDeletionResponse
+        GuidelineDeletionResult
             Successful Response
 
         Examples
@@ -301,9 +301,9 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineDeletionResponse,
+                    GuidelineDeletionResult,
                     parse_obj_as(
-                        type_=GuidelineDeletionResponse,  # type: ignore
+                        type_=GuidelineDeletionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -411,7 +411,7 @@ class AsyncGuidelinesClient:
 
     async def list(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> GuidelineListResponse:
+    ) -> GuidelineListResult:
         """
         Parameters
         ----------
@@ -422,7 +422,7 @@ class AsyncGuidelinesClient:
 
         Returns
         -------
-        GuidelineListResponse
+        GuidelineListResult
             Successful Response
 
         Examples
@@ -452,9 +452,9 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineListResponse,
+                    GuidelineListResult,
                     parse_obj_as(
-                        type_=GuidelineListResponse,  # type: ignore
+                        type_=GuidelineListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -479,7 +479,7 @@ class AsyncGuidelinesClient:
         *,
         invoices: typing.Sequence[GuidelineInvoice],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineCreationResponse:
+    ) -> GuidelineCreationResult:
         """
         Parameters
         ----------
@@ -492,7 +492,7 @@ class AsyncGuidelinesClient:
 
         Returns
         -------
-        GuidelineCreationResponse
+        GuidelineCreationResult
             Successful Response
 
         Examples
@@ -569,9 +569,9 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineCreationResponse,
+                    GuidelineCreationResult,
                     parse_obj_as(
-                        type_=GuidelineCreationResponse,  # type: ignore
+                        type_=GuidelineCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -667,7 +667,7 @@ class AsyncGuidelinesClient:
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineDeletionResponse:
+    ) -> GuidelineDeletionResult:
         """
         Parameters
         ----------
@@ -680,7 +680,7 @@ class AsyncGuidelinesClient:
 
         Returns
         -------
-        GuidelineDeletionResponse
+        GuidelineDeletionResult
             Successful Response
 
         Examples
@@ -711,9 +711,9 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineDeletionResponse,
+                    GuidelineDeletionResult,
                     parse_obj_as(
-                        type_=GuidelineDeletionResponse,  # type: ignore
+                        type_=GuidelineDeletionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

@@ -3,16 +3,16 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.term_list_response import TermListResponse
+from ..types.term_list_result import TermListResult
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.create_term_response import CreateTermResponse
+from ..types.create_term_result import CreateTermResult
 from ..types.term import Term
-from ..types.term_deletion_response import TermDeletionResponse
+from ..types.term_deletion_result import TermDeletionResult
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -25,7 +25,7 @@ class GlossaryClient:
 
     def list_terms(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> TermListResponse:
+    ) -> TermListResult:
         """
         Parameters
         ----------
@@ -36,7 +36,7 @@ class GlossaryClient:
 
         Returns
         -------
-        TermListResponse
+        TermListResult
             Successful Response
 
         Examples
@@ -58,9 +58,9 @@ class GlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    TermListResponse,
+                    TermListResult,
                     parse_obj_as(
-                        type_=TermListResponse,  # type: ignore
+                        type_=TermListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -87,7 +87,7 @@ class GlossaryClient:
         description: str,
         synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateTermResponse:
+    ) -> CreateTermResult:
         """
         Parameters
         ----------
@@ -104,7 +104,7 @@ class GlossaryClient:
 
         Returns
         -------
-        CreateTermResponse
+        CreateTermResult
             Successful Response
 
         Examples
@@ -134,9 +134,9 @@ class GlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateTermResponse,
+                    CreateTermResult,
                     parse_obj_as(
-                        type_=CreateTermResponse,  # type: ignore
+                        type_=CreateTermResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -224,7 +224,7 @@ class GlossaryClient:
         term_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> TermDeletionResponse:
+    ) -> TermDeletionResult:
         """
         Parameters
         ----------
@@ -237,7 +237,7 @@ class GlossaryClient:
 
         Returns
         -------
-        TermDeletionResponse
+        TermDeletionResult
             Successful Response
 
         Examples
@@ -260,9 +260,9 @@ class GlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    TermDeletionResponse,
+                    TermDeletionResult,
                     parse_obj_as(
-                        type_=TermDeletionResponse,  # type: ignore
+                        type_=TermDeletionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -366,7 +366,7 @@ class AsyncGlossaryClient:
 
     async def list_terms(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> TermListResponse:
+    ) -> TermListResult:
         """
         Parameters
         ----------
@@ -377,7 +377,7 @@ class AsyncGlossaryClient:
 
         Returns
         -------
-        TermListResponse
+        TermListResult
             Successful Response
 
         Examples
@@ -407,9 +407,9 @@ class AsyncGlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    TermListResponse,
+                    TermListResult,
                     parse_obj_as(
-                        type_=TermListResponse,  # type: ignore
+                        type_=TermListResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -436,7 +436,7 @@ class AsyncGlossaryClient:
         description: str,
         synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> CreateTermResponse:
+    ) -> CreateTermResult:
         """
         Parameters
         ----------
@@ -453,7 +453,7 @@ class AsyncGlossaryClient:
 
         Returns
         -------
-        CreateTermResponse
+        CreateTermResult
             Successful Response
 
         Examples
@@ -491,9 +491,9 @@ class AsyncGlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    CreateTermResponse,
+                    CreateTermResult,
                     parse_obj_as(
-                        type_=CreateTermResponse,  # type: ignore
+                        type_=CreateTermResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -589,7 +589,7 @@ class AsyncGlossaryClient:
         term_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> TermDeletionResponse:
+    ) -> TermDeletionResult:
         """
         Parameters
         ----------
@@ -602,7 +602,7 @@ class AsyncGlossaryClient:
 
         Returns
         -------
-        TermDeletionResponse
+        TermDeletionResult
             Successful Response
 
         Examples
@@ -633,9 +633,9 @@ class AsyncGlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    TermDeletionResponse,
+                    TermDeletionResult,
                     parse_obj_as(
-                        type_=TermDeletionResponse,  # type: ignore
+                        type_=TermDeletionResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

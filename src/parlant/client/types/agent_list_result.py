@@ -2,13 +2,13 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .tag import Tag
+from .agent import Agent
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class ListTagsResponse(UniversalBaseModel):
-    tags: typing.List[Tag]
+class AgentListResult(UniversalBaseModel):
+    agents: typing.List[Agent]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
