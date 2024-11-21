@@ -10,6 +10,8 @@ from .context_variables.client import ContextVariablesClient
 from .sessions.client import SessionsClient
 from .evaluations.client import EvaluationsClient
 from .services.client import ServicesClient
+from .tags.client import TagsClient
+from .customers.client import CustomersClient
 from .core.request_options import RequestOptions
 from .core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
@@ -22,6 +24,8 @@ from .context_variables.client import AsyncContextVariablesClient
 from .sessions.client import AsyncSessionsClient
 from .evaluations.client import AsyncEvaluationsClient
 from .services.client import AsyncServicesClient
+from .tags.client import AsyncTagsClient
+from .customers.client import AsyncCustomersClient
 
 
 class ParlantClient:
@@ -82,6 +86,8 @@ class ParlantClient:
         self.sessions = SessionsClient(client_wrapper=self._client_wrapper)
         self.evaluations = EvaluationsClient(client_wrapper=self._client_wrapper)
         self.services = ServicesClient(client_wrapper=self._client_wrapper)
+        self.tags = TagsClient(client_wrapper=self._client_wrapper)
+        self.customers = CustomersClient(client_wrapper=self._client_wrapper)
 
     def root_get(
         self, *, request_options: typing.Optional[RequestOptions] = None
@@ -183,6 +189,8 @@ class AsyncParlantClient:
         self.sessions = AsyncSessionsClient(client_wrapper=self._client_wrapper)
         self.evaluations = AsyncEvaluationsClient(client_wrapper=self._client_wrapper)
         self.services = AsyncServicesClient(client_wrapper=self._client_wrapper)
+        self.tags = AsyncTagsClient(client_wrapper=self._client_wrapper)
+        self.customers = AsyncCustomersClient(client_wrapper=self._client_wrapper)
 
     async def root_get(
         self, *, request_options: typing.Optional[RequestOptions] = None
