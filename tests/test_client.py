@@ -19,11 +19,10 @@ from parlant.client import (
     Term,
     ToolId,
 )
-from conftest import app
+from conftest import PLUGIN_ADDRESS, PLUGIN_PORT, app
 from test_utilities import ContextOfTest
 
-PLUGIN_PORT = 8002
-PLUGIN_ADDRESS = f"http://localhost:{PLUGIN_PORT}"
+
 
 
 def mock_tool() -> None:
@@ -47,7 +46,7 @@ def context() -> Iterator[ContextOfTest]:
         yield ContextOfTest(home_dir=home_dir_path)
 
 
-SERVER_PORT = 8012
+SERVER_PORT = 8000
 SERVER_ADDRESS = f"http://localhost:{SERVER_PORT}"
 CLI_PLUGIN_PATH = "tests/example_plugin.py"
 
@@ -95,9 +94,11 @@ async def test_parlant_client_happy_path(context: ContextOfTest) -> None:
         service_url=PLUGIN_ADDRESS,
     )
 
+    customer_id = client.customers.create(name="customer", extra={}).customer.id
+
     create_session_response = client.sessions.create(
         agent_id=agent.id,
-        end_user_id="end_user",
+        customer_id=customer_id,
     )
     assert create_session_response
     demo_session = create_session_response.session
@@ -105,7 +106,7 @@ async def test_parlant_client_happy_path(context: ContextOfTest) -> None:
     create_event_response = client.sessions.create_event(
         demo_session.id,
         kind="message",
-        source="end_user",
+        source="customer",
         content="Heads or tails?",
         moderation="auto",
     )
@@ -229,8 +230,8 @@ def make_service_tool_association(
         tool_name,
         kind="openapi",
         openapi=OpenApiServiceParams(
-            url="http://localhost:8002",
-            source="http://localhost:8002/openapi.json",
+            url=PLUGIN_ADDRESS,
+            source=f"{PLUGIN_ADDRESS}/openapi.json",
         ),
     )
     service = client.services.retrieve(tool_name)
