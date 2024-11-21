@@ -27,7 +27,6 @@ from .create_tag_response import CreateTagResponse
 from .create_term_response import CreateTermResponse
 from .customer import Customer
 from .day_of_week_dto import DayOfWeekDto
-from .delete_session_response import DeleteSessionResponse
 from .delete_tag_response import DeleteTagResponse
 from .evaluation_creation_response import EvaluationCreationResponse
 from .evaluation_read_response import EvaluationReadResponse
@@ -37,7 +36,9 @@ from .event_creation_response import EventCreationResponse
 from .event_deletion_response import EventDeletionResponse
 from .event_kind_dto import EventKindDto
 from .event_list_response import EventListResponse
+from .event_read_response import EventReadResponse
 from .event_source_dto import EventSourceDto
+from .event_trace import EventTrace
 from .extra_update import ExtraUpdate
 from .freshness_rules import FreshnessRules
 from .generation_info import GenerationInfo
@@ -54,6 +55,7 @@ from .guideline_list_response import GuidelineListResponse
 from .guideline_payload import GuidelinePayload
 from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
 from .guideline_proposition import GuidelineProposition
+from .guideline_proposition_inspection import GuidelinePropositionInspection
 from .guideline_tool_association import GuidelineToolAssociation
 from .guideline_tool_association_update_params import (
     GuidelineToolAssociationUpdateParams,
@@ -62,15 +64,9 @@ from .guideline_with_connections_and_tool_associations import (
     GuidelineWithConnectionsAndToolAssociations,
 )
 from .http_validation_error import HttpValidationError
-from .interaction import Interaction
-from .interaction_creation_response import InteractionCreationResponse
-from .interaction_kind_dto import InteractionKindDto
-from .interaction_list_response import InteractionListResponse
-from .interaction_read_response import InteractionReadResponse
 from .invoice import Invoice
 from .invoice_data import InvoiceData
 from .list_customers_response import ListCustomersResponse
-from .list_sessions_response import ListSessionsResponse
 from .list_tags_response import ListTagsResponse
 from .message_generation_inspection import MessageGenerationInspection
 from .moderation import Moderation
@@ -78,12 +74,15 @@ from .open_api_service_params import OpenApiServiceParams
 from .payload import Payload
 from .payload_kind_dto import PayloadKindDto
 from .preparation_iteration import PreparationIteration
+from .preparation_iteration_generations import PreparationIterationGenerations
 from .sdk_service_params import SdkServiceParams
 from .service import Service
 from .service_deletion_response import ServiceDeletionResponse
 from .service_list_response import ServiceListResponse
 from .service_update_response import ServiceUpdateResponse
 from .session import Session
+from .session_deletion_response import SessionDeletionResponse
+from .session_list_response import SessionListResponse
 from .tag import Tag
 from .tags_update import TagsUpdate
 from .term import Term
@@ -127,7 +126,6 @@ __all__ = [
     "CreateTermResponse",
     "Customer",
     "DayOfWeekDto",
-    "DeleteSessionResponse",
     "DeleteTagResponse",
     "EvaluationCreationResponse",
     "EvaluationReadResponse",
@@ -137,7 +135,9 @@ __all__ = [
     "EventDeletionResponse",
     "EventKindDto",
     "EventListResponse",
+    "EventReadResponse",
     "EventSourceDto",
+    "EventTrace",
     "ExtraUpdate",
     "FreshnessRules",
     "GenerationInfo",
@@ -154,19 +154,14 @@ __all__ = [
     "GuidelinePayload",
     "GuidelinePayloadOperationDto",
     "GuidelineProposition",
+    "GuidelinePropositionInspection",
     "GuidelineToolAssociation",
     "GuidelineToolAssociationUpdateParams",
     "GuidelineWithConnectionsAndToolAssociations",
     "HttpValidationError",
-    "Interaction",
-    "InteractionCreationResponse",
-    "InteractionKindDto",
-    "InteractionListResponse",
-    "InteractionReadResponse",
     "Invoice",
     "InvoiceData",
     "ListCustomersResponse",
-    "ListSessionsResponse",
     "ListTagsResponse",
     "MessageGenerationInspection",
     "Moderation",
@@ -174,12 +169,15 @@ __all__ = [
     "Payload",
     "PayloadKindDto",
     "PreparationIteration",
+    "PreparationIterationGenerations",
     "SdkServiceParams",
     "Service",
     "ServiceDeletionResponse",
     "ServiceListResponse",
     "ServiceUpdateResponse",
     "Session",
+    "SessionDeletionResponse",
+    "SessionListResponse",
     "Tag",
     "TagsUpdate",
     "Term",

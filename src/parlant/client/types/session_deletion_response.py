@@ -6,7 +6,7 @@ import typing
 import pydantic
 
 
-class DeleteSessionResponse(UniversalBaseModel):
+class SessionDeletionResponse(UniversalBaseModel):
     session_id: str
 
     if IS_PYDANTIC_V2:

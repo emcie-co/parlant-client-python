@@ -7,7 +7,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class ListSessionsResponse(UniversalBaseModel):
+class SessionListResponse(UniversalBaseModel):
     sessions: typing.List[Session]
 
     if IS_PYDANTIC_V2:

@@ -3,7 +3,7 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.list_sessions_response import ListSessionsResponse
+from ..types.session_list_response import SessionListResponse
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
@@ -12,7 +12,7 @@ from ..core.api_error import ApiError
 from ..types.create_session_response import CreateSessionResponse
 from ..types.session import Session
 from ..core.jsonable_encoder import jsonable_encoder
-from ..types.delete_session_response import DeleteSessionResponse
+from ..types.session_deletion_response import SessionDeletionResponse
 from ..types.consumption_offsets_update_params import ConsumptionOffsetsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.event_list_response import EventListResponse
@@ -21,9 +21,7 @@ from ..types.event_source_dto import EventSourceDto
 from ..types.moderation import Moderation
 from ..types.event_creation_response import EventCreationResponse
 from ..types.event_deletion_response import EventDeletionResponse
-from ..types.interaction_list_response import InteractionListResponse
-from ..types.interaction_creation_response import InteractionCreationResponse
-from ..types.interaction_read_response import InteractionReadResponse
+from ..types.event_read_response import EventReadResponse
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -40,7 +38,7 @@ class SessionsClient:
         agent_id: typing.Optional[str] = None,
         customer_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListSessionsResponse:
+    ) -> SessionListResponse:
         """
         Parameters
         ----------
@@ -53,7 +51,7 @@ class SessionsClient:
 
         Returns
         -------
-        ListSessionsResponse
+        SessionListResponse
             Successful Response
 
         Examples
@@ -77,9 +75,9 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListSessionsResponse,
+                    SessionListResponse,
                     parse_obj_as(
-                        type_=ListSessionsResponse,  # type: ignore
+                        type_=SessionListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -296,7 +294,7 @@ class SessionsClient:
         session_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteSessionResponse:
+    ) -> SessionDeletionResponse:
         """
         Parameters
         ----------
@@ -307,7 +305,7 @@ class SessionsClient:
 
         Returns
         -------
-        DeleteSessionResponse
+        SessionDeletionResponse
             Successful Response
 
         Examples
@@ -329,9 +327,9 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteSessionResponse,
+                    SessionDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteSessionResponse,  # type: ignore
+                        type_=SessionDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -504,8 +502,8 @@ class SessionsClient:
         *,
         kind: EventKindDto,
         source: EventSourceDto,
-        content: str,
         moderation: typing.Optional[Moderation] = None,
+        data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EventCreationResponse:
         """
@@ -517,9 +515,9 @@ class SessionsClient:
 
         source : EventSourceDto
 
-        content : str
-
         moderation : typing.Optional[Moderation]
+
+        data : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -540,7 +538,6 @@ class SessionsClient:
             session_id="session_id",
             kind="message",
             source="customer",
-            content="content",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -552,7 +549,7 @@ class SessionsClient:
             json={
                 "kind": kind,
                 "source": source,
-                "content": content,
+                "data": data,
             },
             request_options=request_options,
             omit=OMIT,
@@ -647,32 +644,26 @@ class SessionsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def list_interactions(
+    def retrieve_event(
         self,
         session_id: str,
+        event_id: str,
         *,
-        min_event_offset: int,
-        source: EventSourceDto,
-        wait: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> InteractionListResponse:
+    ) -> EventReadResponse:
         """
         Parameters
         ----------
         session_id : str
 
-        min_event_offset : int
-
-        source : EventSourceDto
-
-        wait : typing.Optional[bool]
+        event_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        InteractionListResponse
+        EventReadResponse
             Successful Response
 
         Examples
@@ -682,156 +673,22 @@ class SessionsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.sessions.list_interactions(
+        client.sessions.retrieve_event(
             session_id="session_id",
-            min_event_offset=1,
-            source="customer",
+            event_id="event_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"sessions/{jsonable_encoder(session_id)}/interactions",
-            method="GET",
-            params={
-                "min_event_offset": min_event_offset,
-                "source": source,
-                "wait": wait,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    InteractionListResponse,
-                    parse_obj_as(
-                        type_=InteractionListResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def create_interaction(
-        self,
-        session_id: str,
-        *,
-        moderation: typing.Optional[Moderation] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> InteractionCreationResponse:
-        """
-        Parameters
-        ----------
-        session_id : str
-
-        moderation : typing.Optional[Moderation]
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        InteractionCreationResponse
-            Successful Response
-
-        Examples
-        --------
-        from parlant.client import ParlantClient
-
-        client = ParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-        client.sessions.create_interaction(
-            session_id="session_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"sessions/{jsonable_encoder(session_id)}/interactions",
-            method="POST",
-            params={
-                "moderation": moderation,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    InteractionCreationResponse,
-                    parse_obj_as(
-                        type_=InteractionCreationResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def retrieve_interaction(
-        self,
-        session_id: str,
-        correlation_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> InteractionReadResponse:
-        """
-        Parameters
-        ----------
-        session_id : str
-
-        correlation_id : str
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        InteractionReadResponse
-            Successful Response
-
-        Examples
-        --------
-        from parlant.client import ParlantClient
-
-        client = ParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-        client.sessions.retrieve_interaction(
-            session_id="session_id",
-            correlation_id="correlation_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"sessions/{jsonable_encoder(session_id)}/interactions/{jsonable_encoder(correlation_id)}",
+            f"sessions/{jsonable_encoder(session_id)}/events/{jsonable_encoder(event_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    InteractionReadResponse,
+                    EventReadResponse,
                     parse_obj_as(
-                        type_=InteractionReadResponse,  # type: ignore
+                        type_=EventReadResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -861,7 +718,7 @@ class AsyncSessionsClient:
         agent_id: typing.Optional[str] = None,
         customer_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ListSessionsResponse:
+    ) -> SessionListResponse:
         """
         Parameters
         ----------
@@ -874,7 +731,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        ListSessionsResponse
+        SessionListResponse
             Successful Response
 
         Examples
@@ -906,9 +763,9 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ListSessionsResponse,
+                    SessionListResponse,
                     parse_obj_as(
-                        type_=ListSessionsResponse,  # type: ignore
+                        type_=SessionListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1149,7 +1006,7 @@ class AsyncSessionsClient:
         session_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> DeleteSessionResponse:
+    ) -> SessionDeletionResponse:
         """
         Parameters
         ----------
@@ -1160,7 +1017,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        DeleteSessionResponse
+        SessionDeletionResponse
             Successful Response
 
         Examples
@@ -1190,9 +1047,9 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    DeleteSessionResponse,
+                    SessionDeletionResponse,
                     parse_obj_as(
-                        type_=DeleteSessionResponse,  # type: ignore
+                        type_=SessionDeletionResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -1381,8 +1238,8 @@ class AsyncSessionsClient:
         *,
         kind: EventKindDto,
         source: EventSourceDto,
-        content: str,
         moderation: typing.Optional[Moderation] = None,
+        data: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EventCreationResponse:
         """
@@ -1394,9 +1251,9 @@ class AsyncSessionsClient:
 
         source : EventSourceDto
 
-        content : str
-
         moderation : typing.Optional[Moderation]
+
+        data : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1422,7 +1279,6 @@ class AsyncSessionsClient:
                 session_id="session_id",
                 kind="message",
                 source="customer",
-                content="content",
             )
 
 
@@ -1437,7 +1293,7 @@ class AsyncSessionsClient:
             json={
                 "kind": kind,
                 "source": source,
-                "content": content,
+                "data": data,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1540,32 +1396,26 @@ class AsyncSessionsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def list_interactions(
+    async def retrieve_event(
         self,
         session_id: str,
+        event_id: str,
         *,
-        min_event_offset: int,
-        source: EventSourceDto,
-        wait: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> InteractionListResponse:
+    ) -> EventReadResponse:
         """
         Parameters
         ----------
         session_id : str
 
-        min_event_offset : int
-
-        source : EventSourceDto
-
-        wait : typing.Optional[bool]
+        event_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        InteractionListResponse
+        EventReadResponse
             Successful Response
 
         Examples
@@ -1580,175 +1430,25 @@ class AsyncSessionsClient:
 
 
         async def main() -> None:
-            await client.sessions.list_interactions(
+            await client.sessions.retrieve_event(
                 session_id="session_id",
-                min_event_offset=1,
-                source="customer",
+                event_id="event_id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"sessions/{jsonable_encoder(session_id)}/interactions",
-            method="GET",
-            params={
-                "min_event_offset": min_event_offset,
-                "source": source,
-                "wait": wait,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    InteractionListResponse,
-                    parse_obj_as(
-                        type_=InteractionListResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def create_interaction(
-        self,
-        session_id: str,
-        *,
-        moderation: typing.Optional[Moderation] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> InteractionCreationResponse:
-        """
-        Parameters
-        ----------
-        session_id : str
-
-        moderation : typing.Optional[Moderation]
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        InteractionCreationResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from parlant.client import AsyncParlantClient
-
-        client = AsyncParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-
-
-        async def main() -> None:
-            await client.sessions.create_interaction(
-                session_id="session_id",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"sessions/{jsonable_encoder(session_id)}/interactions",
-            method="POST",
-            params={
-                "moderation": moderation,
-            },
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    InteractionCreationResponse,
-                    parse_obj_as(
-                        type_=InteractionCreationResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def retrieve_interaction(
-        self,
-        session_id: str,
-        correlation_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> InteractionReadResponse:
-        """
-        Parameters
-        ----------
-        session_id : str
-
-        correlation_id : str
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        InteractionReadResponse
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from parlant.client import AsyncParlantClient
-
-        client = AsyncParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-
-
-        async def main() -> None:
-            await client.sessions.retrieve_interaction(
-                session_id="session_id",
-                correlation_id="correlation_id",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"sessions/{jsonable_encoder(session_id)}/interactions/{jsonable_encoder(correlation_id)}",
+            f"sessions/{jsonable_encoder(session_id)}/events/{jsonable_encoder(event_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    InteractionReadResponse,
+                    EventReadResponse,
                     parse_obj_as(
-                        type_=InteractionReadResponse,  # type: ignore
+                        type_=EventReadResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
