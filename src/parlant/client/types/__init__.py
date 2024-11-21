@@ -21,10 +21,14 @@ from .context_variable_value_deletion_response import (
     ContextVariableValueDeletionResponse,
 )
 from .context_variable_value_update_response import ContextVariableValueUpdateResponse
+from .create_customer_response import CreateCustomerResponse
 from .create_session_response import CreateSessionResponse
+from .create_tag_response import CreateTagResponse
 from .create_term_response import CreateTermResponse
+from .customer import Customer
 from .day_of_week_dto import DayOfWeekDto
 from .delete_session_response import DeleteSessionResponse
+from .delete_tag_response import DeleteTagResponse
 from .evaluation_creation_response import EvaluationCreationResponse
 from .evaluation_read_response import EvaluationReadResponse
 from .evaluation_status_dto import EvaluationStatusDto
@@ -34,6 +38,7 @@ from .event_deletion_response import EventDeletionResponse
 from .event_kind_dto import EventKindDto
 from .event_list_response import EventListResponse
 from .event_source_dto import EventSourceDto
+from .extra_update import ExtraUpdate
 from .freshness_rules import FreshnessRules
 from .generation_info import GenerationInfo
 from .guideline import Guideline
@@ -64,7 +69,9 @@ from .interaction_list_response import InteractionListResponse
 from .interaction_read_response import InteractionReadResponse
 from .invoice import Invoice
 from .invoice_data import InvoiceData
+from .list_customers_response import ListCustomersResponse
 from .list_sessions_response import ListSessionsResponse
+from .list_tags_response import ListTagsResponse
 from .message_generation_inspection import MessageGenerationInspection
 from .moderation import Moderation
 from .open_api_service_params import OpenApiServiceParams
@@ -77,6 +84,8 @@ from .service_deletion_response import ServiceDeletionResponse
 from .service_list_response import ServiceListResponse
 from .service_update_response import ServiceUpdateResponse
 from .session import Session
+from .tag import Tag
+from .tags_update import TagsUpdate
 from .term import Term
 from .term_deletion_response import TermDeletionResponse
 from .term_list_response import TermListResponse
@@ -112,10 +121,14 @@ __all__ = [
     "ContextVariableValue",
     "ContextVariableValueDeletionResponse",
     "ContextVariableValueUpdateResponse",
+    "CreateCustomerResponse",
     "CreateSessionResponse",
+    "CreateTagResponse",
     "CreateTermResponse",
+    "Customer",
     "DayOfWeekDto",
     "DeleteSessionResponse",
+    "DeleteTagResponse",
     "EvaluationCreationResponse",
     "EvaluationReadResponse",
     "EvaluationStatusDto",
@@ -125,6 +138,7 @@ __all__ = [
     "EventKindDto",
     "EventListResponse",
     "EventSourceDto",
+    "ExtraUpdate",
     "FreshnessRules",
     "GenerationInfo",
     "Guideline",
@@ -151,7 +165,9 @@ __all__ = [
     "InteractionReadResponse",
     "Invoice",
     "InvoiceData",
+    "ListCustomersResponse",
     "ListSessionsResponse",
+    "ListTagsResponse",
     "MessageGenerationInspection",
     "Moderation",
     "OpenApiServiceParams",
@@ -164,6 +180,8 @@ __all__ = [
     "ServiceListResponse",
     "ServiceUpdateResponse",
     "Session",
+    "Tag",
+    "TagsUpdate",
     "Term",
     "TermDeletionResponse",
     "TermListResponse",

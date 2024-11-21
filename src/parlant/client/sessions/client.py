@@ -38,7 +38,7 @@ class SessionsClient:
         self,
         *,
         agent_id: typing.Optional[str] = None,
-        end_user_id: typing.Optional[str] = None,
+        customer_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListSessionsResponse:
         """
@@ -46,7 +46,7 @@ class SessionsClient:
         ----------
         agent_id : typing.Optional[str]
 
-        end_user_id : typing.Optional[str]
+        customer_id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -70,7 +70,7 @@ class SessionsClient:
             method="GET",
             params={
                 "agent_id": agent_id,
-                "end_user_id": end_user_id,
+                "customer_id": customer_id,
             },
             request_options=request_options,
         )
@@ -101,20 +101,20 @@ class SessionsClient:
     def create(
         self,
         *,
-        end_user_id: str,
         agent_id: str,
         allow_greeting: typing.Optional[bool] = None,
+        customer_id: typing.Optional[str] = OMIT,
         title: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateSessionResponse:
         """
         Parameters
         ----------
-        end_user_id : str
-
         agent_id : str
 
         allow_greeting : typing.Optional[bool]
+
+        customer_id : typing.Optional[str]
 
         title : typing.Optional[str]
 
@@ -134,7 +134,6 @@ class SessionsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.sessions.create(
-            end_user_id="end_user_id",
             agent_id="agent_id",
         )
         """
@@ -145,8 +144,8 @@ class SessionsClient:
                 "allow_greeting": allow_greeting,
             },
             json={
-                "end_user_id": end_user_id,
                 "agent_id": agent_id,
+                "customer_id": customer_id,
                 "title": title,
             },
             request_options=request_options,
@@ -180,7 +179,7 @@ class SessionsClient:
         self,
         *,
         agent_id: typing.Optional[str] = None,
-        end_user_id: typing.Optional[str] = None,
+        customer_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
@@ -188,7 +187,7 @@ class SessionsClient:
         ----------
         agent_id : typing.Optional[str]
 
-        end_user_id : typing.Optional[str]
+        customer_id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -211,7 +210,7 @@ class SessionsClient:
             method="DELETE",
             params={
                 "agent_id": agent_id,
-                "end_user_id": end_user_id,
+                "customer_id": customer_id,
             },
             request_options=request_options,
         )
@@ -540,7 +539,7 @@ class SessionsClient:
         client.sessions.create_event(
             session_id="session_id",
             kind="message",
-            source="end_user",
+            source="customer",
             content="content",
         )
         """
@@ -686,7 +685,7 @@ class SessionsClient:
         client.sessions.list_interactions(
             session_id="session_id",
             min_event_offset=1,
-            source="end_user",
+            source="customer",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -860,7 +859,7 @@ class AsyncSessionsClient:
         self,
         *,
         agent_id: typing.Optional[str] = None,
-        end_user_id: typing.Optional[str] = None,
+        customer_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ListSessionsResponse:
         """
@@ -868,7 +867,7 @@ class AsyncSessionsClient:
         ----------
         agent_id : typing.Optional[str]
 
-        end_user_id : typing.Optional[str]
+        customer_id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -900,7 +899,7 @@ class AsyncSessionsClient:
             method="GET",
             params={
                 "agent_id": agent_id,
-                "end_user_id": end_user_id,
+                "customer_id": customer_id,
             },
             request_options=request_options,
         )
@@ -931,20 +930,20 @@ class AsyncSessionsClient:
     async def create(
         self,
         *,
-        end_user_id: str,
         agent_id: str,
         allow_greeting: typing.Optional[bool] = None,
+        customer_id: typing.Optional[str] = OMIT,
         title: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CreateSessionResponse:
         """
         Parameters
         ----------
-        end_user_id : str
-
         agent_id : str
 
         allow_greeting : typing.Optional[bool]
+
+        customer_id : typing.Optional[str]
 
         title : typing.Optional[str]
 
@@ -969,7 +968,6 @@ class AsyncSessionsClient:
 
         async def main() -> None:
             await client.sessions.create(
-                end_user_id="end_user_id",
                 agent_id="agent_id",
             )
 
@@ -983,8 +981,8 @@ class AsyncSessionsClient:
                 "allow_greeting": allow_greeting,
             },
             json={
-                "end_user_id": end_user_id,
                 "agent_id": agent_id,
+                "customer_id": customer_id,
                 "title": title,
             },
             request_options=request_options,
@@ -1018,7 +1016,7 @@ class AsyncSessionsClient:
         self,
         *,
         agent_id: typing.Optional[str] = None,
-        end_user_id: typing.Optional[str] = None,
+        customer_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
@@ -1026,7 +1024,7 @@ class AsyncSessionsClient:
         ----------
         agent_id : typing.Optional[str]
 
-        end_user_id : typing.Optional[str]
+        customer_id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1057,7 +1055,7 @@ class AsyncSessionsClient:
             method="DELETE",
             params={
                 "agent_id": agent_id,
-                "end_user_id": end_user_id,
+                "customer_id": customer_id,
             },
             request_options=request_options,
         )
@@ -1423,7 +1421,7 @@ class AsyncSessionsClient:
             await client.sessions.create_event(
                 session_id="session_id",
                 kind="message",
-                source="end_user",
+                source="customer",
                 content="content",
             )
 
@@ -1585,7 +1583,7 @@ class AsyncSessionsClient:
             await client.sessions.list_interactions(
                 session_id="session_id",
                 min_event_offset=1,
-                source="end_user",
+                source="customer",
             )
 
 
