@@ -16,7 +16,6 @@ from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.guideline_with_connections_and_tool_associations import (
     GuidelineWithConnectionsAndToolAssociations,
 )
-from ..types.guideline_deletion_result import GuidelineDeletionResult
 from ..types.guideline_connection_update_params import GuidelineConnectionUpdateParams
 from ..types.guideline_tool_association_update_params import (
     GuidelineToolAssociationUpdateParams,
@@ -265,7 +264,7 @@ class GuidelinesClient:
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -278,8 +277,7 @@ class GuidelinesClient:
 
         Returns
         -------
-        GuidelineDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -300,13 +298,7 @@ class GuidelinesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    GuidelineDeletionResult,
-                    parse_obj_as(
-                        type_=GuidelineDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -667,7 +659,7 @@ class AsyncGuidelinesClient:
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -680,8 +672,7 @@ class AsyncGuidelinesClient:
 
         Returns
         -------
-        GuidelineDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -710,13 +701,7 @@ class AsyncGuidelinesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    GuidelineDeletionResult,
-                    parse_obj_as(
-                        type_=GuidelineDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

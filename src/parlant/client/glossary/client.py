@@ -12,7 +12,6 @@ from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..types.create_term_result import CreateTermResult
 from ..types.term import Term
-from ..types.term_deletion_result import TermDeletionResult
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -224,7 +223,7 @@ class GlossaryClient:
         term_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> TermDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -237,8 +236,7 @@ class GlossaryClient:
 
         Returns
         -------
-        TermDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -259,13 +257,7 @@ class GlossaryClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    TermDeletionResult,
-                    parse_obj_as(
-                        type_=TermDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -589,7 +581,7 @@ class AsyncGlossaryClient:
         term_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> TermDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -602,8 +594,7 @@ class AsyncGlossaryClient:
 
         Returns
         -------
-        TermDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -632,13 +623,7 @@ class AsyncGlossaryClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    TermDeletionResult,
-                    parse_obj_as(
-                        type_=TermDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

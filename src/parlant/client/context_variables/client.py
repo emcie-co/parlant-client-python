@@ -15,13 +15,9 @@ from ..types.freshness_rules import FreshnessRules
 from ..types.context_variable_creation_result import ContextVariableCreationResult
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.context_variable_read_result import ContextVariableReadResult
-from ..types.context_variable_deletion_result import ContextVariableDeletionResult
 from ..types.context_variable_value import ContextVariableValue
 from ..types.context_variable_value_update_result import (
     ContextVariableValueUpdateResult,
-)
-from ..types.context_variable_value_deletion_result import (
-    ContextVariableValueDeletionResult,
 )
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -298,7 +294,7 @@ class ContextVariablesClient:
         variable_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ContextVariableDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -311,8 +307,7 @@ class ContextVariablesClient:
 
         Returns
         -------
-        ContextVariableDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -333,13 +328,7 @@ class ContextVariablesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ContextVariableDeletionResult,
-                    parse_obj_as(
-                        type_=ContextVariableDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -504,7 +493,7 @@ class ContextVariablesClient:
         key: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ContextVariableValueDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -519,8 +508,7 @@ class ContextVariablesClient:
 
         Returns
         -------
-        ContextVariableValueDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -542,13 +530,7 @@ class ContextVariablesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ContextVariableValueDeletionResult,
-                    parse_obj_as(
-                        type_=ContextVariableValueDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -866,7 +848,7 @@ class AsyncContextVariablesClient:
         variable_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ContextVariableDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -879,8 +861,7 @@ class AsyncContextVariablesClient:
 
         Returns
         -------
-        ContextVariableDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -909,13 +890,7 @@ class AsyncContextVariablesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ContextVariableDeletionResult,
-                    parse_obj_as(
-                        type_=ContextVariableDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -1096,7 +1071,7 @@ class AsyncContextVariablesClient:
         key: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ContextVariableValueDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -1111,8 +1086,7 @@ class AsyncContextVariablesClient:
 
         Returns
         -------
-        ContextVariableValueDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -1142,13 +1116,7 @@ class AsyncContextVariablesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ContextVariableValueDeletionResult,
-                    parse_obj_as(
-                        type_=ContextVariableValueDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

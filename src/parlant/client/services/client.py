@@ -15,7 +15,6 @@ from ..types.sdk_service_params import SdkServiceParams
 from ..types.open_api_service_params import OpenApiServiceParams
 from ..types.service_update_result import ServiceUpdateResult
 from ..core.serialization import convert_and_respect_annotation_metadata
-from ..types.service_deletion_result import ServiceDeletionResult
 from ..types.service_list_result import ServiceListResult
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -164,7 +163,7 @@ class ServicesClient:
 
     def delete(
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ServiceDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -175,8 +174,7 @@ class ServicesClient:
 
         Returns
         -------
-        ServiceDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -196,13 +194,7 @@ class ServicesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ServiceDeletionResult,
-                    parse_obj_as(
-                        type_=ServiceDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -418,7 +410,7 @@ class AsyncServicesClient:
 
     async def delete(
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ServiceDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -429,8 +421,7 @@ class AsyncServicesClient:
 
         Returns
         -------
-        ServiceDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -458,13 +449,7 @@ class AsyncServicesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ServiceDeletionResult,
-                    parse_obj_as(
-                        type_=ServiceDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

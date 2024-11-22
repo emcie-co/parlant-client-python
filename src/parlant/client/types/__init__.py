@@ -13,11 +13,9 @@ from .consumption_offsets_update_params import ConsumptionOffsetsUpdateParams
 from .context_variable import ContextVariable
 from .context_variable_and_value import ContextVariableAndValue
 from .context_variable_creation_result import ContextVariableCreationResult
-from .context_variable_deletion_result import ContextVariableDeletionResult
 from .context_variable_list_result import ContextVariableListResult
 from .context_variable_read_result import ContextVariableReadResult
 from .context_variable_value import ContextVariableValue
-from .context_variable_value_deletion_result import ContextVariableValueDeletionResult
 from .context_variable_value_update_result import ContextVariableValueUpdateResult
 from .create_customer_result import CreateCustomerResult
 from .create_session_result import CreateSessionResult
@@ -25,13 +23,11 @@ from .create_tag_result import CreateTagResult
 from .create_term_result import CreateTermResult
 from .customer import Customer
 from .day_of_week_dto import DayOfWeekDto
-from .delete_tag_result import DeleteTagResult
 from .evaluation_creation_result import EvaluationCreationResult
 from .evaluation_read_result import EvaluationReadResult
 from .evaluation_status_dto import EvaluationStatusDto
 from .event import Event
 from .event_creation_result import EventCreationResult
-from .event_deletion_result import EventDeletionResult
 from .event_kind_dto import EventKindDto
 from .event_list_result import EventListResult
 from .event_read_result import EventReadResult
@@ -46,7 +42,6 @@ from .guideline_connection_addition import GuidelineConnectionAddition
 from .guideline_connection_update_params import GuidelineConnectionUpdateParams
 from .guideline_content import GuidelineContent
 from .guideline_creation_result import GuidelineCreationResult
-from .guideline_deletion_result import GuidelineDeletionResult
 from .guideline_invoice import GuidelineInvoice
 from .guideline_invoice_data import GuidelineInvoiceData
 from .guideline_list_result import GuidelineListResult
@@ -75,16 +70,13 @@ from .preparation_iteration import PreparationIteration
 from .preparation_iteration_generations import PreparationIterationGenerations
 from .sdk_service_params import SdkServiceParams
 from .service import Service
-from .service_deletion_result import ServiceDeletionResult
 from .service_list_result import ServiceListResult
 from .service_update_result import ServiceUpdateResult
 from .session import Session
-from .session_deletion_result import SessionDeletionResult
 from .session_list_result import SessionListResult
 from .tag import Tag
 from .tags_update import TagsUpdate
 from .term import Term
-from .term_deletion_result import TermDeletionResult
 from .term_list_result import TermListResult
 from .tool import Tool
 from .tool_call import ToolCall
@@ -112,11 +104,9 @@ __all__ = [
     "ContextVariable",
     "ContextVariableAndValue",
     "ContextVariableCreationResult",
-    "ContextVariableDeletionResult",
     "ContextVariableListResult",
     "ContextVariableReadResult",
     "ContextVariableValue",
-    "ContextVariableValueDeletionResult",
     "ContextVariableValueUpdateResult",
     "CreateCustomerResult",
     "CreateSessionResult",
@@ -124,13 +114,11 @@ __all__ = [
     "CreateTermResult",
     "Customer",
     "DayOfWeekDto",
-    "DeleteTagResult",
     "EvaluationCreationResult",
     "EvaluationReadResult",
     "EvaluationStatusDto",
     "Event",
     "EventCreationResult",
-    "EventDeletionResult",
     "EventKindDto",
     "EventListResult",
     "EventReadResult",
@@ -145,7 +133,6 @@ __all__ = [
     "GuidelineConnectionUpdateParams",
     "GuidelineContent",
     "GuidelineCreationResult",
-    "GuidelineDeletionResult",
     "GuidelineInvoice",
     "GuidelineInvoiceData",
     "GuidelineListResult",
@@ -170,16 +157,13 @@ __all__ = [
     "PreparationIterationGenerations",
     "SdkServiceParams",
     "Service",
-    "ServiceDeletionResult",
     "ServiceListResult",
     "ServiceUpdateResult",
     "Session",
-    "SessionDeletionResult",
     "SessionListResult",
     "Tag",
     "TagsUpdate",
     "Term",
-    "TermDeletionResult",
     "TermListResult",
     "Tool",
     "ToolCall",

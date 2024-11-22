@@ -12,7 +12,6 @@ from ..core.api_error import ApiError
 from ..types.create_session_result import CreateSessionResult
 from ..types.session import Session
 from ..core.jsonable_encoder import jsonable_encoder
-from ..types.session_deletion_result import SessionDeletionResult
 from ..types.consumption_offsets_update_params import ConsumptionOffsetsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.event_list_result import EventListResult
@@ -20,7 +19,6 @@ from ..types.event_kind_dto import EventKindDto
 from ..types.event_source_dto import EventSourceDto
 from ..types.moderation import Moderation
 from ..types.event_creation_result import EventCreationResult
-from ..types.event_deletion_result import EventDeletionResult
 from ..types.event_read_result import EventReadResult
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -294,7 +292,7 @@ class SessionsClient:
         session_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> SessionDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -305,8 +303,7 @@ class SessionsClient:
 
         Returns
         -------
-        SessionDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -326,13 +323,7 @@ class SessionsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    SessionDeletionResult,
-                    parse_obj_as(
-                        type_=SessionDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -577,7 +568,7 @@ class SessionsClient:
         *,
         min_offset: int,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -590,8 +581,7 @@ class SessionsClient:
 
         Returns
         -------
-        EventDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -615,13 +605,7 @@ class SessionsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EventDeletionResult,
-                    parse_obj_as(
-                        type_=EventDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -999,7 +983,7 @@ class AsyncSessionsClient:
         session_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> SessionDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -1010,8 +994,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        SessionDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -1039,13 +1022,7 @@ class AsyncSessionsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    SessionDeletionResult,
-                    parse_obj_as(
-                        type_=SessionDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -1314,7 +1291,7 @@ class AsyncSessionsClient:
         *,
         min_offset: int,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventDeletionResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -1327,8 +1304,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        EventDeletionResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -1360,13 +1336,7 @@ class AsyncSessionsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EventDeletionResult,
-                    parse_obj_as(
-                        type_=EventDeletionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

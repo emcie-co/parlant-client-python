@@ -12,7 +12,6 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from ..types.tag import Tag
 from ..core.jsonable_encoder import jsonable_encoder
-from ..types.delete_tag_result import DeleteTagResult
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -183,7 +182,7 @@ class TagsClient:
 
     def delete(
         self, tag_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteTagResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -194,8 +193,7 @@ class TagsClient:
 
         Returns
         -------
-        DeleteTagResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -215,13 +213,7 @@ class TagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeleteTagResult,
-                    parse_obj_as(
-                        type_=DeleteTagResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -486,7 +478,7 @@ class AsyncTagsClient:
 
     async def delete(
         self, tag_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> DeleteTagResult:
+    ) -> None:
         """
         Parameters
         ----------
@@ -497,8 +489,7 @@ class AsyncTagsClient:
 
         Returns
         -------
-        DeleteTagResult
-            Successful Response
+        None
 
         Examples
         --------
@@ -526,13 +517,7 @@ class AsyncTagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    DeleteTagResult,
-                    parse_obj_as(
-                        type_=DeleteTagResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
