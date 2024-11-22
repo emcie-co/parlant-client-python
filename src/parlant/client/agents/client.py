@@ -195,6 +195,7 @@ class AgentsClient:
         self,
         agent_id: str,
         *,
+        name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -203,6 +204,8 @@ class AgentsClient:
         Parameters
         ----------
         agent_id : str
+
+        name : typing.Optional[str]
 
         description : typing.Optional[str]
 
@@ -230,6 +233,7 @@ class AgentsClient:
             f"agents/{jsonable_encoder(agent_id)}",
             method="PATCH",
             json={
+                "name": name,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
             },
@@ -456,6 +460,7 @@ class AsyncAgentsClient:
         self,
         agent_id: str,
         *,
+        name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -464,6 +469,8 @@ class AsyncAgentsClient:
         Parameters
         ----------
         agent_id : str
+
+        name : typing.Optional[str]
 
         description : typing.Optional[str]
 
@@ -499,6 +506,7 @@ class AsyncAgentsClient:
             f"agents/{jsonable_encoder(agent_id)}",
             method="PATCH",
             json={
+                "name": name,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
             },
