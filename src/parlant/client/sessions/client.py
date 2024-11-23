@@ -410,7 +410,7 @@ class SessionsClient:
         min_offset: typing.Optional[int] = None,
         correlation_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
-        wait: typing.Optional[bool] = None,
+        wait_for_data: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Event]:
         """
@@ -425,7 +425,7 @@ class SessionsClient:
         kinds : typing.Optional[str]
             If set, only list events of the specified kinds (separated by commas)
 
-        wait : typing.Optional[bool]
+        wait_for_data : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -453,7 +453,7 @@ class SessionsClient:
                 "min_offset": min_offset,
                 "correlation_id": correlation_id,
                 "kinds": kinds,
-                "wait": wait,
+                "wait_for_data": wait_for_data,
             },
             request_options=request_options,
         )
@@ -1121,7 +1121,7 @@ class AsyncSessionsClient:
         min_offset: typing.Optional[int] = None,
         correlation_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
-        wait: typing.Optional[bool] = None,
+        wait_for_data: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Event]:
         """
@@ -1136,7 +1136,7 @@ class AsyncSessionsClient:
         kinds : typing.Optional[str]
             If set, only list events of the specified kinds (separated by commas)
 
-        wait : typing.Optional[bool]
+        wait_for_data : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1172,7 +1172,7 @@ class AsyncSessionsClient:
                 "min_offset": min_offset,
                 "correlation_id": correlation_id,
                 "kinds": kinds,
-                "wait": wait,
+                "wait_for_data": wait_for_data,
             },
             request_options=request_options,
         )
