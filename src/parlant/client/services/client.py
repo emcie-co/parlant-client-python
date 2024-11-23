@@ -13,10 +13,7 @@ from ..core.api_error import ApiError
 from ..types.tool_service_kind_dto import ToolServiceKindDto
 from ..types.sdk_service_params import SdkServiceParams
 from ..types.open_api_service_params import OpenApiServiceParams
-from ..types.service_update_response import ServiceUpdateResponse
 from ..core.serialization import convert_and_respect_annotation_metadata
-from ..types.service_deletion_response import ServiceDeletionResponse
-from ..types.service_list_response import ServiceListResponse
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -91,7 +88,7 @@ class ServicesClient:
         sdk: typing.Optional[SdkServiceParams] = OMIT,
         openapi: typing.Optional[OpenApiServiceParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ServiceUpdateResponse:
+    ) -> Service:
         """
         Parameters
         ----------
@@ -108,7 +105,7 @@ class ServicesClient:
 
         Returns
         -------
-        ServiceUpdateResponse
+        Service
             Successful Response
 
         Examples
@@ -141,9 +138,9 @@ class ServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceUpdateResponse,
+                    Service,
                     parse_obj_as(
-                        type_=ServiceUpdateResponse,  # type: ignore
+                        type_=Service,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -164,7 +161,7 @@ class ServicesClient:
 
     def delete(
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ServiceDeletionResponse:
+    ) -> None:
         """
         Parameters
         ----------
@@ -175,8 +172,7 @@ class ServicesClient:
 
         Returns
         -------
-        ServiceDeletionResponse
-            Successful Response
+        None
 
         Examples
         --------
@@ -196,13 +192,7 @@ class ServicesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ServiceDeletionResponse,
-                    parse_obj_as(
-                        type_=ServiceDeletionResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -220,7 +210,7 @@ class ServicesClient:
 
     def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ServiceListResponse:
+    ) -> typing.List[Service]:
         """
         Parameters
         ----------
@@ -229,7 +219,7 @@ class ServicesClient:
 
         Returns
         -------
-        ServiceListResponse
+        typing.List[Service]
             Successful Response
 
         Examples
@@ -249,9 +239,9 @@ class ServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceListResponse,
+                    typing.List[Service],
                     parse_obj_as(
-                        type_=ServiceListResponse,  # type: ignore
+                        type_=typing.List[Service],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -337,7 +327,7 @@ class AsyncServicesClient:
         sdk: typing.Optional[SdkServiceParams] = OMIT,
         openapi: typing.Optional[OpenApiServiceParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> ServiceUpdateResponse:
+    ) -> Service:
         """
         Parameters
         ----------
@@ -354,7 +344,7 @@ class AsyncServicesClient:
 
         Returns
         -------
-        ServiceUpdateResponse
+        Service
             Successful Response
 
         Examples
@@ -395,9 +385,9 @@ class AsyncServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceUpdateResponse,
+                    Service,
                     parse_obj_as(
-                        type_=ServiceUpdateResponse,  # type: ignore
+                        type_=Service,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -418,7 +408,7 @@ class AsyncServicesClient:
 
     async def delete(
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ServiceDeletionResponse:
+    ) -> None:
         """
         Parameters
         ----------
@@ -429,8 +419,7 @@ class AsyncServicesClient:
 
         Returns
         -------
-        ServiceDeletionResponse
-            Successful Response
+        None
 
         Examples
         --------
@@ -458,13 +447,7 @@ class AsyncServicesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    ServiceDeletionResponse,
-                    parse_obj_as(
-                        type_=ServiceDeletionResponse,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -482,7 +465,7 @@ class AsyncServicesClient:
 
     async def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> ServiceListResponse:
+    ) -> typing.List[Service]:
         """
         Parameters
         ----------
@@ -491,7 +474,7 @@ class AsyncServicesClient:
 
         Returns
         -------
-        ServiceListResponse
+        typing.List[Service]
             Successful Response
 
         Examples
@@ -519,9 +502,9 @@ class AsyncServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    ServiceListResponse,
+                    typing.List[Service],
                     parse_obj_as(
-                        type_=ServiceListResponse,  # type: ignore
+                        type_=typing.List[Service],  # type: ignore
                         object_=_response.json(),
                     ),
                 )

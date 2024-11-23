@@ -4,11 +4,12 @@ import typing
 
 EventSourceDto = typing.Union[
     typing.Literal[
-        "end_user",
-        "end_user_ui",
+        "customer",
+        "customer_ui",
         "human_agent",
         "human_agent_on_behalf_of_ai_agent",
         "ai_agent",
+        "system",
     ],
     typing.Any,
 ]

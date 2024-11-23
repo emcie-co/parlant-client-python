@@ -3,14 +3,12 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.agent_list_response import AgentListResponse
+from ..types.agent import Agent
 from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.agent_creation_response import AgentCreationResponse
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
-from ..types.agent import Agent
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -24,7 +22,7 @@ class AgentsClient:
 
     def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> AgentListResponse:
+    ) -> typing.List[Agent]:
         """
         Parameters
         ----------
@@ -33,7 +31,7 @@ class AgentsClient:
 
         Returns
         -------
-        AgentListResponse
+        typing.List[Agent]
             Successful Response
 
         Examples
@@ -53,9 +51,9 @@ class AgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    AgentListResponse,
+                    typing.List[Agent],
                     parse_obj_as(
-                        type_=AgentListResponse,  # type: ignore
+                        type_=typing.List[Agent],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -71,7 +69,7 @@ class AgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AgentCreationResponse:
+    ) -> Agent:
         """
         Parameters
         ----------
@@ -86,7 +84,7 @@ class AgentsClient:
 
         Returns
         -------
-        AgentCreationResponse
+        Agent
             Successful Response
 
         Examples
@@ -114,9 +112,9 @@ class AgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    AgentCreationResponse,
+                    Agent,
                     parse_obj_as(
-                        type_=AgentCreationResponse,  # type: ignore
+                        type_=Agent,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -191,18 +189,70 @@ class AgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update(
-        self,
-        agent_id: str,
-        *,
-        description: typing.Optional[str] = OMIT,
-        max_engine_iterations: typing.Optional[int] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Optional[typing.Any]:
+    def delete(
+        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
         """
         Parameters
         ----------
         agent_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from parlant.client import ParlantClient
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.agents.delete(
+            agent_id="agent_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"agents/{jsonable_encoder(agent_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        parse_obj_as(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update(
+        self,
+        agent_id: str,
+        *,
+        name: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        max_engine_iterations: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> None:
+        """
+        Parameters
+        ----------
+        agent_id : str
+
+        name : typing.Optional[str]
 
         description : typing.Optional[str]
 
@@ -213,8 +263,7 @@ class AgentsClient:
 
         Returns
         -------
-        typing.Optional[typing.Any]
-            Successful Response
+        None
 
         Examples
         --------
@@ -231,6 +280,7 @@ class AgentsClient:
             f"agents/{jsonable_encoder(agent_id)}",
             method="PATCH",
             json={
+                "name": name,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
             },
@@ -239,13 +289,7 @@ class AgentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.Optional[typing.Any],
-                    parse_obj_as(
-                        type_=typing.Optional[typing.Any],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -268,7 +312,7 @@ class AsyncAgentsClient:
 
     async def list(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> AgentListResponse:
+    ) -> typing.List[Agent]:
         """
         Parameters
         ----------
@@ -277,7 +321,7 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        AgentListResponse
+        typing.List[Agent]
             Successful Response
 
         Examples
@@ -305,9 +349,9 @@ class AsyncAgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    AgentListResponse,
+                    typing.List[Agent],
                     parse_obj_as(
-                        type_=AgentListResponse,  # type: ignore
+                        type_=typing.List[Agent],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -323,7 +367,7 @@ class AsyncAgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> AgentCreationResponse:
+    ) -> Agent:
         """
         Parameters
         ----------
@@ -338,7 +382,7 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        AgentCreationResponse
+        Agent
             Successful Response
 
         Examples
@@ -374,9 +418,9 @@ class AsyncAgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    AgentCreationResponse,
+                    Agent,
                     parse_obj_as(
-                        type_=AgentCreationResponse,  # type: ignore
+                        type_=Agent,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -459,18 +503,78 @@ class AsyncAgentsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update(
-        self,
-        agent_id: str,
-        *,
-        description: typing.Optional[str] = OMIT,
-        max_engine_iterations: typing.Optional[int] = OMIT,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.Optional[typing.Any]:
+    async def delete(
+        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> None:
         """
         Parameters
         ----------
         agent_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.agents.delete(
+                agent_id="agent_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"agents/{jsonable_encoder(agent_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        HttpValidationError,
+                        parse_obj_as(
+                            type_=HttpValidationError,  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update(
+        self,
+        agent_id: str,
+        *,
+        name: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        max_engine_iterations: typing.Optional[int] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> None:
+        """
+        Parameters
+        ----------
+        agent_id : str
+
+        name : typing.Optional[str]
 
         description : typing.Optional[str]
 
@@ -481,8 +585,7 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        typing.Optional[typing.Any]
-            Successful Response
+        None
 
         Examples
         --------
@@ -507,6 +610,7 @@ class AsyncAgentsClient:
             f"agents/{jsonable_encoder(agent_id)}",
             method="PATCH",
             json={
+                "name": name,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
             },
@@ -515,13 +619,7 @@ class AsyncAgentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.Optional[typing.Any],
-                    parse_obj_as(
-                        type_=typing.Optional[typing.Any],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

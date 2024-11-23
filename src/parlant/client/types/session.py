@@ -11,7 +11,7 @@ import pydantic
 class Session(UniversalBaseModel):
     id: str
     agent_id: str
-    end_user_id: str
+    customer_id: str
     creation_utc: dt.datetime
     title: typing.Optional[str] = None
     consumption_offsets: ConsumptionOffsets

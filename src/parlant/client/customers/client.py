@@ -3,47 +3,38 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.guideline import Guideline
-from ..core.jsonable_encoder import jsonable_encoder
+from ..types.customer import Customer
 from ..core.pydantic_utilities import parse_obj_as
-from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.guideline_invoice import GuidelineInvoice
-from ..types.guideline_creation_result import GuidelineCreationResult
+from ..errors.unprocessable_entity_error import UnprocessableEntityError
+from ..types.http_validation_error import HttpValidationError
+from ..core.jsonable_encoder import jsonable_encoder
+from ..types.customer_extra_update_params import CustomerExtraUpdateParams
+from ..types.tags_update_params import TagsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
-from ..types.guideline_with_connections_and_tool_associations import (
-    GuidelineWithConnectionsAndToolAssociations,
-)
-from ..types.guideline_connection_update_params import GuidelineConnectionUpdateParams
-from ..types.guideline_tool_association_update_params import (
-    GuidelineToolAssociationUpdateParams,
-)
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
 
-class GuidelinesClient:
+class CustomersClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[Guideline]:
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[Customer]:
         """
         Parameters
         ----------
-        agent_id : str
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Guideline]
+        typing.List[Customer]
             Successful Response
 
         Examples
@@ -53,33 +44,21 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.list(
-            agent_id="agent_id",
-        )
+        client.customers.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines",
+            "customers/",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Guideline],
+                    typing.List[Customer],
                     parse_obj_as(
-                        type_=typing.List[Guideline],  # type: ignore
+                        type_=typing.List[Customer],  # type: ignore
                         object_=_response.json(),
                     ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -88,85 +67,43 @@ class GuidelinesClient:
 
     def create(
         self,
-        agent_id: str,
         *,
-        invoices: typing.Sequence[GuidelineInvoice],
+        name: str,
+        extra: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineCreationResult:
+    ) -> Customer:
         """
         Parameters
         ----------
-        agent_id : str
+        name : str
 
-        invoices : typing.Sequence[GuidelineInvoice]
+        extra : typing.Optional[typing.Dict[str, typing.Optional[str]]]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineCreationResult
+        Customer
             Successful Response
 
         Examples
         --------
-        from parlant.client import (
-            CoherenceCheck,
-            GuidelineContent,
-            GuidelineInvoice,
-            GuidelineInvoiceData,
-            GuidelinePayload,
-            ParlantClient,
-        )
+        from parlant.client import ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.create(
-            agent_id="agent_id",
-            invoices=[
-                GuidelineInvoice(
-                    payload=GuidelinePayload(
-                        content=GuidelineContent(
-                            condition="condition",
-                            action="action",
-                        ),
-                        operation="add",
-                        coherence_check=True,
-                        connection_proposition=True,
-                    ),
-                    checksum="checksum",
-                    approved=True,
-                    data=GuidelineInvoiceData(
-                        coherence_checks=[
-                            CoherenceCheck(
-                                kind="contradiction_with_existing_guideline",
-                                first=GuidelineContent(
-                                    condition="condition",
-                                    action="action",
-                                ),
-                                second=GuidelineContent(
-                                    condition="condition",
-                                    action="action",
-                                ),
-                                issue="issue",
-                                severity=1,
-                            )
-                        ],
-                    ),
-                )
-            ],
+        client.customers.create(
+            name="name",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines",
+            "customers/",
             method="POST",
             json={
-                "invoices": convert_and_respect_annotation_metadata(
-                    object_=invoices,
-                    annotation=typing.Sequence[GuidelineInvoice],
-                    direction="write",
-                ),
+                "name": name,
+                "extra": extra,
             },
             request_options=request_options,
             omit=OMIT,
@@ -174,9 +111,9 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineCreationResult,
+                    Customer,
                     parse_obj_as(
-                        type_=GuidelineCreationResult,  # type: ignore
+                        type_=Customer,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -197,24 +134,21 @@ class GuidelinesClient:
 
     def retrieve(
         self,
-        agent_id: str,
-        guideline_id: str,
+        customer_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> Customer:
         """
         Parameters
         ----------
-        agent_id : str
-
-        guideline_id : str
+        customer_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
+        Customer
             Successful Response
 
         Examples
@@ -224,22 +158,21 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.retrieve(
-            agent_id="agent_id",
-            guideline_id="guideline_id",
+        client.customers.retrieve(
+            customer_id="customer_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"customers/{jsonable_encoder(customer_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
+                    Customer,
                     parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
+                        type_=Customer,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -260,17 +193,14 @@ class GuidelinesClient:
 
     def delete(
         self,
-        agent_id: str,
-        guideline_id: str,
+        customer_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
         Parameters
         ----------
-        agent_id : str
-
-        guideline_id : str
+        customer_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -286,13 +216,12 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.delete(
-            agent_id="agent_id",
-            guideline_id="guideline_id",
+        client.customers.delete(
+            customer_id="customer_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"customers/{jsonable_encoder(customer_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -316,31 +245,30 @@ class GuidelinesClient:
 
     def update(
         self,
-        agent_id: str,
-        guideline_id: str,
+        customer_id: str,
         *,
-        connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
-        tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
+        name: typing.Optional[str] = OMIT,
+        extra: typing.Optional[CustomerExtraUpdateParams] = OMIT,
+        tags: typing.Optional[TagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> None:
         """
         Parameters
         ----------
-        agent_id : str
+        customer_id : str
 
-        guideline_id : str
+        name : typing.Optional[str]
 
-        connections : typing.Optional[GuidelineConnectionUpdateParams]
+        extra : typing.Optional[CustomerExtraUpdateParams]
 
-        tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
+        tags : typing.Optional[TagsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
-            Successful Response
+        None
 
         Examples
         --------
@@ -349,24 +277,22 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.update(
-            agent_id="agent_id",
-            guideline_id="guideline_id",
+        client.customers.update(
+            customer_id="customer_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"customers/{jsonable_encoder(customer_id)}",
             method="PATCH",
             json={
-                "connections": convert_and_respect_annotation_metadata(
-                    object_=connections,
-                    annotation=GuidelineConnectionUpdateParams,
+                "name": name,
+                "extra": convert_and_respect_annotation_metadata(
+                    object_=extra,
+                    annotation=CustomerExtraUpdateParams,
                     direction="write",
                 ),
-                "tool_associations": convert_and_respect_annotation_metadata(
-                    object_=tool_associations,
-                    annotation=GuidelineToolAssociationUpdateParams,
-                    direction="write",
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=TagsUpdateParams, direction="write"
                 ),
             },
             request_options=request_options,
@@ -374,13 +300,7 @@ class GuidelinesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
-                    parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -397,24 +317,22 @@ class GuidelinesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncGuidelinesClient:
+class AsyncCustomersClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[Guideline]:
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[Customer]:
         """
         Parameters
         ----------
-        agent_id : str
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Guideline]
+        typing.List[Customer]
             Successful Response
 
         Examples
@@ -429,36 +347,24 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.list(
-                agent_id="agent_id",
-            )
+            await client.customers.list()
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines",
+            "customers/",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Guideline],
+                    typing.List[Customer],
                     parse_obj_as(
-                        type_=typing.List[Guideline],  # type: ignore
+                        type_=typing.List[Customer],  # type: ignore
                         object_=_response.json(),
                     ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        HttpValidationError,
-                        parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -467,38 +373,31 @@ class AsyncGuidelinesClient:
 
     async def create(
         self,
-        agent_id: str,
         *,
-        invoices: typing.Sequence[GuidelineInvoice],
+        name: str,
+        extra: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineCreationResult:
+    ) -> Customer:
         """
         Parameters
         ----------
-        agent_id : str
+        name : str
 
-        invoices : typing.Sequence[GuidelineInvoice]
+        extra : typing.Optional[typing.Dict[str, typing.Optional[str]]]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineCreationResult
+        Customer
             Successful Response
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import (
-            AsyncParlantClient,
-            CoherenceCheck,
-            GuidelineContent,
-            GuidelineInvoice,
-            GuidelineInvoiceData,
-            GuidelinePayload,
-        )
+        from parlant.client import AsyncParlantClient
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -506,54 +405,19 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.create(
-                agent_id="agent_id",
-                invoices=[
-                    GuidelineInvoice(
-                        payload=GuidelinePayload(
-                            content=GuidelineContent(
-                                condition="condition",
-                                action="action",
-                            ),
-                            operation="add",
-                            coherence_check=True,
-                            connection_proposition=True,
-                        ),
-                        checksum="checksum",
-                        approved=True,
-                        data=GuidelineInvoiceData(
-                            coherence_checks=[
-                                CoherenceCheck(
-                                    kind="contradiction_with_existing_guideline",
-                                    first=GuidelineContent(
-                                        condition="condition",
-                                        action="action",
-                                    ),
-                                    second=GuidelineContent(
-                                        condition="condition",
-                                        action="action",
-                                    ),
-                                    issue="issue",
-                                    severity=1,
-                                )
-                            ],
-                        ),
-                    )
-                ],
+            await client.customers.create(
+                name="name",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines",
+            "customers/",
             method="POST",
             json={
-                "invoices": convert_and_respect_annotation_metadata(
-                    object_=invoices,
-                    annotation=typing.Sequence[GuidelineInvoice],
-                    direction="write",
-                ),
+                "name": name,
+                "extra": extra,
             },
             request_options=request_options,
             omit=OMIT,
@@ -561,9 +425,9 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineCreationResult,
+                    Customer,
                     parse_obj_as(
-                        type_=GuidelineCreationResult,  # type: ignore
+                        type_=Customer,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -584,24 +448,21 @@ class AsyncGuidelinesClient:
 
     async def retrieve(
         self,
-        agent_id: str,
-        guideline_id: str,
+        customer_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> Customer:
         """
         Parameters
         ----------
-        agent_id : str
-
-        guideline_id : str
+        customer_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
+        Customer
             Successful Response
 
         Examples
@@ -616,25 +477,24 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.retrieve(
-                agent_id="agent_id",
-                guideline_id="guideline_id",
+            await client.customers.retrieve(
+                customer_id="customer_id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"customers/{jsonable_encoder(customer_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
+                    Customer,
                     parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
+                        type_=Customer,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -655,17 +515,14 @@ class AsyncGuidelinesClient:
 
     async def delete(
         self,
-        agent_id: str,
-        guideline_id: str,
+        customer_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
         Parameters
         ----------
-        agent_id : str
-
-        guideline_id : str
+        customer_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -686,16 +543,15 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.delete(
-                agent_id="agent_id",
-                guideline_id="guideline_id",
+            await client.customers.delete(
+                customer_id="customer_id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"customers/{jsonable_encoder(customer_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -719,31 +575,30 @@ class AsyncGuidelinesClient:
 
     async def update(
         self,
-        agent_id: str,
-        guideline_id: str,
+        customer_id: str,
         *,
-        connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
-        tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
+        name: typing.Optional[str] = OMIT,
+        extra: typing.Optional[CustomerExtraUpdateParams] = OMIT,
+        tags: typing.Optional[TagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> None:
         """
         Parameters
         ----------
-        agent_id : str
+        customer_id : str
 
-        guideline_id : str
+        name : typing.Optional[str]
 
-        connections : typing.Optional[GuidelineConnectionUpdateParams]
+        extra : typing.Optional[CustomerExtraUpdateParams]
 
-        tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
+        tags : typing.Optional[TagsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
-            Successful Response
+        None
 
         Examples
         --------
@@ -757,27 +612,25 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.update(
-                agent_id="agent_id",
-                guideline_id="guideline_id",
+            await client.customers.update(
+                customer_id="customer_id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"customers/{jsonable_encoder(customer_id)}",
             method="PATCH",
             json={
-                "connections": convert_and_respect_annotation_metadata(
-                    object_=connections,
-                    annotation=GuidelineConnectionUpdateParams,
+                "name": name,
+                "extra": convert_and_respect_annotation_metadata(
+                    object_=extra,
+                    annotation=CustomerExtraUpdateParams,
                     direction="write",
                 ),
-                "tool_associations": convert_and_respect_annotation_metadata(
-                    object_=tool_associations,
-                    annotation=GuidelineToolAssociationUpdateParams,
-                    direction="write",
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=TagsUpdateParams, direction="write"
                 ),
             },
             request_options=request_options,
@@ -785,13 +638,7 @@ class AsyncGuidelinesClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
-                    parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
