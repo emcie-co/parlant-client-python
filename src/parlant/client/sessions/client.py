@@ -411,6 +411,7 @@ class SessionsClient:
         session_id: str,
         *,
         min_offset: typing.Optional[int] = None,
+        correlation_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
         wait: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -421,6 +422,8 @@ class SessionsClient:
         session_id : str
 
         min_offset : typing.Optional[int]
+
+        correlation_id : typing.Optional[str]
 
         kinds : typing.Optional[str]
             If set, only list events of the specified kinds (separated by commas)
@@ -451,6 +454,7 @@ class SessionsClient:
             method="GET",
             params={
                 "min_offset": min_offset,
+                "correlation_id": correlation_id,
                 "kinds": kinds,
                 "wait": wait,
             },
@@ -1118,6 +1122,7 @@ class AsyncSessionsClient:
         session_id: str,
         *,
         min_offset: typing.Optional[int] = None,
+        correlation_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
         wait: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1128,6 +1133,8 @@ class AsyncSessionsClient:
         session_id : str
 
         min_offset : typing.Optional[int]
+
+        correlation_id : typing.Optional[str]
 
         kinds : typing.Optional[str]
             If set, only list events of the specified kinds (separated by commas)
@@ -1166,6 +1173,7 @@ class AsyncSessionsClient:
             method="GET",
             params={
                 "min_offset": min_offset,
+                "correlation_id": correlation_id,
                 "kinds": kinds,
                 "wait": wait,
             },

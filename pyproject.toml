@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "parlant-client"
-version = "0.3.6"
+version = "0.3.7"
 description = "Parlant Client SDK"
 authors = ["MCNatsu <nathan@emcie.co>"]
 readme = "README.md"
