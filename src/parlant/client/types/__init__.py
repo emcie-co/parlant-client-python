@@ -30,7 +30,6 @@ from .guideline_connection_addition import GuidelineConnectionAddition
 from .guideline_connection_update_params import GuidelineConnectionUpdateParams
 from .guideline_content import GuidelineContent
 from .guideline_creation_result import GuidelineCreationResult
-from .guideline_invoice import GuidelineInvoice
 from .guideline_invoice_data import GuidelineInvoiceData
 from .guideline_payload import GuidelinePayload
 from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
@@ -102,7 +101,6 @@ __all__ = [
     "GuidelineConnectionUpdateParams",
     "GuidelineContent",
     "GuidelineCreationResult",
-    "GuidelineInvoice",
     "GuidelineInvoiceData",
     "GuidelinePayload",
     "GuidelinePayloadOperationDto",

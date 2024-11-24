@@ -10,7 +10,7 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.guideline_invoice import GuidelineInvoice
+from ..types.invoice import Invoice
 from ..types.guideline_creation_result import GuidelineCreationResult
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.guideline_with_connections_and_tool_associations import (
@@ -90,7 +90,7 @@ class GuidelinesClient:
         self,
         agent_id: str,
         *,
-        invoices: typing.Sequence[GuidelineInvoice],
+        invoices: typing.Sequence[Invoice],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineCreationResult:
         """
@@ -98,7 +98,7 @@ class GuidelinesClient:
         ----------
         agent_id : str
 
-        invoices : typing.Sequence[GuidelineInvoice]
+        invoices : typing.Sequence[Invoice]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -110,14 +110,7 @@ class GuidelinesClient:
 
         Examples
         --------
-        from parlant.client import (
-            CoherenceCheck,
-            GuidelineContent,
-            GuidelineInvoice,
-            GuidelineInvoiceData,
-            GuidelinePayload,
-            ParlantClient,
-        )
+        from parlant.client import Invoice, ParlantClient, Payload
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -125,35 +118,10 @@ class GuidelinesClient:
         client.guidelines.create(
             agent_id="agent_id",
             invoices=[
-                GuidelineInvoice(
-                    payload=GuidelinePayload(
-                        content=GuidelineContent(
-                            condition="condition",
-                            action="action",
-                        ),
-                        operation="add",
-                        coherence_check=True,
-                        connection_proposition=True,
-                    ),
+                Invoice(
+                    payload=Payload(),
                     checksum="checksum",
                     approved=True,
-                    data=GuidelineInvoiceData(
-                        coherence_checks=[
-                            CoherenceCheck(
-                                kind="contradiction_with_existing_guideline",
-                                first=GuidelineContent(
-                                    condition="condition",
-                                    action="action",
-                                ),
-                                second=GuidelineContent(
-                                    condition="condition",
-                                    action="action",
-                                ),
-                                issue="issue",
-                                severity=1,
-                            )
-                        ],
-                    ),
                 )
             ],
         )
@@ -164,7 +132,7 @@ class GuidelinesClient:
             json={
                 "invoices": convert_and_respect_annotation_metadata(
                     object_=invoices,
-                    annotation=typing.Sequence[GuidelineInvoice],
+                    annotation=typing.Sequence[Invoice],
                     direction="write",
                 ),
             },
@@ -469,7 +437,7 @@ class AsyncGuidelinesClient:
         self,
         agent_id: str,
         *,
-        invoices: typing.Sequence[GuidelineInvoice],
+        invoices: typing.Sequence[Invoice],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineCreationResult:
         """
@@ -477,7 +445,7 @@ class AsyncGuidelinesClient:
         ----------
         agent_id : str
 
-        invoices : typing.Sequence[GuidelineInvoice]
+        invoices : typing.Sequence[Invoice]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -491,14 +459,7 @@ class AsyncGuidelinesClient:
         --------
         import asyncio
 
-        from parlant.client import (
-            AsyncParlantClient,
-            CoherenceCheck,
-            GuidelineContent,
-            GuidelineInvoice,
-            GuidelineInvoiceData,
-            GuidelinePayload,
-        )
+        from parlant.client import AsyncParlantClient, Invoice, Payload
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -509,35 +470,10 @@ class AsyncGuidelinesClient:
             await client.guidelines.create(
                 agent_id="agent_id",
                 invoices=[
-                    GuidelineInvoice(
-                        payload=GuidelinePayload(
-                            content=GuidelineContent(
-                                condition="condition",
-                                action="action",
-                            ),
-                            operation="add",
-                            coherence_check=True,
-                            connection_proposition=True,
-                        ),
+                    Invoice(
+                        payload=Payload(),
                         checksum="checksum",
                         approved=True,
-                        data=GuidelineInvoiceData(
-                            coherence_checks=[
-                                CoherenceCheck(
-                                    kind="contradiction_with_existing_guideline",
-                                    first=GuidelineContent(
-                                        condition="condition",
-                                        action="action",
-                                    ),
-                                    second=GuidelineContent(
-                                        condition="condition",
-                                        action="action",
-                                    ),
-                                    issue="issue",
-                                    severity=1,
-                                )
-                            ],
-                        ),
                     )
                 ],
             )
@@ -551,7 +487,7 @@ class AsyncGuidelinesClient:
             json={
                 "invoices": convert_and_respect_annotation_metadata(
                     object_=invoices,
-                    annotation=typing.Sequence[GuidelineInvoice],
+                    annotation=typing.Sequence[Invoice],
                     direction="write",
                 ),
             },
