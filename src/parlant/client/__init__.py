@@ -67,7 +67,7 @@ from .types import (
     ValidationError,
     ValidationErrorLocItem,
 )
-from .errors import UnprocessableEntityError
+from .errors import NotFoundError, UnprocessableEntityError
 from . import (
     agents,
     context_variables,
@@ -126,6 +126,7 @@ __all__ = [
     "InvoiceData",
     "MessageGenerationInspection",
     "Moderation",
+    "NotFoundError",
     "OpenApiServiceParams",
     "ParlantClient",
     "Payload",
