@@ -8,6 +8,7 @@ from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
+from ..types.http_validation_error import HttpValidationError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -109,9 +110,9 @@ class TagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        typing.Optional[typing.Any],
+                        HttpValidationError,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=HttpValidationError,  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -165,9 +166,9 @@ class TagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        typing.Optional[typing.Any],
+                        HttpValidationError,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=HttpValidationError,  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -214,9 +215,9 @@ class TagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        typing.Optional[typing.Any],
+                        HttpValidationError,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=HttpValidationError,  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -274,9 +275,9 @@ class TagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        typing.Optional[typing.Any],
+                        HttpValidationError,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=HttpValidationError,  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -397,9 +398,9 @@ class AsyncTagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        typing.Optional[typing.Any],
+                        HttpValidationError,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=HttpValidationError,  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -461,9 +462,9 @@ class AsyncTagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        typing.Optional[typing.Any],
+                        HttpValidationError,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=HttpValidationError,  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -518,9 +519,9 @@ class AsyncTagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        typing.Optional[typing.Any],
+                        HttpValidationError,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=HttpValidationError,  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -586,9 +587,9 @@ class AsyncTagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        typing.Optional[typing.Any],
+                        HttpValidationError,
                         parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
+                            type_=HttpValidationError,  # type: ignore
                             object_=_response.json(),
                         ),
                     )
