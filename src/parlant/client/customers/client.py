@@ -251,7 +251,7 @@ class CustomersClient:
         extra: typing.Optional[CustomerExtraUpdateParams] = OMIT,
         tags: typing.Optional[TagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Customer:
+    ) -> None:
         """
         Parameters
         ----------
@@ -268,8 +268,7 @@ class CustomersClient:
 
         Returns
         -------
-        Customer
-            Successful Response
+        None
 
         Examples
         --------
@@ -301,13 +300,7 @@ class CustomersClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    Customer,
-                    parse_obj_as(
-                        type_=Customer,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -588,7 +581,7 @@ class AsyncCustomersClient:
         extra: typing.Optional[CustomerExtraUpdateParams] = OMIT,
         tags: typing.Optional[TagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Customer:
+    ) -> None:
         """
         Parameters
         ----------
@@ -605,8 +598,7 @@ class AsyncCustomersClient:
 
         Returns
         -------
-        Customer
-            Successful Response
+        None
 
         Examples
         --------
@@ -646,13 +638,7 @@ class AsyncCustomersClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    Customer,
-                    parse_obj_as(
-                        type_=Customer,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

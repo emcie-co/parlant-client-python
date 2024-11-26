@@ -98,12 +98,15 @@ class EvaluationsClient:
         self,
         evaluation_id: str,
         *,
+        wait_for_completion: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Evaluation:
         """
         Parameters
         ----------
         evaluation_id : str
+
+        wait_for_completion : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -127,6 +130,9 @@ class EvaluationsClient:
         _response = self._client_wrapper.httpx_client.request(
             f"index/evaluations/{jsonable_encoder(evaluation_id)}",
             method="GET",
+            params={
+                "wait_for_completion": wait_for_completion,
+            },
             request_options=request_options,
         )
         try:
@@ -242,12 +248,15 @@ class AsyncEvaluationsClient:
         self,
         evaluation_id: str,
         *,
+        wait_for_completion: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Evaluation:
         """
         Parameters
         ----------
         evaluation_id : str
+
+        wait_for_completion : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -279,6 +288,9 @@ class AsyncEvaluationsClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"index/evaluations/{jsonable_encoder(evaluation_id)}",
             method="GET",
+            params={
+                "wait_for_completion": wait_for_completion,
+            },
             request_options=request_options,
         )
         try:

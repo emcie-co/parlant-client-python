@@ -343,7 +343,7 @@ class SessionsClient:
         consumption_offsets: typing.Optional[ConsumptionOffsetsUpdateParams] = OMIT,
         title: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Session:
+    ) -> None:
         """
         Parameters
         ----------
@@ -358,8 +358,7 @@ class SessionsClient:
 
         Returns
         -------
-        Session
-            Successful Response
+        None
 
         Examples
         --------
@@ -388,13 +387,7 @@ class SessionsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    Session,
-                    parse_obj_as(
-                        type_=Session,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -1053,7 +1046,7 @@ class AsyncSessionsClient:
         consumption_offsets: typing.Optional[ConsumptionOffsetsUpdateParams] = OMIT,
         title: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Session:
+    ) -> None:
         """
         Parameters
         ----------
@@ -1068,8 +1061,7 @@ class AsyncSessionsClient:
 
         Returns
         -------
-        Session
-            Successful Response
+        None
 
         Examples
         --------
@@ -1106,13 +1098,7 @@ class AsyncSessionsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    Session,
-                    parse_obj_as(
-                        type_=Session,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
+                return
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
