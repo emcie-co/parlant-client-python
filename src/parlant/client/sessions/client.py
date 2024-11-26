@@ -44,8 +44,10 @@ class SessionsClient:
         Parameters
         ----------
         agent_id : typing.Optional[str]
+            Unique identifier of the agent
 
         customer_id : typing.Optional[str]
+            Unique identifier of the customers
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -201,8 +203,10 @@ class SessionsClient:
         Parameters
         ----------
         agent_id : typing.Optional[str]
+            Unique identifier of the agent
 
         customer_id : typing.Optional[str]
+            Unique identifier of the customers
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -259,7 +263,7 @@ class SessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -333,7 +337,7 @@ class SessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -402,9 +406,10 @@ class SessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         consumption_offsets : typing.Optional[ConsumptionOffsetsUpdateParams]
+            Optionally contains the updated consumption offsets
 
         title : typing.Optional[str]
             Optional descriptive title for the session
@@ -484,7 +489,7 @@ class SessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         min_offset : typing.Optional[int]
 
@@ -587,13 +592,11 @@ class SessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         kind : EventKindDto
-            Type of event (message, tool call, status update, etc)
 
         source : EventSourceDto
-            Origin of the event (customer, agent, system, etc)
 
         moderation : typing.Optional[Moderation]
             Content moderation level for the event
@@ -686,7 +689,7 @@ class SessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         min_offset : int
 
@@ -761,7 +764,7 @@ class SessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         event_id : str
             Unique identifier for the event
@@ -846,8 +849,10 @@ class AsyncSessionsClient:
         Parameters
         ----------
         agent_id : typing.Optional[str]
+            Unique identifier of the agent
 
         customer_id : typing.Optional[str]
+            Unique identifier of the customers
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1019,8 +1024,10 @@ class AsyncSessionsClient:
         Parameters
         ----------
         agent_id : typing.Optional[str]
+            Unique identifier of the agent
 
         customer_id : typing.Optional[str]
+            Unique identifier of the customers
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1085,7 +1092,7 @@ class AsyncSessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1167,7 +1174,7 @@ class AsyncSessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1244,9 +1251,10 @@ class AsyncSessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         consumption_offsets : typing.Optional[ConsumptionOffsetsUpdateParams]
+            Optionally contains the updated consumption offsets
 
         title : typing.Optional[str]
             Optional descriptive title for the session
@@ -1334,7 +1342,7 @@ class AsyncSessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         min_offset : typing.Optional[int]
 
@@ -1445,13 +1453,11 @@ class AsyncSessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         kind : EventKindDto
-            Type of event (message, tool call, status update, etc)
 
         source : EventSourceDto
-            Origin of the event (customer, agent, system, etc)
 
         moderation : typing.Optional[Moderation]
             Content moderation level for the event
@@ -1552,7 +1558,7 @@ class AsyncSessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         min_offset : int
 
@@ -1635,7 +1641,7 @@ class AsyncSessionsClient:
         Parameters
         ----------
         session_id : str
-            Unique identifier for the session.
+            Unique identifier for the session
 
         event_id : str
             Unique identifier for the event

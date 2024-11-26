@@ -10,7 +10,7 @@ import pydantic
 class ContextVariableValue(UniversalBaseModel):
     id: str
     last_modified: dt.datetime
-    data: typing.Optional[typing.Optional[typing.Any]] = None
+    data: typing.Optional[typing.Any] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

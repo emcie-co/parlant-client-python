@@ -9,10 +9,6 @@ import pydantic
 
 
 class GuidelinePayload(UniversalBaseModel):
-    """
-    #TODO
-    """
-
     content: GuidelineContent
     operation: GuidelinePayloadOperationDto
     updated_id: typing.Optional[str] = None

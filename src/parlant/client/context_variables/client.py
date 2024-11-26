@@ -500,7 +500,7 @@ class ContextVariablesClient:
         variable_id: str,
         key: str,
         *,
-        data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
+        data: typing.Optional[typing.Any] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
@@ -512,7 +512,7 @@ class ContextVariablesClient:
 
         key : str
 
-        data : typing.Optional[typing.Optional[typing.Any]]
+        data : typing.Optional[typing.Any]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -530,9 +530,10 @@ class ContextVariablesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.context_variables.set_value(
-            agent_id="agent_id",
-            variable_id="variable_id",
-            key="key",
+            agent_id="string",
+            variable_id="string",
+            key="string",
+            data={"key": "value"},
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -1165,7 +1166,7 @@ class AsyncContextVariablesClient:
         variable_id: str,
         key: str,
         *,
-        data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
+        data: typing.Optional[typing.Any] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
@@ -1177,7 +1178,7 @@ class AsyncContextVariablesClient:
 
         key : str
 
-        data : typing.Optional[typing.Optional[typing.Any]]
+        data : typing.Optional[typing.Any]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1200,9 +1201,10 @@ class AsyncContextVariablesClient:
 
         async def main() -> None:
             await client.context_variables.set_value(
-                agent_id="agent_id",
-                variable_id="variable_id",
-                key="key",
+                agent_id="string",
+                variable_id="string",
+                key="string",
+                data={"key": "value"},
             )
 
 

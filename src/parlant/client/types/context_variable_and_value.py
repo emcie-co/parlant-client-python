@@ -21,9 +21,17 @@ class ContextVariableAndValue(UniversalBaseModel):
     The name of the context variable
     """
 
-    description: str
-    key: str
-    value: typing.Optional[typing.Optional[typing.Any]] = None
+    description: str = pydantic.Field()
+    """
+    The description text assigned to this variable
+    """
+
+    key: str = pydantic.Field()
+    """
+    This is the key which can be used to identify the variable
+    """
+
+    value: typing.Optional[typing.Any] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

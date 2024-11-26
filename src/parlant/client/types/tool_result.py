@@ -11,7 +11,7 @@ class ToolResult(UniversalBaseModel):
     Result from a tool execution.
     """
 
-    data: typing.Optional[typing.Optional[typing.Any]] = None
+    data: typing.Optional[typing.Any] = None
     metadata: typing.Dict[str, typing.Optional[typing.Any]] = pydantic.Field()
     """
     A `dict` of the metadata associated with the tool's execution

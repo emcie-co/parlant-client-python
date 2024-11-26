@@ -19,16 +19,8 @@ class Event(UniversalBaseModel):
     Unique identifier for the event
     """
 
-    source: EventSourceDto = pydantic.Field()
-    """
-    Origin of the event (customer, agent, system, etc)
-    """
-
-    kind: EventKindDto = pydantic.Field()
-    """
-    Type of event (message, tool call, status update, etc)
-    """
-
+    source: EventSourceDto
+    kind: EventKindDto
     offset: int = pydantic.Field()
     """
     Sequential position of the event in the session
@@ -44,7 +36,7 @@ class Event(UniversalBaseModel):
     ID linking related events together
     """
 
-    data: typing.Optional[typing.Optional[typing.Any]] = None
+    data: typing.Optional[typing.Any] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

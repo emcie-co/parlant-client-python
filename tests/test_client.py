@@ -18,8 +18,8 @@ from parlant.client import (
     Term,
     ToolId,
     Invoice,
-    EventSourceDto,
 )
+
 from conftest import app
 from test_utilities import ContextOfTest
 
@@ -118,7 +118,9 @@ async def test_parlant_client_happy_path(context: ContextOfTest) -> None:
     assert event_inspection_result
     print(event_inspection_result)
 
-    events = client.sessions.list_events(session.id, min_offset=event_inspection_result.event.offset+1)
+    events = client.sessions.list_events(
+        session.id, min_offset=event_inspection_result.event.offset + 1
+    )
     assert events
     for event in events:
         print(event)

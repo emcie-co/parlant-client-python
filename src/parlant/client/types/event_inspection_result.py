@@ -15,11 +15,14 @@ class EventInspectionResult(UniversalBaseModel):
 
     session_id: str = pydantic.Field()
     """
-    Unique identifier for the session.
+    Unique identifier for the session
     """
 
     event: Event
-    trace: typing.Optional[EventTrace] = None
+    trace: typing.Optional[EventTrace] = pydantic.Field(default=None)
+    """
+    Optionally contains an `EventTraceDTO` for the inspected event
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

@@ -3,8 +3,8 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 from .generation_info import GenerationInfo
 import typing
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class MessageGenerationInspection(UniversalBaseModel):
@@ -13,7 +13,10 @@ class MessageGenerationInspection(UniversalBaseModel):
     """
 
     generation: GenerationInfo
-    messages: typing.List[typing.Optional[str]]
+    messages: typing.List[typing.Optional[str]] = pydantic.Field()
+    """
+    The messages that were generated
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

@@ -15,7 +15,7 @@ class Session(UniversalBaseModel):
 
     id: str = pydantic.Field()
     """
-    Unique identifier for the session.
+    Unique identifier for the session
     """
 
     agent_id: str = pydantic.Field()
@@ -38,10 +38,7 @@ class Session(UniversalBaseModel):
     Optional descriptive title for the session
     """
 
-    consumption_offsets: ConsumptionOffsets = pydantic.Field()
-    """
-    #TODO
-    """
+    consumption_offsets: ConsumptionOffsets
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
