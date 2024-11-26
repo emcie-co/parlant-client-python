@@ -8,7 +8,6 @@ from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.customer_extra_update_params import CustomerExtraUpdateParams
 from ..types.tags_update_params import TagsUpdateParams
@@ -120,9 +119,9 @@ class CustomersClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -142,6 +141,7 @@ class CustomersClient:
         Parameters
         ----------
         customer_id : str
+            Unique identifer of a customer.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -179,9 +179,9 @@ class CustomersClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -231,9 +231,9 @@ class CustomersClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -256,6 +256,7 @@ class CustomersClient:
         Parameters
         ----------
         customer_id : str
+            Unique identifer of a customer.
 
         name : typing.Optional[str]
 
@@ -311,9 +312,9 @@ class CustomersClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -441,9 +442,9 @@ class AsyncCustomersClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -463,6 +464,7 @@ class AsyncCustomersClient:
         Parameters
         ----------
         customer_id : str
+            Unique identifer of a customer.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -508,9 +510,9 @@ class AsyncCustomersClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -568,9 +570,9 @@ class AsyncCustomersClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -593,6 +595,7 @@ class AsyncCustomersClient:
         Parameters
         ----------
         customer_id : str
+            Unique identifer of a customer.
 
         name : typing.Optional[str]
 
@@ -656,9 +659,9 @@ class AsyncCustomersClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

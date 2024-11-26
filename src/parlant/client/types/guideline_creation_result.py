@@ -5,12 +5,19 @@ import typing
 from .guideline_with_connections_and_tool_associations import (
     GuidelineWithConnectionsAndToolAssociations,
 )
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class GuidelineCreationResult(UniversalBaseModel):
-    items: typing.List[GuidelineWithConnectionsAndToolAssociations]
+    """
+    Result wrapped for `Guideline`s creation.
+    """
+
+    items: typing.List[GuidelineWithConnectionsAndToolAssociations] = pydantic.Field()
+    """
+    
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

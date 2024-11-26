@@ -4,13 +4,20 @@ from ..core.pydantic_utilities import UniversalBaseModel
 from .guideline_proposition_inspection import GuidelinePropositionInspection
 import typing
 from .generation_info import GenerationInfo
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class PreparationIterationGenerations(UniversalBaseModel):
+    """
+    Generation information for a preparation iteration.
+    """
+
     guideline_proposition: GuidelinePropositionInspection
-    tool_calls: typing.List[GenerationInfo]
+    tool_calls: typing.List[GenerationInfo] = pydantic.Field()
+    """
+    A list of `GenerationInfoDTO` describing the executed tool calls
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

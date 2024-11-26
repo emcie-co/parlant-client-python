@@ -2,13 +2,20 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class ToolResult(UniversalBaseModel):
+    """
+    Result from a tool execution.
+    """
+
     data: typing.Optional[typing.Any] = None
-    metadata: typing.Dict[str, typing.Optional[typing.Any]]
+    metadata: typing.Dict[str, typing.Optional[typing.Any]] = pydantic.Field()
+    """
+    A `dict` of the metadata associated with the tool's execution
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

@@ -8,6 +8,20 @@ import pydantic
 
 
 class Customer(UniversalBaseModel):
+    """
+    Represents a customer in the system.
+
+    Customers are entities that interact with agents through sessions. Each customer
+    can have metadata stored in the extra field and can be tagged for categorization.
+
+    Properties:
+    id: Unique identifier for the customer
+    creation_utc: Timestamp of when the customer was created
+    name: Display name of the customer
+    extra: Additional metadata as key-value pairs
+    tags: List of tag IDs associated with this customer
+    """
+
     id: str
     creation_utc: dt.datetime
     name: str

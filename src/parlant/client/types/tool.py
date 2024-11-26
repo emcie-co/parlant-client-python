@@ -2,18 +2,41 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import datetime as dt
+import pydantic
 import typing
 from .tool_parameter import ToolParameter
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
-import pydantic
 
 
 class Tool(UniversalBaseModel):
-    creation_utc: dt.datetime
-    name: str
-    description: str
-    parameters: typing.Dict[str, ToolParameter]
-    required: typing.List[str]
+    """
+    Represents a single function provided by a service that agents can use.
+    """
+
+    creation_utc: dt.datetime = pydantic.Field()
+    """
+    UTC timestamp of when the tool was created
+    """
+
+    name: str = pydantic.Field()
+    """
+    User assigned name of the tool
+    """
+
+    description: str = pydantic.Field()
+    """
+    The description text of the tool
+    """
+
+    parameters: typing.Dict[str, ToolParameter] = pydantic.Field()
+    """
+    A `dict` of parameters passed to the tool
+    """
+
+    required: typing.List[str] = pydantic.Field()
+    """
+    Names of parameters that must be provided. Optional parameters may be omitted.
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

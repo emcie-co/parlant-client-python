@@ -4,6 +4,6 @@ from ..core.api_error import ApiError
 import typing
 
 
-class UnprocessableEntityError(ApiError):
+class ServiceUnavailableError(ApiError):
     def __init__(self, body: typing.Optional[typing.Any]):
-        super().__init__(status_code=422, body=body)
+        super().__init__(status_code=503, body=body)

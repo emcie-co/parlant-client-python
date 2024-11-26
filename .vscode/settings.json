@@ -1,0 +1,6 @@
+{
+    "python.testing.pytestArgs": [
+        "-vvv",
+        "--log-cli-level=DEBUG"
+    ]
+}

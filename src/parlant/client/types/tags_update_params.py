@@ -7,6 +7,14 @@ import pydantic
 
 
 class TagsUpdateParams(UniversalBaseModel):
+    """
+    Parameters for updating a customer's tags.
+
+    Optional:
+    add: List of tag IDs to add to the customer
+    remove: List of tag IDs to remove from the customer
+    """
+
     add: typing.Optional[typing.List[str]] = None
     remove: typing.Optional[typing.List[str]] = None
 

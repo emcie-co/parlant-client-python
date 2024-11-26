@@ -8,8 +8,8 @@ from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
 from ..core.jsonable_encoder import jsonable_encoder
+from ..errors.not_found_error import NotFoundError
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -24,6 +24,8 @@ class TagsClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Tag]:
         """
+        List all tags.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -32,7 +34,7 @@ class TagsClient:
         Returns
         -------
         typing.List[Tag]
-            Successful Response
+            List of all the `Tag`s.
 
         Examples
         --------
@@ -66,9 +68,12 @@ class TagsClient:
         self, *, name: str, request_options: typing.Optional[RequestOptions] = None
     ) -> Tag:
         """
+        Creates a new `Tag` with the provided `name`.
+
         Parameters
         ----------
         name : str
+            Name of the tag
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -76,7 +81,7 @@ class TagsClient:
         Returns
         -------
         Tag
-            Successful Response
+            Tag successfully generated. Returns a `Tag` object with a unique generated id.
 
         Examples
         --------
@@ -110,9 +115,9 @@ class TagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -126,9 +131,12 @@ class TagsClient:
         self, tag_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Tag:
         """
+        Retrieves the `Tag` with the provided `id`.
+
         Parameters
         ----------
         tag_id : str
+            Unique identifier for the tag
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -136,7 +144,7 @@ class TagsClient:
         Returns
         -------
         Tag
-            Successful Response
+            Tag successfully retrieved.
 
         Examples
         --------
@@ -163,12 +171,22 @@ class TagsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -212,12 +230,22 @@ class TagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -235,11 +263,15 @@ class TagsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Updates an existing `Tag`'s fields (namely: `name`).
+
         Parameters
         ----------
         tag_id : str
+            Unique identifier for the tag
 
         name : str
+            Name of the tag
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -272,12 +304,22 @@ class TagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -296,6 +338,8 @@ class AsyncTagsClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Tag]:
         """
+        List all tags.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -304,7 +348,7 @@ class AsyncTagsClient:
         Returns
         -------
         typing.List[Tag]
-            Successful Response
+            List of all the `Tag`s.
 
         Examples
         --------
@@ -346,9 +390,12 @@ class AsyncTagsClient:
         self, *, name: str, request_options: typing.Optional[RequestOptions] = None
     ) -> Tag:
         """
+        Creates a new `Tag` with the provided `name`.
+
         Parameters
         ----------
         name : str
+            Name of the tag
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -356,7 +403,7 @@ class AsyncTagsClient:
         Returns
         -------
         Tag
-            Successful Response
+            Tag successfully generated. Returns a `Tag` object with a unique generated id.
 
         Examples
         --------
@@ -398,9 +445,9 @@ class AsyncTagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -414,9 +461,12 @@ class AsyncTagsClient:
         self, tag_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Tag:
         """
+        Retrieves the `Tag` with the provided `id`.
+
         Parameters
         ----------
         tag_id : str
+            Unique identifier for the tag
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -424,7 +474,7 @@ class AsyncTagsClient:
         Returns
         -------
         Tag
-            Successful Response
+            Tag successfully retrieved.
 
         Examples
         --------
@@ -459,12 +509,22 @@ class AsyncTagsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -516,12 +576,22 @@ class AsyncTagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -539,11 +609,15 @@ class AsyncTagsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Updates an existing `Tag`'s fields (namely: `name`).
+
         Parameters
         ----------
         tag_id : str
+            Unique identifier for the tag
 
         name : str
+            Name of the tag
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -584,12 +658,22 @@ class AsyncTagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

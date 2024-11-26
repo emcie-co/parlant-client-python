@@ -9,7 +9,6 @@ import uvicorn
 from parlant.client import (
     Agent,
     GuidelineContent,
-    GuidelineInvoice,
     GuidelinePayload,
     GuidelineToolAssociationUpdateParams,
     GuidelineWithConnectionsAndToolAssociations,
@@ -18,11 +17,13 @@ from parlant.client import (
     Payload,
     Term,
     ToolId,
+    Invoice,
 )
-from conftest import app
-from test_utilities import ContextOfTest
 
-PLUGIN_PORT = 8002
+from tests.conftest import app
+from tests.test_utilities import ContextOfTest
+
+PLUGIN_PORT = 8802
 PLUGIN_ADDRESS = f"http://localhost:{PLUGIN_PORT}"
 
 
@@ -47,9 +48,8 @@ def context() -> Iterator[ContextOfTest]:
         yield ContextOfTest(home_dir=home_dir_path)
 
 
-SERVER_PORT = 8012
+SERVER_PORT = 8800
 SERVER_ADDRESS = f"http://localhost:{SERVER_PORT}"
-CLI_PLUGIN_PATH = "tests/example_plugin.py"
 
 
 # async def test_parlant_client_happy_path_with_server_and_plugin(context: ContextOfTest) -> None:
@@ -95,33 +95,35 @@ async def test_parlant_client_happy_path(context: ContextOfTest) -> None:
         service_url=PLUGIN_ADDRESS,
     )
 
-    create_session_response = client.sessions.create(
+    session = client.sessions.create(
         agent_id=agent.id,
-        end_user_id="end_user",
     )
-    assert create_session_response
-    demo_session = create_session_response.session
+    assert session
 
-    create_event_response = client.sessions.create_event(
-        demo_session.id,
+    event = client.sessions.create_event(
+        session.id,
         kind="message",
-        source="end_user",
-        content="Heads or tails?",
+        source="customer",
+        message="Heads or tails?",
         moderation="auto",
     )
-    assert create_event_response
+    assert event
 
-    last_known_offset = create_event_response.event.offset
-    list_interaction_response = client.sessions.list_interactions(
-        demo_session.id,
-        min_event_offset=last_known_offset,
-        source="ai_agent",
-        wait=True,
+    event_inspection_result = client.sessions.inspect_event(
+        session.id,
+        event.id,
     )
 
-    for interaction in list_interaction_response.interactions:
-        assert interaction.data
-        print(interaction.data)
+    assert event_inspection_result
+    print(event_inspection_result)
+
+    events = client.sessions.list_events(
+        session.id, min_offset=event_inspection_result.event.offset + 1
+    )
+    assert events
+    for event in events:
+        print(event)
+        assert event
 
 
 def make_parlant_client(base_url: str) -> ParlantClient:
@@ -131,9 +133,9 @@ def make_parlant_client(base_url: str) -> ParlantClient:
 
 
 def make_api_agent(client: ParlantClient, name: str) -> Agent:
-    create_agent_reponse = client.agents.create(name=name)
+    agent = client.agents.create(name=name)
     print(f"Agent `{name}` created.")
-    return create_agent_reponse.agent
+    return agent
 
 
 def make_guideline_evaluation(
@@ -153,8 +155,8 @@ def make_guideline_evaluation(
         agent_id=agent_id,
         payloads=[Payload(kind="guideline", guideline=guideline_payload)],
     )
-    print(f"Evaluation created with id=`{create_evaluation_response.evaluation_id}`")
-    return create_evaluation_response.evaluation_id
+    print(f"Evaluation created with id=`{create_evaluation_response.id}`")
+    return create_evaluation_response.id
 
 
 def make_guideline(
@@ -180,18 +182,18 @@ def make_guideline(
         if read_evaluation_response.status != "completed":
             raise Exception(read_evaluation_response.status)
 
-        guidelines_invoices: list[GuidelineInvoice] = []
+        guidelines_invoices: list[Invoice] = []
 
         for invoice in read_evaluation_response.invoices:
             if not invoice.data or not invoice.payload.guideline or not invoice.data.guideline:
                 continue
 
             guidelines_invoices.append(
-                GuidelineInvoice(
-                    payload=invoice.payload.guideline,
+                Invoice(
+                    payload=invoice.payload,
                     checksum=invoice.checksum,
                     approved=invoice.approved,
-                    data=invoice.data.guideline,
+                    data=invoice.data,
                     error=invoice.error,
                 ),
             )
@@ -211,11 +213,11 @@ def make_term(
     description: str,
     synonyms: list[str] | None,
 ) -> Term:
-    create_term_response = client.glossary.create_term(
+    term = client.glossary.create_term(
         agent_id=agent_id, name=name, description=description, synonyms=synonyms
     )
     print(f"Created Term `{name}~{synonyms}`='{description}'")
-    return create_term_response.term
+    return term
 
 
 def make_service_tool_association(
@@ -229,8 +231,8 @@ def make_service_tool_association(
         tool_name,
         kind="openapi",
         openapi=OpenApiServiceParams(
-            url="http://localhost:8002",
-            source="http://localhost:8002/openapi.json",
+            url=PLUGIN_ADDRESS,
+            source=f"{PLUGIN_ADDRESS}/openapi.json",
         ),
     )
     service = client.services.retrieve(tool_name)
