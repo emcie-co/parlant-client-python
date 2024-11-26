@@ -2,12 +2,19 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class ConsumptionOffsetsUpdateParams(UniversalBaseModel):
-    client: typing.Optional[int] = None
+    """
+    Parameters for updating consumption offsets.
+    """
+
+    client: typing.Optional[int] = pydantic.Field(default=None)
+    """
+    Latest event offset processed by the client
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

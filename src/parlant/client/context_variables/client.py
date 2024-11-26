@@ -7,7 +7,6 @@ from ..types.context_variable import ContextVariable
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..types.tool_id import ToolId
@@ -69,9 +68,9 @@ class ContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -154,9 +153,9 @@ class ContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -203,9 +202,9 @@ class ContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -272,9 +271,9 @@ class ContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -328,9 +327,9 @@ class ContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -483,9 +482,9 @@ class ContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -501,7 +500,7 @@ class ContextVariablesClient:
         variable_id: str,
         key: str,
         *,
-        data: typing.Optional[typing.Any] = OMIT,
+        data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
@@ -513,7 +512,7 @@ class ContextVariablesClient:
 
         key : str
 
-        data : typing.Optional[typing.Any]
+        data : typing.Optional[typing.Optional[typing.Any]]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -531,10 +530,9 @@ class ContextVariablesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.context_variables.set_value(
-            agent_id="string",
-            variable_id="string",
-            key="string",
-            data={"key": "value"},
+            agent_id="agent_id",
+            variable_id="variable_id",
+            key="key",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -558,9 +556,9 @@ class ContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -618,9 +616,9 @@ class ContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -687,9 +685,9 @@ class AsyncContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -780,9 +778,9 @@ class AsyncContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -837,9 +835,9 @@ class AsyncContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -914,9 +912,9 @@ class AsyncContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -978,9 +976,9 @@ class AsyncContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1149,9 +1147,9 @@ class AsyncContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1167,7 +1165,7 @@ class AsyncContextVariablesClient:
         variable_id: str,
         key: str,
         *,
-        data: typing.Optional[typing.Any] = OMIT,
+        data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
@@ -1179,7 +1177,7 @@ class AsyncContextVariablesClient:
 
         key : str
 
-        data : typing.Optional[typing.Any]
+        data : typing.Optional[typing.Optional[typing.Any]]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1202,10 +1200,9 @@ class AsyncContextVariablesClient:
 
         async def main() -> None:
             await client.context_variables.set_value(
-                agent_id="string",
-                variable_id="string",
-                key="string",
-                data={"key": "value"},
+                agent_id="agent_id",
+                variable_id="variable_id",
+                key="key",
             )
 
 
@@ -1232,9 +1229,9 @@ class AsyncContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1300,9 +1297,9 @@ class AsyncContextVariablesClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

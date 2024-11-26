@@ -6,13 +6,14 @@ from ..core.request_options import RequestOptions
 from ..types.session import Session
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..core.jsonable_encoder import jsonable_encoder
+from ..errors.not_found_error import NotFoundError
 from ..types.consumption_offsets_update_params import ConsumptionOffsetsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.event import Event
+from ..errors.gateway_timeout_error import GatewayTimeoutError
 from ..types.event_kind_dto import EventKindDto
 from ..types.event_source_dto import EventSourceDto
 from ..types.moderation import Moderation
@@ -35,6 +36,11 @@ class SessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Session]:
         """
+        Lists all sessions matching the specified filters.
+
+        Can filter by agent_id and/or customer_id. Returns all sessions if no
+        filters are provided.
+
         Parameters
         ----------
         agent_id : typing.Optional[str]
@@ -47,7 +53,7 @@ class SessionsClient:
         Returns
         -------
         typing.List[Session]
-            Successful Response
+            List of all matching sessions
 
         Examples
         --------
@@ -79,9 +85,9 @@ class SessionsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -101,15 +107,24 @@ class SessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
+        Creates a new session between an agent and customer.
+
+        The session will be initialized with the specified agent and optional customer.
+        If no customer_id is provided, a guest customer will be created.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the session.
 
         allow_greeting : typing.Optional[bool]
+            Whether to allow the agent to send an initial greeting
 
         customer_id : typing.Optional[str]
+             ID of the customer this session belongs to. If not provided, a guest customer will be created.
 
         title : typing.Optional[str]
+            Optional descriptive title for the session
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -117,7 +132,7 @@ class SessionsClient:
         Returns
         -------
         Session
-            Successful Response
+            Session successfully created. Returns the complete session object.
 
         Examples
         --------
@@ -127,7 +142,9 @@ class SessionsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.sessions.create(
-            agent_id="agent_id",
+            agent_id="ag_123xyz",
+            customer_id="cust_123xyz",
+            title="Product inquiry session",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -156,9 +173,9 @@ class SessionsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -176,6 +193,11 @@ class SessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes all sessions matching the specified filters.
+
+        Can filter by agent_id and/or customer_id. Will delete all sessions if no
+        filters are provided.
+
         Parameters
         ----------
         agent_id : typing.Optional[str]
@@ -213,9 +235,9 @@ class SessionsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -232,9 +254,12 @@ class SessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
+        Retrieves details of a specific session by ID.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -242,7 +267,7 @@ class SessionsClient:
         Returns
         -------
         Session
-            Successful Response
+            Session details successfully retrieved
 
         Examples
         --------
@@ -269,12 +294,22 @@ class SessionsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -291,9 +326,14 @@ class SessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a session and all its associated events.
+
+        The operation is idempotent - deleting a non-existent session will return 404.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -321,12 +361,22 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -345,13 +395,19 @@ class SessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
+        Updates an existing session's attributes.
+
+        Only provided attributes will be updated; others remain unchanged.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         consumption_offsets : typing.Optional[ConsumptionOffsetsUpdateParams]
 
         title : typing.Optional[str]
+            Optional descriptive title for the session
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -363,13 +419,17 @@ class SessionsClient:
 
         Examples
         --------
-        from parlant.client import ParlantClient
+        from parlant.client import ConsumptionOffsetsUpdateParams, ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
         client.sessions.update(
             session_id="session_id",
+            consumption_offsets=ConsumptionOffsetsUpdateParams(
+                client=42,
+            ),
+            title="Updated session title",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -398,9 +458,9 @@ class SessionsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -424,6 +484,7 @@ class SessionsClient:
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         min_offset : typing.Optional[int]
 
@@ -440,7 +501,7 @@ class SessionsClient:
         Returns
         -------
         typing.List[Event]
-            Successful Response
+            List of events matching the specified criteria
 
         Examples
         --------
@@ -473,12 +534,32 @@ class SessionsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 504:
+                raise GatewayTimeoutError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -499,17 +580,26 @@ class SessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
+        Creates a new event in the specified session.
+
+        Currently supports creating message events from customer and human agent sources.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         kind : EventKindDto
+            Type of event (message, tool call, status update, etc)
 
         source : EventSourceDto
+            Origin of the event (customer, agent, system, etc)
 
         moderation : typing.Optional[Moderation]
+            Content moderation level for the event
 
         data : typing.Optional[str]
+            Event payload data, format depends on kind
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -517,7 +607,7 @@ class SessionsClient:
         Returns
         -------
         Event
-            Successful Response
+            Event successfully created
 
         Examples
         --------
@@ -530,6 +620,7 @@ class SessionsClient:
             session_id="session_id",
             kind="message",
             source="customer",
+            data="Hello, I need help with my order",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -555,12 +646,22 @@ class SessionsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -578,9 +679,14 @@ class SessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes events from a session with offset >= the specified value.
+
+        This operation is permanent and cannot be undone.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         min_offset : int
 
@@ -614,12 +720,22 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -637,11 +753,18 @@ class SessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EventInspectionResult:
         """
+        Retrieves detailed inspection information about an event.
+
+        For AI agent message events, includes information about message generation,
+        tool calls, and preparation iterations.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         event_id : str
+            Unique identifier for the event
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -649,7 +772,7 @@ class SessionsClient:
         Returns
         -------
         EventInspectionResult
-            Successful Response
+            Event inspection details successfully retrieved
 
         Examples
         --------
@@ -677,12 +800,22 @@ class SessionsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -705,6 +838,11 @@ class AsyncSessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Session]:
         """
+        Lists all sessions matching the specified filters.
+
+        Can filter by agent_id and/or customer_id. Returns all sessions if no
+        filters are provided.
+
         Parameters
         ----------
         agent_id : typing.Optional[str]
@@ -717,7 +855,7 @@ class AsyncSessionsClient:
         Returns
         -------
         typing.List[Session]
-            Successful Response
+            List of all matching sessions
 
         Examples
         --------
@@ -757,9 +895,9 @@ class AsyncSessionsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -779,15 +917,24 @@ class AsyncSessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
+        Creates a new session between an agent and customer.
+
+        The session will be initialized with the specified agent and optional customer.
+        If no customer_id is provided, a guest customer will be created.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the session.
 
         allow_greeting : typing.Optional[bool]
+            Whether to allow the agent to send an initial greeting
 
         customer_id : typing.Optional[str]
+             ID of the customer this session belongs to. If not provided, a guest customer will be created.
 
         title : typing.Optional[str]
+            Optional descriptive title for the session
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -795,7 +942,7 @@ class AsyncSessionsClient:
         Returns
         -------
         Session
-            Successful Response
+            Session successfully created. Returns the complete session object.
 
         Examples
         --------
@@ -810,7 +957,9 @@ class AsyncSessionsClient:
 
         async def main() -> None:
             await client.sessions.create(
-                agent_id="agent_id",
+                agent_id="ag_123xyz",
+                customer_id="cust_123xyz",
+                title="Product inquiry session",
             )
 
 
@@ -842,9 +991,9 @@ class AsyncSessionsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -862,6 +1011,11 @@ class AsyncSessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes all sessions matching the specified filters.
+
+        Can filter by agent_id and/or customer_id. Will delete all sessions if no
+        filters are provided.
+
         Parameters
         ----------
         agent_id : typing.Optional[str]
@@ -907,9 +1061,9 @@ class AsyncSessionsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -926,9 +1080,12 @@ class AsyncSessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
+        Retrieves details of a specific session by ID.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -936,7 +1093,7 @@ class AsyncSessionsClient:
         Returns
         -------
         Session
-            Successful Response
+            Session details successfully retrieved
 
         Examples
         --------
@@ -971,12 +1128,22 @@ class AsyncSessionsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -993,9 +1160,14 @@ class AsyncSessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a session and all its associated events.
+
+        The operation is idempotent - deleting a non-existent session will return 404.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1031,12 +1203,22 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1055,13 +1237,19 @@ class AsyncSessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
+        Updates an existing session's attributes.
+
+        Only provided attributes will be updated; others remain unchanged.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         consumption_offsets : typing.Optional[ConsumptionOffsetsUpdateParams]
 
         title : typing.Optional[str]
+            Optional descriptive title for the session
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1075,7 +1263,7 @@ class AsyncSessionsClient:
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient
+        from parlant.client import AsyncParlantClient, ConsumptionOffsetsUpdateParams
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -1085,6 +1273,10 @@ class AsyncSessionsClient:
         async def main() -> None:
             await client.sessions.update(
                 session_id="session_id",
+                consumption_offsets=ConsumptionOffsetsUpdateParams(
+                    client=42,
+                ),
+                title="Updated session title",
             )
 
 
@@ -1116,9 +1308,9 @@ class AsyncSessionsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1142,6 +1334,7 @@ class AsyncSessionsClient:
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         min_offset : typing.Optional[int]
 
@@ -1158,7 +1351,7 @@ class AsyncSessionsClient:
         Returns
         -------
         typing.List[Event]
-            Successful Response
+            List of events matching the specified criteria
 
         Examples
         --------
@@ -1199,12 +1392,32 @@ class AsyncSessionsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 504:
+                raise GatewayTimeoutError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1225,17 +1438,26 @@ class AsyncSessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
+        Creates a new event in the specified session.
+
+        Currently supports creating message events from customer and human agent sources.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         kind : EventKindDto
+            Type of event (message, tool call, status update, etc)
 
         source : EventSourceDto
+            Origin of the event (customer, agent, system, etc)
 
         moderation : typing.Optional[Moderation]
+            Content moderation level for the event
 
         data : typing.Optional[str]
+            Event payload data, format depends on kind
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1243,7 +1465,7 @@ class AsyncSessionsClient:
         Returns
         -------
         Event
-            Successful Response
+            Event successfully created
 
         Examples
         --------
@@ -1261,6 +1483,7 @@ class AsyncSessionsClient:
                 session_id="session_id",
                 kind="message",
                 source="customer",
+                data="Hello, I need help with my order",
             )
 
 
@@ -1289,12 +1512,22 @@ class AsyncSessionsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1312,9 +1545,14 @@ class AsyncSessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes events from a session with offset >= the specified value.
+
+        This operation is permanent and cannot be undone.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         min_offset : int
 
@@ -1356,12 +1594,22 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -1379,11 +1627,18 @@ class AsyncSessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> EventInspectionResult:
         """
+        Retrieves detailed inspection information about an event.
+
+        For AI agent message events, includes information about message generation,
+        tool calls, and preparation iterations.
+
         Parameters
         ----------
         session_id : str
+            Unique identifier for the session.
 
         event_id : str
+            Unique identifier for the event
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1391,7 +1646,7 @@ class AsyncSessionsClient:
         Returns
         -------
         EventInspectionResult
-            Successful Response
+            Event inspection details successfully retrieved
 
         Examples
         --------
@@ -1427,12 +1682,22 @@ class AsyncSessionsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

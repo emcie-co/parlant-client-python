@@ -12,6 +12,10 @@ import pydantic
 
 
 class PreparationIteration(UniversalBaseModel):
+    """
+    Information about a preparation iteration.
+    """
+
     generations: PreparationIterationGenerations
     guideline_propositions: typing.List[GuidelineProposition]
     tool_calls: typing.List[ToolCall]

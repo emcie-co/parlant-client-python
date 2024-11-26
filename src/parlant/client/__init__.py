@@ -67,7 +67,7 @@ from .types import (
     ValidationError,
     ValidationErrorLocItem,
 )
-from .errors import UnprocessableEntityError
+from .errors import GatewayTimeoutError, NotFoundError, UnprocessableEntityError
 from . import (
     agents,
     context_variables,
@@ -106,6 +106,7 @@ __all__ = [
     "EventSourceDto",
     "EventTrace",
     "FreshnessRules",
+    "GatewayTimeoutError",
     "GenerationInfo",
     "Guideline",
     "GuidelineConnection",
@@ -126,6 +127,7 @@ __all__ = [
     "InvoiceData",
     "MessageGenerationInspection",
     "Moderation",
+    "NotFoundError",
     "OpenApiServiceParams",
     "ParlantClient",
     "Payload",

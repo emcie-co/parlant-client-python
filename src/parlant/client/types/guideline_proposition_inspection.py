@@ -8,6 +8,10 @@ import pydantic
 
 
 class GuidelinePropositionInspection(UniversalBaseModel):
+    """
+    Inspection data for guideline proposition.
+    """
+
     total_duration: float
     batches: typing.List[GenerationInfo]
 

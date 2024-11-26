@@ -10,6 +10,10 @@ import pydantic
 
 
 class EventTrace(UniversalBaseModel):
+    """
+    Trace information for an event.
+    """
+
     tool_calls: typing.List[ToolCall]
     message_generations: typing.List[MessageGenerationInspection]
     preparation_iterations: typing.List[PreparationIteration]

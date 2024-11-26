@@ -8,6 +8,10 @@ import pydantic
 
 
 class MessageGenerationInspection(UniversalBaseModel):
+    """
+    Inspection data for message generation.
+    """
+
     generation: GenerationInfo
     messages: typing.List[typing.Optional[str]]
 

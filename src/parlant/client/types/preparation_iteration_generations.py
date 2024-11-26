@@ -9,6 +9,10 @@ import pydantic
 
 
 class PreparationIterationGenerations(UniversalBaseModel):
+    """
+    Generation information for a preparation iteration.
+    """
+
     guideline_proposition: GuidelinePropositionInspection
     tool_calls: typing.List[GenerationInfo]
 

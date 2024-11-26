@@ -8,6 +8,10 @@ import pydantic
 
 
 class GenerationInfo(UniversalBaseModel):
+    """
+    Information about a text generation.
+    """
+
     schema_name: str
     model: str
     duration: float

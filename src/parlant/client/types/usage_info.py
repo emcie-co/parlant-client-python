@@ -7,6 +7,10 @@ import pydantic
 
 
 class UsageInfo(UniversalBaseModel):
+    """
+    Token usage information.
+    """
+
     input_tokens: int
     output_tokens: int
     extra: typing.Optional[typing.Dict[str, typing.Optional[int]]] = None
