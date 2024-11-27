@@ -246,7 +246,7 @@ class AgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
+    ) -> Agent:
         """
         Parameters
         ----------
@@ -263,7 +263,8 @@ class AgentsClient:
 
         Returns
         -------
-        None
+        Agent
+            Successful Response
 
         Examples
         --------
@@ -289,7 +290,13 @@ class AgentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return
+                return typing.cast(
+                    Agent,
+                    parse_obj_as(
+                        type_=Agent,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -568,7 +575,7 @@ class AsyncAgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
+    ) -> Agent:
         """
         Parameters
         ----------
@@ -585,7 +592,8 @@ class AsyncAgentsClient:
 
         Returns
         -------
-        None
+        Agent
+            Successful Response
 
         Examples
         --------
@@ -619,7 +627,13 @@ class AsyncAgentsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return
+                return typing.cast(
+                    Agent,
+                    parse_obj_as(
+                        type_=Agent,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
