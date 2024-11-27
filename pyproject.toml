@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "parlant-client"
-version = "0.4.6"
-description = "Python API client for the Parlant Agent Server (https://parlant.io)"
+version = "0.4.8"
+description = "Python API client for the Parlant Server (https://parlant.io)"
 authors = ["Yam Marcovitz <yam@emcie.co>", "Dor Zohar <dor@emcie.co>", "Nathan Dortman <nathan@emcie.co>"]
 readme = "README.md"
 packages = [{ include = "parlant", from = "src" }]
