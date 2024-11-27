@@ -98,6 +98,7 @@ class GuidelinesClient:
         agent_id : str
 
         invoices : typing.Sequence[Invoice]
+            A collection of invoices obtained from evaluating guidelines
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -445,6 +446,7 @@ class AsyncGuidelinesClient:
         agent_id : str
 
         invoices : typing.Sequence[Invoice]
+            A collection of invoices obtained from evaluating guidelines
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.

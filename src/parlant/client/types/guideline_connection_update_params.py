@@ -8,6 +8,10 @@ import pydantic
 
 
 class GuidelineConnectionUpdateParams(UniversalBaseModel):
+    """
+    #TODO
+    """
+
     add: typing.Optional[typing.List[GuidelineConnectionAddition]] = None
     remove: typing.Optional[typing.List[str]] = None
 

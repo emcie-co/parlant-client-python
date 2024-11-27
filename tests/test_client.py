@@ -20,11 +20,11 @@ from parlant.client import (
     Invoice,
 )
 
-from conftest import app
-from test_utilities import ContextOfTest
+from tests.conftest import app
+from tests.test_utilities import ContextOfTest
 
 PLUGIN_PORT = 8002
-PLUGIN_ADDRESS = f"http://localhost:{PLUGIN_PORT}"
+PLUGIN_ADDRESS = f"http://host.docker.internal:{PLUGIN_PORT}"
 
 
 def mock_tool() -> None:
@@ -50,7 +50,6 @@ def context() -> Iterator[ContextOfTest]:
 
 SERVER_PORT = 8000
 SERVER_ADDRESS = f"http://localhost:{SERVER_PORT}"
-CLI_PLUGIN_PATH = "tests/example_plugin.py"
 
 
 # async def test_parlant_client_happy_path_with_server_and_plugin(context: ContextOfTest) -> None:
@@ -232,8 +231,8 @@ def make_service_tool_association(
         tool_name,
         kind="openapi",
         openapi=OpenApiServiceParams(
-            url="http://localhost:8002",
-            source="http://localhost:8002/openapi.json",
+            url=PLUGIN_ADDRESS,
+            source=f"{PLUGIN_ADDRESS}/openapi.json",
         ),
     )
     service = client.services.retrieve(tool_name)

@@ -9,6 +9,10 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class ToolParameter(UniversalBaseModel):
+    """
+    Holds information regarding a tool parameter
+    """
+
     type: ToolParameterTypeDto
     description: typing.Optional[str] = pydantic.Field(default=None)
     """
