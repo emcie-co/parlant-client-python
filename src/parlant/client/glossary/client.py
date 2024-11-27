@@ -9,6 +9,7 @@ from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..errors.not_found_error import NotFoundError
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -23,9 +24,15 @@ class GlossaryClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Term]:
         """
+        Retrieves a list of all terms in the agent's glossary.
+
+        Returns an empty list if no terms associated to the provided agent's ID.
+        Terms are returned in no guaranteed order.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the term.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -33,7 +40,7 @@ class GlossaryClient:
         Returns
         -------
         typing.List[Term]
-            Successful Response
+            List of all terms in the agent's glossary.
 
         Examples
         --------
@@ -85,15 +92,29 @@ class GlossaryClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
+        Creates a new term in the agent's glossary.
+
+        The term will be initialized with the provided name and description, and optional synonyms.
+        The term will be associated with the specified agent.
+        A unique identifier will be automatically generated.
+
+        Default behaviors:
+
+        - `synonyms` defaults to an empty list if not provided
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the term.
 
         name : str
+            The name of the term, e.g., 'Gas' in blockchain.
 
         description : str
+            A detailed description of the term
 
         synonyms : typing.Optional[typing.Sequence[str]]
+            A list of synonyms for the term, including alternate contexts if applicable.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -101,7 +122,7 @@ class GlossaryClient:
         Returns
         -------
         Term
-            Successful Response
+            Term successfully created. Returns the complete term object including generated ID
 
         Examples
         --------
@@ -112,8 +133,9 @@ class GlossaryClient:
         )
         client.glossary.create_term(
             agent_id="agent_id",
-            name="name",
-            description="description",
+            name="Gas",
+            description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
+            synonyms=["Transaction Fee", "Blockchain Fuel"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -159,9 +181,12 @@ class GlossaryClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
+        Retrieves details of a specific term by ID for a given agent.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the term.
 
         term_id : str
 
@@ -171,7 +196,7 @@ class GlossaryClient:
         Returns
         -------
         Term
-            Successful Response
+            Term details successfully retrieved. Returns the complete term object
 
         Examples
         --------
@@ -199,6 +224,16 @@ class GlossaryClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -222,9 +257,15 @@ class GlossaryClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a term from the system.
+
+        Deleting a non-existent term will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the term.
 
         term_id : str
 
@@ -255,6 +296,16 @@ class GlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -284,14 +335,18 @@ class GlossaryClient:
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the term.
 
         term_id : str
 
         name : typing.Optional[str]
+            The name of the term, e.g., 'Gas' in blockchain.
 
         description : typing.Optional[str]
+            A detailed description of the term
 
         synonyms : typing.Optional[typing.Sequence[str]]
+            A list of synonyms for the term, including alternate contexts if applicable.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -299,7 +354,7 @@ class GlossaryClient:
         Returns
         -------
         Term
-            Successful Response
+            Term successfully updated. Returns the updated term object
 
         Examples
         --------
@@ -311,6 +366,9 @@ class GlossaryClient:
         client.glossary.update_term(
             agent_id="agent_id",
             term_id="term_id",
+            name="Gas",
+            description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
+            synonyms=["Transaction Fee", "Blockchain Fuel"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -332,6 +390,16 @@ class GlossaryClient:
                         type_=Term,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
@@ -357,9 +425,15 @@ class AsyncGlossaryClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Term]:
         """
+        Retrieves a list of all terms in the agent's glossary.
+
+        Returns an empty list if no terms associated to the provided agent's ID.
+        Terms are returned in no guaranteed order.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the term.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -367,7 +441,7 @@ class AsyncGlossaryClient:
         Returns
         -------
         typing.List[Term]
-            Successful Response
+            List of all terms in the agent's glossary.
 
         Examples
         --------
@@ -427,15 +501,29 @@ class AsyncGlossaryClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
+        Creates a new term in the agent's glossary.
+
+        The term will be initialized with the provided name and description, and optional synonyms.
+        The term will be associated with the specified agent.
+        A unique identifier will be automatically generated.
+
+        Default behaviors:
+
+        - `synonyms` defaults to an empty list if not provided
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the term.
 
         name : str
+            The name of the term, e.g., 'Gas' in blockchain.
 
         description : str
+            A detailed description of the term
 
         synonyms : typing.Optional[typing.Sequence[str]]
+            A list of synonyms for the term, including alternate contexts if applicable.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -443,7 +531,7 @@ class AsyncGlossaryClient:
         Returns
         -------
         Term
-            Successful Response
+            Term successfully created. Returns the complete term object including generated ID
 
         Examples
         --------
@@ -459,8 +547,9 @@ class AsyncGlossaryClient:
         async def main() -> None:
             await client.glossary.create_term(
                 agent_id="agent_id",
-                name="name",
-                description="description",
+                name="Gas",
+                description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
+                synonyms=["Transaction Fee", "Blockchain Fuel"],
             )
 
 
@@ -509,9 +598,12 @@ class AsyncGlossaryClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
+        Retrieves details of a specific term by ID for a given agent.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the term.
 
         term_id : str
 
@@ -521,7 +613,7 @@ class AsyncGlossaryClient:
         Returns
         -------
         Term
-            Successful Response
+            Term details successfully retrieved. Returns the complete term object
 
         Examples
         --------
@@ -557,6 +649,16 @@ class AsyncGlossaryClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -580,9 +682,15 @@ class AsyncGlossaryClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a term from the system.
+
+        Deleting a non-existent term will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the term.
 
         term_id : str
 
@@ -621,6 +729,16 @@ class AsyncGlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -650,14 +768,18 @@ class AsyncGlossaryClient:
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent associated with the term.
 
         term_id : str
 
         name : typing.Optional[str]
+            The name of the term, e.g., 'Gas' in blockchain.
 
         description : typing.Optional[str]
+            A detailed description of the term
 
         synonyms : typing.Optional[typing.Sequence[str]]
+            A list of synonyms for the term, including alternate contexts if applicable.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -665,7 +787,7 @@ class AsyncGlossaryClient:
         Returns
         -------
         Term
-            Successful Response
+            Term successfully updated. Returns the updated term object
 
         Examples
         --------
@@ -682,6 +804,9 @@ class AsyncGlossaryClient:
             await client.glossary.update_term(
                 agent_id="agent_id",
                 term_id="term_id",
+                name="Gas",
+                description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
+                synonyms=["Transaction Fee", "Blockchain Fuel"],
             )
 
 
@@ -706,6 +831,16 @@ class AsyncGlossaryClient:
                         type_=Term,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(

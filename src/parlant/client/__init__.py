@@ -67,7 +67,12 @@ from .types import (
     ValidationError,
     ValidationErrorLocItem,
 )
-from .errors import GatewayTimeoutError, NotFoundError, UnprocessableEntityError
+from .errors import (
+    GatewayTimeoutError,
+    NotFoundError,
+    ServiceUnavailableError,
+    UnprocessableEntityError,
+)
 from . import (
     agents,
     context_variables,
@@ -136,6 +141,7 @@ __all__ = [
     "PreparationIterationGenerations",
     "SdkServiceParams",
     "Service",
+    "ServiceUnavailableError",
     "Session",
     "Tag",
     "TagsUpdateParams",

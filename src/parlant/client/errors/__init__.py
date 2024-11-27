@@ -2,6 +2,12 @@
 
 from .gateway_timeout_error import GatewayTimeoutError
 from .not_found_error import NotFoundError
+from .service_unavailable_error import ServiceUnavailableError
 from .unprocessable_entity_error import UnprocessableEntityError
 
-__all__ = ["GatewayTimeoutError", "NotFoundError", "UnprocessableEntityError"]
+__all__ = [
+    "GatewayTimeoutError",
+    "NotFoundError",
+    "ServiceUnavailableError",
+    "UnprocessableEntityError",
+]

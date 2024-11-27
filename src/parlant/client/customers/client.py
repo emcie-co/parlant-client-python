@@ -141,6 +141,7 @@ class CustomersClient:
         Parameters
         ----------
         customer_id : str
+            Unique identifer of a customer.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -255,6 +256,7 @@ class CustomersClient:
         Parameters
         ----------
         customer_id : str
+            Unique identifer of a customer.
 
         name : typing.Optional[str]
 
@@ -462,6 +464,7 @@ class AsyncCustomersClient:
         Parameters
         ----------
         customer_id : str
+            Unique identifer of a customer.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -592,6 +595,7 @@ class AsyncCustomersClient:
         Parameters
         ----------
         customer_id : str
+            Unique identifer of a customer.
 
         name : typing.Optional[str]
 
