@@ -12,9 +12,9 @@ from ..core.api_error import ApiError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.consumption_offsets_update_params import ConsumptionOffsetsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
+from ..types.event_source_dto import EventSourceDto
 from ..types.event import Event
 from ..types.event_kind_dto import EventKindDto
-from ..types.event_source_dto import EventSourceDto
 from ..types.moderation import Moderation
 from ..types.event_inspection_result import EventInspectionResult
 from ..core.client_wrapper import AsyncClientWrapper
@@ -415,6 +415,7 @@ class SessionsClient:
         session_id: str,
         *,
         min_offset: typing.Optional[int] = None,
+        source: typing.Optional[EventSourceDto] = None,
         correlation_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
         wait_for_data: typing.Optional[int] = None,
@@ -426,6 +427,8 @@ class SessionsClient:
         session_id : str
 
         min_offset : typing.Optional[int]
+
+        source : typing.Optional[EventSourceDto]
 
         correlation_id : typing.Optional[str]
 
@@ -458,6 +461,7 @@ class SessionsClient:
             method="GET",
             params={
                 "min_offset": min_offset,
+                "source": source,
                 "correlation_id": correlation_id,
                 "kinds": kinds,
                 "wait_for_data": wait_for_data,
@@ -495,7 +499,7 @@ class SessionsClient:
         kind: EventKindDto,
         source: EventSourceDto,
         moderation: typing.Optional[Moderation] = None,
-        data: typing.Optional[str] = OMIT,
+        message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -509,7 +513,7 @@ class SessionsClient:
 
         moderation : typing.Optional[Moderation]
 
-        data : typing.Optional[str]
+        message : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -541,7 +545,7 @@ class SessionsClient:
             json={
                 "kind": kind,
                 "source": source,
-                "data": data,
+                "message": message,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1133,6 +1137,7 @@ class AsyncSessionsClient:
         session_id: str,
         *,
         min_offset: typing.Optional[int] = None,
+        source: typing.Optional[EventSourceDto] = None,
         correlation_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
         wait_for_data: typing.Optional[int] = None,
@@ -1144,6 +1149,8 @@ class AsyncSessionsClient:
         session_id : str
 
         min_offset : typing.Optional[int]
+
+        source : typing.Optional[EventSourceDto]
 
         correlation_id : typing.Optional[str]
 
@@ -1184,6 +1191,7 @@ class AsyncSessionsClient:
             method="GET",
             params={
                 "min_offset": min_offset,
+                "source": source,
                 "correlation_id": correlation_id,
                 "kinds": kinds,
                 "wait_for_data": wait_for_data,
@@ -1221,7 +1229,7 @@ class AsyncSessionsClient:
         kind: EventKindDto,
         source: EventSourceDto,
         moderation: typing.Optional[Moderation] = None,
-        data: typing.Optional[str] = OMIT,
+        message: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -1235,7 +1243,7 @@ class AsyncSessionsClient:
 
         moderation : typing.Optional[Moderation]
 
-        data : typing.Optional[str]
+        message : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1275,7 +1283,7 @@ class AsyncSessionsClient:
             json={
                 "kind": kind,
                 "source": source,
-                "data": data,
+                "message": message,
             },
             request_options=request_options,
             omit=OMIT,

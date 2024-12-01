@@ -2,4 +2,4 @@
 
 import typing
 
-Moderation = typing.Union[typing.Literal["auto", "none"], typing.Any]
+Moderation = typing.Union[typing.Literal["auto", "paranoid", "none"], typing.Any]
