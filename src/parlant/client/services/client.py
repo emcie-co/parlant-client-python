@@ -163,9 +163,7 @@ class ServicesClient:
         Returns
         -------
         Service
-            Service successfully created or updated.
-                            The service may take a few seconds to become fully operational
-                            as it establishes connections.
+            Service successfully created or updated. The service may take a few seconds to become fully operational as it establishes connections.
 
         Examples
         --------
@@ -502,9 +500,7 @@ class AsyncServicesClient:
         Returns
         -------
         Service
-            Service successfully created or updated.
-                            The service may take a few seconds to become fully operational
-                            as it establishes connections.
+            Service successfully created or updated. The service may take a few seconds to become fully operational as it establishes connections.
 
         Examples
         --------
