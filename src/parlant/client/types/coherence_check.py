@@ -3,17 +3,24 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 from .coherence_check_kind_dto import CoherenceCheckKindDto
 from .guideline_content import GuidelineContent
+import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
-import pydantic
 
 
 class CoherenceCheck(UniversalBaseModel):
     kind: CoherenceCheckKindDto
     first: GuidelineContent
     second: GuidelineContent
-    issue: str
-    severity: int
+    issue: str = pydantic.Field()
+    """
+    Description of the contradiction or conflict between Guidelines
+    """
+
+    severity: int = pydantic.Field()
+    """
+    Numerical rating of the contradiction's severity (1-10, where 10 is most severe)
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

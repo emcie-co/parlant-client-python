@@ -11,12 +11,12 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 class GuidelineCreationResult(UniversalBaseModel):
     """
-    Result wrapped for `Guideline`s creation.
+    Result wrapper for Guidelines creation.
     """
 
     items: typing.List[GuidelineWithConnectionsAndToolAssociations] = pydantic.Field()
     """
-    
+    A collection of Guidelines along with their associated connections and tool associations. This field provides a comprehensive view of each Guideline's relationships and capabilities, including both logical connections to other Guidelines and associations with tools that can be triggered.
     """
 
     if IS_PYDANTIC_V2:

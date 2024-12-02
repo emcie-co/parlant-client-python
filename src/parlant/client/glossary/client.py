@@ -6,10 +6,10 @@ from ..core.request_options import RequestOptions
 from ..types.term import Term
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
+from ..errors.not_found_error import NotFoundError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..errors.not_found_error import NotFoundError
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -66,6 +66,16 @@ class GlossaryClient:
                         type_=typing.List[Term],  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
@@ -475,6 +485,16 @@ class AsyncGlossaryClient:
                         type_=typing.List[Term],  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(

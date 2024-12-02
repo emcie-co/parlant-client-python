@@ -10,23 +10,27 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 class Service(UniversalBaseModel):
     """
-    Details about a service integration. The tools list is only included when retrieving a specific service.
+    Details about an integrated service and its available tools.
+
+    Services can be either SDK-based for advanced features or OpenAPI-based
+    for simpler integrations. The tools list is only included when retrieving
+    a specific service, not in list operations.
     """
 
     name: str = pydantic.Field()
     """
-    User assigned name of the service
+    Name of the service
     """
 
     kind: ToolServiceKindDto
     url: str = pydantic.Field()
     """
-    The URL of the tool service
+    Base URL where the service is hosted
     """
 
     tools: typing.Optional[typing.List[Tool]] = pydantic.Field(default=None)
     """
-    Optional list of tools associated with this service
+    List of tools provided by this service. Only included when retrieving a specific service.
     """
 
     if IS_PYDANTIC_V2:

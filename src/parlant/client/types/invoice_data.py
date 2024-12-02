@@ -3,12 +3,15 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 from .guideline_invoice_data import GuidelineInvoiceData
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class InvoiceData(UniversalBaseModel):
-    guideline: typing.Optional[GuidelineInvoiceData] = None
+    guideline: typing.Optional[GuidelineInvoiceData] = pydantic.Field(default=None)
+    """
+    Evaluation results for a Guideline, including contradiction checks and connection proposals
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

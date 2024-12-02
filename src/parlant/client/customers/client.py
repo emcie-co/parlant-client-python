@@ -9,6 +9,7 @@ from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..core.jsonable_encoder import jsonable_encoder
+from ..errors.not_found_error import NotFoundError
 from ..types.customer_extra_update_params import CustomerExtraUpdateParams
 from ..types.tags_update_params import TagsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
@@ -26,6 +27,11 @@ class CustomersClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Customer]:
         """
+        Retrieves a list of all customers in the system.
+
+        Returns an empty list if no customers exist.
+        Customers are returned in no guaranteed order.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -34,7 +40,7 @@ class CustomersClient:
         Returns
         -------
         typing.List[Customer]
-            Successful Response
+            List of all customers in the system.
 
         Examples
         --------
@@ -72,11 +78,18 @@ class CustomersClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
+        Creates a new `Customer` in the system.
+
+        A `Customer` may be created with as little as a `name`.
+        `extra` key-value pairs and additional `tags` may be attached to a `Customer`.
+
         Parameters
         ----------
         name : str
+            An arbitrary string that indentifies and/or describes the `Customer`
 
         extra : typing.Optional[typing.Dict[str, typing.Optional[str]]]
+            Key-value pairs (`str: str`) to describe the customer
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -84,7 +97,7 @@ class CustomersClient:
         Returns
         -------
         Customer
-            Successful Response
+            Customer successfully created. Returns the new `Customer` object.
 
         Examples
         --------
@@ -94,7 +107,8 @@ class CustomersClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.customers.create(
-            name="name",
+            name="Scooby",
+            extra={"VIP": "Yes", "email": "scooby@dooby.do"},
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -138,10 +152,15 @@ class CustomersClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
+        Retrieves details of a specific customer by ID.
+
+        Returns a complete customer object including their metadata and tags.
+        The customer must exist in the system.
+
         Parameters
         ----------
         customer_id : str
-            Unique identifer of a customer.
+            Unique identifier for the customer
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -149,7 +168,7 @@ class CustomersClient:
         Returns
         -------
         Customer
-            Successful Response
+            Customer details successfully retrieved. Returns the Customer object.
 
         Examples
         --------
@@ -176,6 +195,16 @@ class CustomersClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -198,6 +227,11 @@ class CustomersClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a customer from the system.
+
+        Deleting a non-existent customer will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
         customer_id : str
@@ -228,6 +262,16 @@ class CustomersClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -253,16 +297,25 @@ class CustomersClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
+        Updates an existing customer's attributes.
+
+        Only provided attributes will be updated; others remain unchanged.
+        The customer's ID and creation timestamp cannot be modified.
+        Extra metadata and tags can be added or removed independently.
+
         Parameters
         ----------
         customer_id : str
-            Unique identifer of a customer.
+            Unique identifier for the customer
 
         name : typing.Optional[str]
+            Optionally, an arbitrary string that indentifies and/or describes the `Customer`
 
         extra : typing.Optional[CustomerExtraUpdateParams]
+            Optional changes to the `Customer`'s extra metadata
 
         tags : typing.Optional[TagsUpdateParams]
+            Optional changes to the `Customer`'s tags metadata
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -270,17 +323,26 @@ class CustomersClient:
         Returns
         -------
         Customer
-            Successful Response
+            Customer successfully updated. Returns the updated Customer object.
 
         Examples
         --------
-        from parlant.client import ParlantClient
+        from parlant.client import CustomerExtraUpdateParams, ParlantClient, TagsUpdateParams
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
         client.customers.update(
             customer_id="customer_id",
+            name="Scooby",
+            extra=CustomerExtraUpdateParams(
+                add={"VIP": "Yes", "email": "scooby@dooby.do"},
+                remove=["old_email", "old_title"],
+            ),
+            tags=TagsUpdateParams(
+                add=["VIP", "New User"],
+                remove=["old_email", "old_title"],
+            ),
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -309,6 +371,16 @@ class CustomersClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -333,6 +405,11 @@ class AsyncCustomersClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Customer]:
         """
+        Retrieves a list of all customers in the system.
+
+        Returns an empty list if no customers exist.
+        Customers are returned in no guaranteed order.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -341,7 +418,7 @@ class AsyncCustomersClient:
         Returns
         -------
         typing.List[Customer]
-            Successful Response
+            List of all customers in the system.
 
         Examples
         --------
@@ -387,11 +464,18 @@ class AsyncCustomersClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
+        Creates a new `Customer` in the system.
+
+        A `Customer` may be created with as little as a `name`.
+        `extra` key-value pairs and additional `tags` may be attached to a `Customer`.
+
         Parameters
         ----------
         name : str
+            An arbitrary string that indentifies and/or describes the `Customer`
 
         extra : typing.Optional[typing.Dict[str, typing.Optional[str]]]
+            Key-value pairs (`str: str`) to describe the customer
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -399,7 +483,7 @@ class AsyncCustomersClient:
         Returns
         -------
         Customer
-            Successful Response
+            Customer successfully created. Returns the new `Customer` object.
 
         Examples
         --------
@@ -414,7 +498,8 @@ class AsyncCustomersClient:
 
         async def main() -> None:
             await client.customers.create(
-                name="name",
+                name="Scooby",
+                extra={"VIP": "Yes", "email": "scooby@dooby.do"},
             )
 
 
@@ -461,10 +546,15 @@ class AsyncCustomersClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
+        Retrieves details of a specific customer by ID.
+
+        Returns a complete customer object including their metadata and tags.
+        The customer must exist in the system.
+
         Parameters
         ----------
         customer_id : str
-            Unique identifer of a customer.
+            Unique identifier for the customer
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -472,7 +562,7 @@ class AsyncCustomersClient:
         Returns
         -------
         Customer
-            Successful Response
+            Customer details successfully retrieved. Returns the Customer object.
 
         Examples
         --------
@@ -507,6 +597,16 @@ class AsyncCustomersClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -529,6 +629,11 @@ class AsyncCustomersClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a customer from the system.
+
+        Deleting a non-existent customer will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
         customer_id : str
@@ -567,6 +672,16 @@ class AsyncCustomersClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -592,16 +707,25 @@ class AsyncCustomersClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
+        Updates an existing customer's attributes.
+
+        Only provided attributes will be updated; others remain unchanged.
+        The customer's ID and creation timestamp cannot be modified.
+        Extra metadata and tags can be added or removed independently.
+
         Parameters
         ----------
         customer_id : str
-            Unique identifer of a customer.
+            Unique identifier for the customer
 
         name : typing.Optional[str]
+            Optionally, an arbitrary string that indentifies and/or describes the `Customer`
 
         extra : typing.Optional[CustomerExtraUpdateParams]
+            Optional changes to the `Customer`'s extra metadata
 
         tags : typing.Optional[TagsUpdateParams]
+            Optional changes to the `Customer`'s tags metadata
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -609,13 +733,17 @@ class AsyncCustomersClient:
         Returns
         -------
         Customer
-            Successful Response
+            Customer successfully updated. Returns the updated Customer object.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient
+        from parlant.client import (
+            AsyncParlantClient,
+            CustomerExtraUpdateParams,
+            TagsUpdateParams,
+        )
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -625,6 +753,15 @@ class AsyncCustomersClient:
         async def main() -> None:
             await client.customers.update(
                 customer_id="customer_id",
+                name="Scooby",
+                extra=CustomerExtraUpdateParams(
+                    add={"VIP": "Yes", "email": "scooby@dooby.do"},
+                    remove=["old_email", "old_title"],
+                ),
+                tags=TagsUpdateParams(
+                    add=["VIP", "New User"],
+                    remove=["old_email", "old_title"],
+                ),
             )
 
 
@@ -655,6 +792,16 @@ class AsyncCustomersClient:
                         type_=Customer,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(

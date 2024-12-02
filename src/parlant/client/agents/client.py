@@ -114,8 +114,8 @@ class AgentsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.agents.create(
-            name="Technical Support Assistant",
-            description="Specialized in handling technical support queries with deep knowledge of our product suite",
+            name="Haxon",
+            description="Technical Support Assistant",
             max_engine_iterations=3,
         )
         """
@@ -323,7 +323,7 @@ class AgentsClient:
         Returns
         -------
         Agent
-            Successful Response
+            Agent successfully updated. Returns the updated `Agent`.
 
         Examples
         --------
@@ -334,8 +334,8 @@ class AgentsClient:
         )
         client.agents.update(
             agent_id="agent_id",
-            name="Technical Support Assistant",
-            description="Specialized in handling technical support queries with deep knowledge of our product suite",
+            name="Haxon",
+            description="Technical Support Assistant",
             max_engine_iterations=3,
         )
         """
@@ -496,8 +496,8 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.create(
-                name="Technical Support Assistant",
-                description="Specialized in handling technical support queries with deep knowledge of our product suite",
+                name="Haxon",
+                description="Technical Support Assistant",
                 max_engine_iterations=3,
             )
 
@@ -724,7 +724,7 @@ class AsyncAgentsClient:
         Returns
         -------
         Agent
-            Successful Response
+            Agent successfully updated. Returns the updated `Agent`.
 
         Examples
         --------
@@ -740,8 +740,8 @@ class AsyncAgentsClient:
         async def main() -> None:
             await client.agents.update(
                 agent_id="agent_id",
-                name="Technical Support Assistant",
-                description="Specialized in handling technical support queries with deep knowledge of our product suite",
+                name="Haxon",
+                description="Technical Support Assistant",
                 max_engine_iterations=3,
             )
 

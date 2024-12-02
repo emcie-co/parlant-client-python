@@ -6,6 +6,7 @@ from ..core.request_options import RequestOptions
 from ..types.context_variable import ContextVariable
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
+from ..errors.not_found_error import NotFoundError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
@@ -28,9 +29,12 @@ class ContextVariablesClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[ContextVariable]:
         """
+        Lists all context variables set for the provided agent
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -38,7 +42,7 @@ class ContextVariablesClient:
         Returns
         -------
         typing.List[ContextVariable]
-            Successful Response
+            List of all context variable for the provided agent
 
         Examples
         --------
@@ -64,6 +68,16 @@ class ContextVariablesClient:
                         type_=typing.List[ContextVariable],  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
@@ -91,17 +105,30 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
+        Creates a new context variable for tracking customer-specific or tag-specific data.
+
+        Example uses:
+
+        - Track subscription tiers to control feature access
+        - Store usage patterns for personalized recommendations
+        - Remember customer preferences for tailored responses
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         name : str
+            Name of the context variable
 
         description : typing.Optional[str]
+            Description of the context variable's purpose
 
         tool_id : typing.Optional[ToolId]
+            Tool identifier associated with this variable
 
         freshness_rules : typing.Optional[FreshnessRules]
+            Rules for data freshness validation
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -109,7 +136,7 @@ class ContextVariablesClient:
         Returns
         -------
         ContextVariable
-            Successful Response
+            Context variable type successfully created
 
         Examples
         --------
@@ -150,6 +177,16 @@ class ContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -169,9 +206,12 @@ class ContextVariablesClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
+        Deletes all context variables and their values for the provided agent ID
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -199,6 +239,16 @@ class ContextVariablesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -223,13 +273,19 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableReadResult:
         """
+        Retrieves a context variable's details and optionally its values.
+
+        Can return all customer or tag values for this variable type if include_values=True.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
         include_values : typing.Optional[bool]
+            Whether to include variable values in the response
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -237,7 +293,7 @@ class ContextVariablesClient:
         Returns
         -------
         ContextVariableReadResult
-            Successful Response
+            Context variable details with optional values
 
         Examples
         --------
@@ -268,6 +324,16 @@ class ContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -291,9 +357,12 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a specific context variable and all its values.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
@@ -324,6 +393,16 @@ class ContextVariablesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -351,19 +430,28 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
+        Updates an existing context variable.
+
+        Only provided fields will be updated; others remain unchanged.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
         name : typing.Optional[str]
+            Name of the context variable
 
         description : typing.Optional[str]
+            Description of the context variable's purpose
 
         tool_id : typing.Optional[ToolId]
+            Tool identifier associated with this variable
 
         freshness_rules : typing.Optional[FreshnessRules]
+            Rules for data freshness validation
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -371,7 +459,7 @@ class ContextVariablesClient:
         Returns
         -------
         ContextVariable
-            Successful Response
+            Context variable type successfully updated
 
         Examples
         --------
@@ -412,6 +500,16 @@ class ContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -436,13 +534,19 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
+        Retrieves the value of a context variable for a specific customer or tag.
+
+        The key should be a customer identifier or a customer tag in the format `tag:{tag_id}`.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
         key : str
+            Key for the variable value (customer identifier or tag in the format 'tag:{tag_id}')
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -450,7 +554,7 @@ class ContextVariablesClient:
         Returns
         -------
         ContextVariableValue
-            Successful Response
+            Retrieved context value for the customer or tag
 
         Examples
         --------
@@ -479,6 +583,16 @@ class ContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -504,13 +618,20 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
+        Updates the value of a context variable.
+
+        The key represents a customer identifier or a customer tag in the format `tag:{tag_id}`.
+        The data contains the actual context information being stored.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
         key : str
+            Key for the variable value (customer identifier or tag in the format 'tag:{tag_id}')
 
         data : typing.Optional[typing.Any]
 
@@ -520,7 +641,7 @@ class ContextVariablesClient:
         Returns
         -------
         ContextVariableValue
-            Successful Response
+            Context value successfully updated for the customer or tag
 
         Examples
         --------
@@ -554,6 +675,16 @@ class ContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -578,13 +709,20 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a specific customer's or tag's value for this context variable.
+
+        The key should be a customer identifier or a customer tag in the format `tag:{tag_id}`.
+        Removes only the value for the specified key while keeping the variable's configuration.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
         key : str
+            Key for the variable value (customer identifier or tag in the format 'tag:{tag_id}')
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -614,6 +752,16 @@ class ContextVariablesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -638,9 +786,12 @@ class AsyncContextVariablesClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[ContextVariable]:
         """
+        Lists all context variables set for the provided agent
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -648,7 +799,7 @@ class AsyncContextVariablesClient:
         Returns
         -------
         typing.List[ContextVariable]
-            Successful Response
+            List of all context variable for the provided agent
 
         Examples
         --------
@@ -683,6 +834,16 @@ class AsyncContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -709,17 +870,30 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
+        Creates a new context variable for tracking customer-specific or tag-specific data.
+
+        Example uses:
+
+        - Track subscription tiers to control feature access
+        - Store usage patterns for personalized recommendations
+        - Remember customer preferences for tailored responses
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         name : str
+            Name of the context variable
 
         description : typing.Optional[str]
+            Description of the context variable's purpose
 
         tool_id : typing.Optional[ToolId]
+            Tool identifier associated with this variable
 
         freshness_rules : typing.Optional[FreshnessRules]
+            Rules for data freshness validation
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -727,7 +901,7 @@ class AsyncContextVariablesClient:
         Returns
         -------
         ContextVariable
-            Successful Response
+            Context variable type successfully created
 
         Examples
         --------
@@ -776,6 +950,16 @@ class AsyncContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -795,9 +979,12 @@ class AsyncContextVariablesClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
+        Deletes all context variables and their values for the provided agent ID
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -833,6 +1020,16 @@ class AsyncContextVariablesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -857,13 +1054,19 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableReadResult:
         """
+        Retrieves a context variable's details and optionally its values.
+
+        Can return all customer or tag values for this variable type if include_values=True.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
         include_values : typing.Optional[bool]
+            Whether to include variable values in the response
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -871,7 +1074,7 @@ class AsyncContextVariablesClient:
         Returns
         -------
         ContextVariableReadResult
-            Successful Response
+            Context variable details with optional values
 
         Examples
         --------
@@ -910,6 +1113,16 @@ class AsyncContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -933,9 +1146,12 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a specific context variable and all its values.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
@@ -974,6 +1190,16 @@ class AsyncContextVariablesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -1001,19 +1227,28 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
+        Updates an existing context variable.
+
+        Only provided fields will be updated; others remain unchanged.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
         name : typing.Optional[str]
+            Name of the context variable
 
         description : typing.Optional[str]
+            Description of the context variable's purpose
 
         tool_id : typing.Optional[ToolId]
+            Tool identifier associated with this variable
 
         freshness_rules : typing.Optional[FreshnessRules]
+            Rules for data freshness validation
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1021,7 +1256,7 @@ class AsyncContextVariablesClient:
         Returns
         -------
         ContextVariable
-            Successful Response
+            Context variable type successfully updated
 
         Examples
         --------
@@ -1070,6 +1305,16 @@ class AsyncContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -1094,13 +1339,19 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
+        Retrieves the value of a context variable for a specific customer or tag.
+
+        The key should be a customer identifier or a customer tag in the format `tag:{tag_id}`.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
         key : str
+            Key for the variable value (customer identifier or tag in the format 'tag:{tag_id}')
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1108,7 +1359,7 @@ class AsyncContextVariablesClient:
         Returns
         -------
         ContextVariableValue
-            Successful Response
+            Retrieved context value for the customer or tag
 
         Examples
         --------
@@ -1145,6 +1396,16 @@ class AsyncContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -1170,13 +1431,20 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
+        Updates the value of a context variable.
+
+        The key represents a customer identifier or a customer tag in the format `tag:{tag_id}`.
+        The data contains the actual context information being stored.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
         key : str
+            Key for the variable value (customer identifier or tag in the format 'tag:{tag_id}')
 
         data : typing.Optional[typing.Any]
 
@@ -1186,7 +1454,7 @@ class AsyncContextVariablesClient:
         Returns
         -------
         ContextVariableValue
-            Successful Response
+            Context value successfully updated for the customer or tag
 
         Examples
         --------
@@ -1228,6 +1496,16 @@ class AsyncContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
@@ -1252,13 +1530,20 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a specific customer's or tag's value for this context variable.
+
+        The key should be a customer identifier or a customer tag in the format `tag:{tag_id}`.
+        Removes only the value for the specified key while keeping the variable's configuration.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier of the agent
 
         variable_id : str
 
         key : str
+            Key for the variable value (customer identifier or tag in the format 'tag:{tag_id}')
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1296,6 +1581,16 @@ class AsyncContextVariablesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(

@@ -3,13 +3,24 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 from .tool_id import ToolId
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class GuidelineToolAssociationUpdateParams(UniversalBaseModel):
-    add: typing.Optional[typing.List[ToolId]] = None
-    remove: typing.Optional[typing.List[ToolId]] = None
+    """
+    Parameters for adding/removing tool associations.
+    """
+
+    add: typing.Optional[typing.List[ToolId]] = pydantic.Field(default=None)
+    """
+    A collection of Tool identifications to be associated with the `Guideline`
+    """
+
+    remove: typing.Optional[typing.List[ToolId]] = pydantic.Field(default=None)
+    """
+    A collection of Tool identifications to be detached from the `Guideline`
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

@@ -11,7 +11,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 class GuidelineWithConnectionsAndToolAssociations(UniversalBaseModel):
     """
-    A `Guideline` with it's `GuidelineCnnection`s and `TooAssociation`s.
+    A Guideline with its connections and tool associations.
     """
 
     guideline: Guideline

@@ -8,7 +8,10 @@ import typing
 
 class GuidelineContent(UniversalBaseModel):
     """
-    A container for the values of a Guideline's content
+    Represention of a guideline with a condition-action pair.
+
+    This model defines a structure for guidelines where specific actions should be taken
+    when certain conditions are met. It follows a simple "if condition then action" pattern.
     """
 
     condition: str = pydantic.Field()

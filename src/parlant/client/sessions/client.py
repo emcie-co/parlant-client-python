@@ -420,7 +420,7 @@ class SessionsClient:
         Returns
         -------
         Session
-            Successful Response
+            Session successfully updated
 
         Examples
         --------
@@ -497,6 +497,30 @@ class SessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Event]:
         """
+        Lists events from a session with optional filtering and waiting capabilities.
+
+        This endpoint retrieves events from a specified session and can:
+
+        1. Filter events by their offset, source, type, and correlation ID
+        2. Wait for new events to arrive if requested
+        3. Return events in chronological order based on their offset
+
+        Args:
+        session_id (SessionIdPath): The unique identifier of the session
+        min_offset (Optional[int]): If set, only return events with offset >= this value
+        source (Optional[EventSourceDTO]): If set, only return events from this source
+        (e.g., 'customer', 'ai_agent')
+        correlation_id (Optional[str]): If set, only return events with this correlation ID
+        kinds (Optional[str]): Comma-separated list of event kinds to filter by
+        (e.g., "message,tool,status")
+        wait_for_data (int): Maximum time in seconds to wait for new events.
+        If 0, return immediately with current events.
+        If > 0, wait up to this many seconds for new events matching criteria.
+
+        Notes:
+        Long Polling Behavior: - When wait_for_data = 0:
+        Returns immediately with any existing events that match the criteria - When wait_for_data > 0: - If new matching events arrive within the timeout period, returns with those events - If no new events arrive before timeout, raises 504 Gateway Timeout - If matching events already exist, returns immediately with those events
+
         Parameters
         ----------
         session_id : str
@@ -616,7 +640,6 @@ class SessionsClient:
             Content moderation level for the event
 
         message : typing.Optional[str]
-            Event payload data, format depends on kind
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -637,7 +660,6 @@ class SessionsClient:
             session_id="session_id",
             kind="message",
             source="customer",
-            data="Hello, I need help with my order",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -1279,7 +1301,7 @@ class AsyncSessionsClient:
         Returns
         -------
         Session
-            Successful Response
+            Session successfully updated
 
         Examples
         --------
@@ -1364,6 +1386,30 @@ class AsyncSessionsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Event]:
         """
+        Lists events from a session with optional filtering and waiting capabilities.
+
+        This endpoint retrieves events from a specified session and can:
+
+        1. Filter events by their offset, source, type, and correlation ID
+        2. Wait for new events to arrive if requested
+        3. Return events in chronological order based on their offset
+
+        Args:
+        session_id (SessionIdPath): The unique identifier of the session
+        min_offset (Optional[int]): If set, only return events with offset >= this value
+        source (Optional[EventSourceDTO]): If set, only return events from this source
+        (e.g., 'customer', 'ai_agent')
+        correlation_id (Optional[str]): If set, only return events with this correlation ID
+        kinds (Optional[str]): Comma-separated list of event kinds to filter by
+        (e.g., "message,tool,status")
+        wait_for_data (int): Maximum time in seconds to wait for new events.
+        If 0, return immediately with current events.
+        If > 0, wait up to this many seconds for new events matching criteria.
+
+        Notes:
+        Long Polling Behavior: - When wait_for_data = 0:
+        Returns immediately with any existing events that match the criteria - When wait_for_data > 0: - If new matching events arrive within the timeout period, returns with those events - If no new events arrive before timeout, raises 504 Gateway Timeout - If matching events already exist, returns immediately with those events
+
         Parameters
         ----------
         session_id : str
@@ -1491,7 +1537,6 @@ class AsyncSessionsClient:
             Content moderation level for the event
 
         message : typing.Optional[str]
-            Event payload data, format depends on kind
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1517,7 +1562,6 @@ class AsyncSessionsClient:
                 session_id="session_id",
                 kind="message",
                 source="customer",
-                data="Hello, I need help with my order",
             )
 
 

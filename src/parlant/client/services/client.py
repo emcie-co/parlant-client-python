@@ -31,6 +31,14 @@ class ServicesClient:
         """
         Get details about a specific service including all its tools.
 
+        The response includes:
+
+        - Basic service information (name, kind, URL)
+        - Complete list of available tools
+        - Parameter definitions for each tool
+
+        Notes:
+
         - Tools list may be empty if service is still initializing
         - Parameters marked as required must be provided when using a tool
         - Enum parameters restrict inputs to the listed values
@@ -38,7 +46,7 @@ class ServicesClient:
         Parameters
         ----------
         name : str
-            User assigned name of the service
+            Unique identifier for the service
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -118,25 +126,36 @@ class ServicesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Service:
         """
-        Create a new service or update an existing one.
+        Creates a new service or updates an existing one.
 
-        - For SDK services, the target server must implement the Parlant SDK protocol
-        - For OpenAPI services, the spec must be accessible and compatible with OpenAPI 3.0
-        - Service names must be unique and should be kebab-case
-        - Updates cause a brief service interruption while reconnecting
+        For SDK services:
+
+        - Target server must implement the Parlant SDK protocol
+        - Supports bidirectional communication and streaming
+
+        For OpenAPI services:
+
+        - Spec must be accessible and compatible with OpenAPI 3.0
+        - Limited to request/response patterns
+
+        Common requirements:
+
+        - Service names must be unique and kebab-case
+        - URLs must include http:// or https:// scheme
+        - Updates cause brief service interruption while reconnecting
 
         Parameters
         ----------
         name : str
-            The name of service to update
+            Unique name of the service to update
 
         kind : ToolServiceKindDto
 
         sdk : typing.Optional[SdkServiceParams]
-            `SDKServiceParams` in case `kind` is `'sdk'`.
+            SDK service configuration parameters. Required when kind is 'sdk'.
 
         openapi : typing.Optional[OpenApiServiceParams]
-            `OpenAPIServiceParams` in case `kind` is `'openapi '`.
+            OpenAPI service configuration parameters. Required when kind is 'openapi'.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -144,18 +163,24 @@ class ServicesClient:
         Returns
         -------
         Service
-            Service successfully created or updated. The service may take a few seconds to become fully operational as it establishes connections.
+            Service successfully created or updated.
+                            The service may take a few seconds to become fully operational
+                            as it establishes connections.
 
         Examples
         --------
-        from parlant.client import ParlantClient
+        from parlant.client import OpenApiServiceParams, ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
         client.services.create_or_update(
             name="name",
-            kind="sdk",
+            kind="openapi",
+            openapi=OpenApiServiceParams(
+                url="https://api.example.com/v1",
+                source="https://api.example.com/openapi.json",
+            ),
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -211,16 +236,19 @@ class ServicesClient:
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
-        Remove a service integration.
+        Removes a service integration.
+
+        Effects:
 
         - Active connections are terminated immediately
-        - Tools from this service become unavailable to agents
+        - Service tools become unavailable to agents
         - Historical data about tool usage is preserved
+        - Running operations may fail
 
         Parameters
         ----------
         name : str
-            User assigned name of the service
+            Unique identifier for the service
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -277,7 +305,11 @@ class ServicesClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Service]:
         """
-        Returns basic info about all registered services. Tool details are omitted for performance.
+        Returns basic info about all registered services.
+
+        For performance reasons, tool details are omitted from the response.
+        Use the retrieve endpoint to get complete information including
+        tools for a specific service.
 
         Parameters
         ----------
@@ -287,7 +319,9 @@ class ServicesClient:
         Returns
         -------
         typing.List[Service]
-            List of all registered services. Tools lists are not included for performance - use the retrieve endpoint to get tools for a specific service.
+            List of all registered services. Tool lists are not
+                            included for performance - use the retrieve endpoint to get tools
+                            for a specific service.
 
         Examples
         --------
@@ -328,6 +362,14 @@ class AsyncServicesClient:
         """
         Get details about a specific service including all its tools.
 
+        The response includes:
+
+        - Basic service information (name, kind, URL)
+        - Complete list of available tools
+        - Parameter definitions for each tool
+
+        Notes:
+
         - Tools list may be empty if service is still initializing
         - Parameters marked as required must be provided when using a tool
         - Enum parameters restrict inputs to the listed values
@@ -335,7 +377,7 @@ class AsyncServicesClient:
         Parameters
         ----------
         name : str
-            User assigned name of the service
+            Unique identifier for the service
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -423,25 +465,36 @@ class AsyncServicesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Service:
         """
-        Create a new service or update an existing one.
+        Creates a new service or updates an existing one.
 
-        - For SDK services, the target server must implement the Parlant SDK protocol
-        - For OpenAPI services, the spec must be accessible and compatible with OpenAPI 3.0
-        - Service names must be unique and should be kebab-case
-        - Updates cause a brief service interruption while reconnecting
+        For SDK services:
+
+        - Target server must implement the Parlant SDK protocol
+        - Supports bidirectional communication and streaming
+
+        For OpenAPI services:
+
+        - Spec must be accessible and compatible with OpenAPI 3.0
+        - Limited to request/response patterns
+
+        Common requirements:
+
+        - Service names must be unique and kebab-case
+        - URLs must include http:// or https:// scheme
+        - Updates cause brief service interruption while reconnecting
 
         Parameters
         ----------
         name : str
-            The name of service to update
+            Unique name of the service to update
 
         kind : ToolServiceKindDto
 
         sdk : typing.Optional[SdkServiceParams]
-            `SDKServiceParams` in case `kind` is `'sdk'`.
+            SDK service configuration parameters. Required when kind is 'sdk'.
 
         openapi : typing.Optional[OpenApiServiceParams]
-            `OpenAPIServiceParams` in case `kind` is `'openapi '`.
+            OpenAPI service configuration parameters. Required when kind is 'openapi'.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -449,13 +502,15 @@ class AsyncServicesClient:
         Returns
         -------
         Service
-            Service successfully created or updated. The service may take a few seconds to become fully operational as it establishes connections.
+            Service successfully created or updated.
+                            The service may take a few seconds to become fully operational
+                            as it establishes connections.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient
+        from parlant.client import AsyncParlantClient, OpenApiServiceParams
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -465,7 +520,11 @@ class AsyncServicesClient:
         async def main() -> None:
             await client.services.create_or_update(
                 name="name",
-                kind="sdk",
+                kind="openapi",
+                openapi=OpenApiServiceParams(
+                    url="https://api.example.com/v1",
+                    source="https://api.example.com/openapi.json",
+                ),
             )
 
 
@@ -524,16 +583,19 @@ class AsyncServicesClient:
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
-        Remove a service integration.
+        Removes a service integration.
+
+        Effects:
 
         - Active connections are terminated immediately
-        - Tools from this service become unavailable to agents
+        - Service tools become unavailable to agents
         - Historical data about tool usage is preserved
+        - Running operations may fail
 
         Parameters
         ----------
         name : str
-            User assigned name of the service
+            Unique identifier for the service
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -598,7 +660,11 @@ class AsyncServicesClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Service]:
         """
-        Returns basic info about all registered services. Tool details are omitted for performance.
+        Returns basic info about all registered services.
+
+        For performance reasons, tool details are omitted from the response.
+        Use the retrieve endpoint to get complete information including
+        tools for a specific service.
 
         Parameters
         ----------
@@ -608,7 +674,9 @@ class AsyncServicesClient:
         Returns
         -------
         typing.List[Service]
-            List of all registered services. Tools lists are not included for performance - use the retrieve endpoint to get tools for a specific service.
+            List of all registered services. Tool lists are not
+                            included for performance - use the retrieve endpoint to get tools
+                            for a specific service.
 
         Examples
         --------

@@ -3,17 +3,29 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 from .guideline_connection_addition import GuidelineConnectionAddition
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class GuidelineConnectionUpdateParams(UniversalBaseModel):
     """
-    #TODO
+    Parameters for updaing a guideline connection.
+
+    `add` is expected to be a collection of addition objects.
+    `remove` should contain the `id`s of the guidelines to remove.
     """
 
-    add: typing.Optional[typing.List[GuidelineConnectionAddition]] = None
-    remove: typing.Optional[typing.List[str]] = None
+    add: typing.Optional[typing.List[GuidelineConnectionAddition]] = pydantic.Field(
+        default=None
+    )
+    """
+    Collection of `GuidelineConnectionAddition` objects
+    """
+
+    remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Collection of `GuidelineConnectionAddition` objects
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

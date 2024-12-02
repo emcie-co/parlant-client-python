@@ -8,7 +8,10 @@ import typing
 
 class OpenApiServiceParams(UniversalBaseModel):
     """
-    Configuration for OpenAPI-based service integration
+    Configuration parameters for OpenAPI-based service integration.
+
+    OpenAPI services are integrated using their OpenAPI/Swagger specification,
+    enabling automatic generation of client code and documentation.
     """
 
     url: str = pydantic.Field()
@@ -18,7 +21,9 @@ class OpenApiServiceParams(UniversalBaseModel):
 
     source: str = pydantic.Field()
     """
-    URL or filesystem path to the OpenAPI spec. If a URL, must be publicly accessible. For filesystem paths, the server must have read access.
+    URL or filesystem path to the OpenAPI specification.
+    For URLs, must be publicly accessible.
+    For filesystem paths, the server must have read permissions.
     """
 
     if IS_PYDANTIC_V2:

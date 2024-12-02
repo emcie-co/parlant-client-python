@@ -2,21 +2,24 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class TagsUpdateParams(UniversalBaseModel):
     """
     Parameters for updating a customer's tags.
-
-    Optional:
-    add: List of tag IDs to add to the customer
-    remove: List of tag IDs to remove from the customer
     """
 
-    add: typing.Optional[typing.List[str]] = None
-    remove: typing.Optional[typing.List[str]] = None
+    add: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Optional collection of `TagId`s to add to the `Customer`'s `Tag`s
+    """
+
+    remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Optional collection of `TagId`s to remove from the `Customer`'s `Tag`s
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

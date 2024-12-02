@@ -4,13 +4,16 @@ from ..core.pydantic_utilities import UniversalBaseModel
 from .payload_kind_dto import PayloadKindDto
 import typing
 from .guideline_payload import GuidelinePayload
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class Payload(UniversalBaseModel):
     kind: PayloadKindDto = "guideline"
-    guideline: typing.Optional[GuidelinePayload] = None
+    guideline: typing.Optional[GuidelinePayload] = pydantic.Field(default=None)
+    """
+    Payload data for Guideline operations
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

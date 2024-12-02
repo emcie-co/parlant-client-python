@@ -8,12 +8,15 @@ import typing
 
 class SdkServiceParams(UniversalBaseModel):
     """
-    Configuration for SDK-based service integration
+    Configuration parameters for SDK-based service integration.
+
+    SDK services must implement the Parlant SDK protocol for advanced features
+    like streaming and bidirectional communication.
     """
 
     url: str = pydantic.Field()
     """
-    Base URL for the service. Must include http:// or https:// scheme. The service must implement the Parlant SDK protocol.
+    Base URL for the service. Must include http:// or https:// scheme.
     """
 
     if IS_PYDANTIC_V2:

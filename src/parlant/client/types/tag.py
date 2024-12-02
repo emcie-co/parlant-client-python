@@ -9,22 +9,25 @@ import typing
 
 class Tag(UniversalBaseModel):
     """
-    Information for a tag
+    Represents a tag in the system.
+
+    Tags can be used to categorize and label various resources like customers, sessions,
+    or content. They provide a flexible way to organize and filter data.
     """
 
     id: str = pydantic.Field()
     """
-    Unique identifier for the tag
+    Unique identifier for the tag in format 'tag\_[alphanumeric]'
     """
 
     creation_utc: dt.datetime = pydantic.Field()
     """
-    UTC timestamp of when the tag was created
+    UTC timestamp of when the tag was created, in ISO 8601 format
     """
 
     name: str = pydantic.Field()
     """
-    Name of the tag
+    Human-readable name for the tag, used for display and organization
     """
 
     if IS_PYDANTIC_V2:

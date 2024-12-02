@@ -9,7 +9,7 @@ import typing
 
 class GuidelineConnectionAddition(UniversalBaseModel):
     """
-    Used to add connections between `Guideline`s.
+    Used to add connections between Guidelines.
     """
 
     source: str = pydantic.Field()

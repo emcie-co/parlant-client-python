@@ -3,14 +3,23 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 from .coherence_check import CoherenceCheck
+import pydantic
 from .connection_proposition import ConnectionProposition
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
-import pydantic
 
 
 class GuidelineInvoiceData(UniversalBaseModel):
-    coherence_checks: typing.List[CoherenceCheck]
-    connection_propositions: typing.Optional[typing.List[ConnectionProposition]] = None
+    coherence_checks: typing.List[CoherenceCheck] = pydantic.Field()
+    """
+    List of potential contradictions found between Guidelines
+    """
+
+    connection_propositions: typing.Optional[typing.List[ConnectionProposition]] = (
+        pydantic.Field(default=None)
+    )
+    """
+    List of proposed logical connections between Guidelines
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

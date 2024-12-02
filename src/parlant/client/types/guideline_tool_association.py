@@ -9,7 +9,8 @@ import typing
 
 class GuidelineToolAssociation(UniversalBaseModel):
     """
-    An configuration telling a guideline to be aware of a specific tool.
+    Represents an association between a Guideline and a Tool, enabling automatic tool invocation
+    when the Guideline's conditions are met.
     """
 
     id: str = pydantic.Field()
