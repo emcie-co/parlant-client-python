@@ -2,18 +2,35 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 from .payload import Payload
+import pydantic
 import typing
 from .invoice_data import InvoiceData
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
-import pydantic
 
 
 class Invoice(UniversalBaseModel):
+    """
+    Represents the result of evaluating a single payload in an evaluation task.
+
+    An invoice is a comprehensive record of the evaluation results for a single payload.
+    """
+
     payload: Payload
-    checksum: str
-    approved: bool
+    checksum: str = pydantic.Field()
+    """
+    Checksum of the invoice content
+    """
+
+    approved: bool = pydantic.Field()
+    """
+    Whether the evaluation task the invoice represents has been approved
+    """
+
     data: typing.Optional[InvoiceData] = None
-    error: typing.Optional[str] = None
+    error: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Error message if the evaluation failed
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

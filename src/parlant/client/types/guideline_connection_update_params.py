@@ -8,6 +8,13 @@ import pydantic
 
 
 class GuidelineConnectionUpdateParams(UniversalBaseModel):
+    """
+    Parameters for updaing a guideline connection.
+
+    `add` is expected to be a collection of addition objects.
+    `remove` should contain the `id`s of the guidelines to remove.
+    """
+
     add: typing.Optional[typing.List[GuidelineConnectionAddition]] = None
     remove: typing.Optional[typing.List[str]] = None
 

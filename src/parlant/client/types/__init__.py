@@ -14,6 +14,7 @@ from .context_variable_read_result import ContextVariableReadResult
 from .context_variable_value import ContextVariableValue
 from .customer import Customer
 from .customer_extra_update_params import CustomerExtraUpdateParams
+from .customer_tag_update_params import CustomerTagUpdateParams
 from .day_of_week_dto import DayOfWeekDto
 from .evaluation import Evaluation
 from .evaluation_status_dto import EvaluationStatusDto
@@ -56,7 +57,6 @@ from .sdk_service_params import SdkServiceParams
 from .service import Service
 from .session import Session
 from .tag import Tag
-from .tags_update_params import TagsUpdateParams
 from .term import Term
 from .tool import Tool
 from .tool_call import ToolCall
@@ -85,6 +85,7 @@ __all__ = [
     "ContextVariableValue",
     "Customer",
     "CustomerExtraUpdateParams",
+    "CustomerTagUpdateParams",
     "DayOfWeekDto",
     "Evaluation",
     "EvaluationStatusDto",
@@ -123,7 +124,6 @@ __all__ = [
     "Service",
     "Session",
     "Tag",
-    "TagsUpdateParams",
     "Term",
     "Tool",
     "ToolCall",

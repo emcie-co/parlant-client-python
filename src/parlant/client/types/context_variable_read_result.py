@@ -4,15 +4,22 @@ from ..core.pydantic_utilities import UniversalBaseModel
 from .context_variable import ContextVariable
 import typing
 from .context_variable_value import ContextVariableValue
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class ContextVariableReadResult(UniversalBaseModel):
+    """
+    Complete context variable data including its values.
+    """
+
     context_variable: ContextVariable
     key_value_pairs: typing.Optional[
         typing.Dict[str, typing.Optional[ContextVariableValue]]
-    ] = None
+    ] = pydantic.Field(default=None)
+    """
+    Collection of key-value pairs associated with the variable
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

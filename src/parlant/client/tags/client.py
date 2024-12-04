@@ -8,8 +8,8 @@ from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
 from ..core.jsonable_encoder import jsonable_encoder
+from ..errors.not_found_error import NotFoundError
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -24,6 +24,11 @@ class TagsClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Tag]:
         """
+        Lists all tags in the system.
+
+        Returns an empty list if no tags exist.
+        Tags are returned in no particular order.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -32,7 +37,7 @@ class TagsClient:
         Returns
         -------
         typing.List[Tag]
-            Successful Response
+            List of all tags in the system
 
         Examples
         --------
@@ -66,9 +71,15 @@ class TagsClient:
         self, *, name: str, request_options: typing.Optional[RequestOptions] = None
     ) -> Tag:
         """
+        Creates a new tag with the specified name.
+
+        The tag ID is automatically generated and the creation timestamp is set to the current time.
+        Tag names must be unique and follow the kebab-case format.
+
         Parameters
         ----------
         name : str
+            Human-readable name for the tag, used for display and organization
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -76,7 +87,7 @@ class TagsClient:
         Returns
         -------
         Tag
-            Successful Response
+            Tag successfully created. Returns the complete tag object with generated ID.
 
         Examples
         --------
@@ -86,7 +97,7 @@ class TagsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.tags.create(
-            name="name",
+            name="premium-customer",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -110,9 +121,9 @@ class TagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -126,9 +137,14 @@ class TagsClient:
         self, tag_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Tag:
         """
+        Retrieves details of a specific tag by ID.
+
+        Returns a 404 error if no tag exists with the specified ID.
+
         Parameters
         ----------
         tag_id : str
+            Unique identifier for the tag to operate on
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -136,7 +152,7 @@ class TagsClient:
         Returns
         -------
         Tag
-            Successful Response
+            Tag details successfully retrieved
 
         Examples
         --------
@@ -163,12 +179,22 @@ class TagsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -182,6 +208,11 @@ class TagsClient:
         self, tag_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
+        Permanently deletes a tag.
+
+        This operation cannot be undone. Returns a 404 error if no tag exists with the specified ID.
+        Note that deleting a tag does not affect resources that were previously tagged with it.
+
         Parameters
         ----------
         tag_id : str
@@ -212,12 +243,22 @@ class TagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -235,11 +276,18 @@ class TagsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Updates an existing tag's name.
+
+        Only the name can be modified - the ID and creation timestamp are immutable.
+        Returns a 404 error if no tag exists with the specified ID.
+
         Parameters
         ----------
         tag_id : str
+            Unique identifier for the tag to operate on
 
         name : str
+            Human-readable name for the tag, used for display and organization
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -257,7 +305,7 @@ class TagsClient:
         )
         client.tags.update(
             tag_id="tag_id",
-            name="name",
+            name="enterprise-customer",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -272,12 +320,22 @@ class TagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -296,6 +354,11 @@ class AsyncTagsClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Tag]:
         """
+        Lists all tags in the system.
+
+        Returns an empty list if no tags exist.
+        Tags are returned in no particular order.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -304,7 +367,7 @@ class AsyncTagsClient:
         Returns
         -------
         typing.List[Tag]
-            Successful Response
+            List of all tags in the system
 
         Examples
         --------
@@ -346,9 +409,15 @@ class AsyncTagsClient:
         self, *, name: str, request_options: typing.Optional[RequestOptions] = None
     ) -> Tag:
         """
+        Creates a new tag with the specified name.
+
+        The tag ID is automatically generated and the creation timestamp is set to the current time.
+        Tag names must be unique and follow the kebab-case format.
+
         Parameters
         ----------
         name : str
+            Human-readable name for the tag, used for display and organization
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -356,7 +425,7 @@ class AsyncTagsClient:
         Returns
         -------
         Tag
-            Successful Response
+            Tag successfully created. Returns the complete tag object with generated ID.
 
         Examples
         --------
@@ -371,7 +440,7 @@ class AsyncTagsClient:
 
         async def main() -> None:
             await client.tags.create(
-                name="name",
+                name="premium-customer",
             )
 
 
@@ -398,9 +467,9 @@ class AsyncTagsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -414,9 +483,14 @@ class AsyncTagsClient:
         self, tag_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Tag:
         """
+        Retrieves details of a specific tag by ID.
+
+        Returns a 404 error if no tag exists with the specified ID.
+
         Parameters
         ----------
         tag_id : str
+            Unique identifier for the tag to operate on
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -424,7 +498,7 @@ class AsyncTagsClient:
         Returns
         -------
         Tag
-            Successful Response
+            Tag details successfully retrieved
 
         Examples
         --------
@@ -459,12 +533,22 @@ class AsyncTagsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -478,6 +562,11 @@ class AsyncTagsClient:
         self, tag_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
+        Permanently deletes a tag.
+
+        This operation cannot be undone. Returns a 404 error if no tag exists with the specified ID.
+        Note that deleting a tag does not affect resources that were previously tagged with it.
+
         Parameters
         ----------
         tag_id : str
@@ -516,12 +605,22 @@ class AsyncTagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -539,11 +638,18 @@ class AsyncTagsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Updates an existing tag's name.
+
+        Only the name can be modified - the ID and creation timestamp are immutable.
+        Returns a 404 error if no tag exists with the specified ID.
+
         Parameters
         ----------
         tag_id : str
+            Unique identifier for the tag to operate on
 
         name : str
+            Human-readable name for the tag, used for display and organization
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -566,7 +672,7 @@ class AsyncTagsClient:
         async def main() -> None:
             await client.tags.update(
                 tag_id="tag_id",
-                name="name",
+                name="enterprise-customer",
             )
 
 
@@ -584,12 +690,22 @@ class AsyncTagsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

@@ -9,6 +9,12 @@ import pydantic
 
 
 class Payload(UniversalBaseModel):
+    """
+    A container for a guideline payload along with its kind
+
+    Only `"guideline"` is available at this point.
+    """
+
     kind: PayloadKindDto = "guideline"
     guideline: typing.Optional[GuidelinePayload] = None
 

@@ -12,10 +12,6 @@ from .evaluations.client import EvaluationsClient
 from .services.client import ServicesClient
 from .tags.client import TagsClient
 from .customers.client import CustomersClient
-from .core.request_options import RequestOptions
-from .core.pydantic_utilities import parse_obj_as
-from json.decoder import JSONDecodeError
-from .core.api_error import ApiError
 from .core.client_wrapper import AsyncClientWrapper
 from .agents.client import AsyncAgentsClient
 from .guidelines.client import AsyncGuidelinesClient
@@ -89,47 +85,6 @@ class ParlantClient:
         self.tags = TagsClient(client_wrapper=self._client_wrapper)
         self.customers = CustomersClient(client_wrapper=self._client_wrapper)
 
-    def root_get(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Optional[typing.Any]:
-        """
-        Parameters
-        ----------
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        typing.Optional[typing.Any]
-            Successful Response
-
-        Examples
-        --------
-        from parlant.client import ParlantClient
-
-        client = ParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-        client.root_get()
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.Optional[typing.Any],
-                    parse_obj_as(
-                        type_=typing.Optional[typing.Any],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
 
 class AsyncParlantClient:
     """
@@ -191,52 +146,3 @@ class AsyncParlantClient:
         self.services = AsyncServicesClient(client_wrapper=self._client_wrapper)
         self.tags = AsyncTagsClient(client_wrapper=self._client_wrapper)
         self.customers = AsyncCustomersClient(client_wrapper=self._client_wrapper)
-
-    async def root_get(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Optional[typing.Any]:
-        """
-        Parameters
-        ----------
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        typing.Optional[typing.Any]
-            Successful Response
-
-        Examples
-        --------
-        import asyncio
-
-        from parlant.client import AsyncParlantClient
-
-        client = AsyncParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-
-
-        async def main() -> None:
-            await client.root_get()
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.Optional[typing.Any],
-                    parse_obj_as(
-                        type_=typing.Optional[typing.Any],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)

@@ -3,15 +3,31 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 from .tool_parameter_type_dto import ToolParameterTypeDto
 import typing
+import pydantic
 from .tool_parameter_dto_enum_item import ToolParameterDtoEnumItem
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
-import pydantic
 
 
 class ToolParameter(UniversalBaseModel):
+    """
+    Defines a parameter that can be passed to a tool.
+
+    Parameters can have different types with optional constraints like enums.
+    Each parameter can include a description to help users understand its purpose.
+    """
+
     type: ToolParameterTypeDto
-    description: typing.Optional[str] = None
-    enum: typing.Optional[typing.List[ToolParameterDtoEnumItem]] = None
+    description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Detailed description of what the parameter does and how it should be used
+    """
+
+    enum: typing.Optional[typing.List[ToolParameterDtoEnumItem]] = pydantic.Field(
+        default=None
+    )
+    """
+    List of allowed values for string or integer parameters. If provided, the parameter value must be one of these options.
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

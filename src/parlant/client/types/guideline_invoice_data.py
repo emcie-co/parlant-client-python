@@ -9,6 +9,10 @@ import pydantic
 
 
 class GuidelineInvoiceData(UniversalBaseModel):
+    """
+    Evaluation results for a Guideline, including contradiction checks and connection proposals
+    """
+
     coherence_checks: typing.List[CoherenceCheck]
     connection_propositions: typing.Optional[typing.List[ConnectionProposition]] = None
 

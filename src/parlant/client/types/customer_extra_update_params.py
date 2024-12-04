@@ -2,13 +2,26 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class CustomerExtraUpdateParams(UniversalBaseModel):
-    add: typing.Optional[typing.Dict[str, typing.Optional[str]]] = None
-    remove: typing.Optional[typing.List[str]] = None
+    """
+    Parameters for updating a customer's extra metadata.
+    """
+
+    add: typing.Optional[typing.Dict[str, typing.Optional[str]]] = pydantic.Field(
+        default=None
+    )
+    """
+    Key-value pairs (`str: str`) to describe the customer
+    """
+
+    remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Extra Metadata keys to remove
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

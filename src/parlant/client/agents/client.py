@@ -8,8 +8,8 @@ from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
 from ..core.jsonable_encoder import jsonable_encoder
+from ..errors.not_found_error import NotFoundError
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -24,6 +24,11 @@ class AgentsClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Agent]:
         """
+        Retrieves a list of all agents in the system.
+
+        Returns an empty list if no agents exist.
+        Agents are returned in no guaranteed order.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -32,7 +37,7 @@ class AgentsClient:
         Returns
         -------
         typing.List[Agent]
-            Successful Response
+            List of all agents in the system
 
         Examples
         --------
@@ -71,13 +76,27 @@ class AgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
+        Creates a new agent in the system.
+
+        The agent will be initialized with the provided name and optional settings.
+        A unique identifier will be automatically generated.
+
+        Default behaviors:
+
+        - `name` defaults to `"Unnamed Agent"` if not provided
+        - `description` defaults to `None`
+        - `max_engine_iterations` defaults to `None` (uses system default)
+
         Parameters
         ----------
         name : str
+            The display name of the agent, mainly for management purposes
 
         description : typing.Optional[str]
+            Detailed description of the agent's purpose and capabilities
 
         max_engine_iterations : typing.Optional[int]
+            Maximum number of processing iterations the agent can perform per request
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -85,7 +104,7 @@ class AgentsClient:
         Returns
         -------
         Agent
-            Successful Response
+            Agent successfully created. Returns the complete agent object including generated ID.
 
         Examples
         --------
@@ -95,7 +114,9 @@ class AgentsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.agents.create(
-            name="name",
+            name="Haxon",
+            description="Technical Support Assistant",
+            max_engine_iterations=3,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -121,9 +142,9 @@ class AgentsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -137,9 +158,12 @@ class AgentsClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Agent:
         """
+        Retrieves details of a specific agent by ID.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -147,7 +171,7 @@ class AgentsClient:
         Returns
         -------
         Agent
-            Successful Response
+            Agent details successfully retrieved. Returns the complete agent object.
 
         Examples
         --------
@@ -174,12 +198,22 @@ class AgentsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -193,9 +227,15 @@ class AgentsClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
+        Deletes an agent from the agent.
+
+        Deleting a non-existent agent will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -223,12 +263,22 @@ class AgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -248,15 +298,24 @@ class AgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
+        Updates an existing agent's attributes.
+
+        Only the provided attributes will be updated; others will remain unchanged.
+        The agent's ID and creation timestamp cannot be modified.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         name : typing.Optional[str]
+            The display name of the agent, mainly for management purposes
 
         description : typing.Optional[str]
+            Detailed description of the agent's purpose and capabilities
 
         max_engine_iterations : typing.Optional[int]
+            Maximum number of processing iterations the agent can perform per request
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -264,7 +323,7 @@ class AgentsClient:
         Returns
         -------
         Agent
-            Successful Response
+            Agent successfully updated. Returns the updated agent.
 
         Examples
         --------
@@ -275,6 +334,9 @@ class AgentsClient:
         )
         client.agents.update(
             agent_id="agent_id",
+            name="Haxon",
+            description="Technical Support Assistant",
+            max_engine_iterations=3,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -297,12 +359,22 @@ class AgentsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -321,6 +393,11 @@ class AsyncAgentsClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Agent]:
         """
+        Retrieves a list of all agents in the system.
+
+        Returns an empty list if no agents exist.
+        Agents are returned in no guaranteed order.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -329,7 +406,7 @@ class AsyncAgentsClient:
         Returns
         -------
         typing.List[Agent]
-            Successful Response
+            List of all agents in the system
 
         Examples
         --------
@@ -376,13 +453,27 @@ class AsyncAgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
+        Creates a new agent in the system.
+
+        The agent will be initialized with the provided name and optional settings.
+        A unique identifier will be automatically generated.
+
+        Default behaviors:
+
+        - `name` defaults to `"Unnamed Agent"` if not provided
+        - `description` defaults to `None`
+        - `max_engine_iterations` defaults to `None` (uses system default)
+
         Parameters
         ----------
         name : str
+            The display name of the agent, mainly for management purposes
 
         description : typing.Optional[str]
+            Detailed description of the agent's purpose and capabilities
 
         max_engine_iterations : typing.Optional[int]
+            Maximum number of processing iterations the agent can perform per request
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -390,7 +481,7 @@ class AsyncAgentsClient:
         Returns
         -------
         Agent
-            Successful Response
+            Agent successfully created. Returns the complete agent object including generated ID.
 
         Examples
         --------
@@ -405,7 +496,9 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.create(
-                name="name",
+                name="Haxon",
+                description="Technical Support Assistant",
+                max_engine_iterations=3,
             )
 
 
@@ -434,9 +527,9 @@ class AsyncAgentsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -450,9 +543,12 @@ class AsyncAgentsClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Agent:
         """
+        Retrieves details of a specific agent by ID.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -460,7 +556,7 @@ class AsyncAgentsClient:
         Returns
         -------
         Agent
-            Successful Response
+            Agent details successfully retrieved. Returns the complete agent object.
 
         Examples
         --------
@@ -495,12 +591,22 @@ class AsyncAgentsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -514,9 +620,15 @@ class AsyncAgentsClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
+        Deletes an agent from the agent.
+
+        Deleting a non-existent agent will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -552,12 +664,22 @@ class AsyncAgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -577,15 +699,24 @@ class AsyncAgentsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
+        Updates an existing agent's attributes.
+
+        Only the provided attributes will be updated; others will remain unchanged.
+        The agent's ID and creation timestamp cannot be modified.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         name : typing.Optional[str]
+            The display name of the agent, mainly for management purposes
 
         description : typing.Optional[str]
+            Detailed description of the agent's purpose and capabilities
 
         max_engine_iterations : typing.Optional[int]
+            Maximum number of processing iterations the agent can perform per request
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -593,7 +724,7 @@ class AsyncAgentsClient:
         Returns
         -------
         Agent
-            Successful Response
+            Agent successfully updated. Returns the updated agent.
 
         Examples
         --------
@@ -609,6 +740,9 @@ class AsyncAgentsClient:
         async def main() -> None:
             await client.agents.update(
                 agent_id="agent_id",
+                name="Haxon",
+                description="Technical Support Assistant",
+                max_engine_iterations=3,
             )
 
 
@@ -634,12 +768,22 @@ class AsyncAgentsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

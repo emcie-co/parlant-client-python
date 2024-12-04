@@ -8,6 +8,12 @@ import pydantic
 
 
 class InvoiceData(UniversalBaseModel):
+    """
+    Contains the relevant invoice data.
+
+    At this point only `guideline` is suppoerted.
+    """
+
     guideline: typing.Optional[GuidelineInvoiceData] = None
 
     if IS_PYDANTIC_V2:

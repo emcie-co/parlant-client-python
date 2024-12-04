@@ -3,16 +3,31 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
 from .tool_call import ToolCall
+import pydantic
 from .message_generation_inspection import MessageGenerationInspection
 from .preparation_iteration import PreparationIteration
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
-import pydantic
 
 
 class EventTrace(UniversalBaseModel):
-    tool_calls: typing.List[ToolCall]
-    message_generations: typing.List[MessageGenerationInspection]
-    preparation_iterations: typing.List[PreparationIteration]
+    """
+    Trace information for an event.
+    """
+
+    tool_calls: typing.List[ToolCall] = pydantic.Field()
+    """
+    List of tool calls made for the traced event
+    """
+
+    message_generations: typing.List[MessageGenerationInspection] = pydantic.Field()
+    """
+    List of message generations made for the traced event
+    """
+
+    preparation_iterations: typing.List[PreparationIteration] = pydantic.Field()
+    """
+    List of preparation iterations made for the traced event
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

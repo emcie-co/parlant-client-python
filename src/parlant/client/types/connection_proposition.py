@@ -10,6 +10,10 @@ import pydantic
 
 
 class ConnectionProposition(UniversalBaseModel):
+    """
+    Proposed logical connection between guidelines
+    """
+
     check_kind: ConnectionPropositionKindDto
     source: GuidelineContent
     target: GuidelineContent

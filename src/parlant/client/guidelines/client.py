@@ -6,8 +6,8 @@ from ..core.request_options import RequestOptions
 from ..types.guideline import Guideline
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
+from ..errors.not_found_error import NotFoundError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..types.invoice import Invoice
@@ -34,9 +34,16 @@ class GuidelinesClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Guideline]:
         """
+        Lists all guidelines for the specified agent.
+
+        Returns an empty list if no guidelines exist.
+        Guidelines are returned in no guaranteed order.
+        Does not include connections or tool associations.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -44,7 +51,7 @@ class GuidelinesClient:
         Returns
         -------
         typing.List[Guideline]
-            Successful Response
+            List of all guidelines for the specified agent
 
         Examples
         --------
@@ -71,12 +78,22 @@ class GuidelinesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -94,9 +111,19 @@ class GuidelinesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineCreationResult:
         """
+        Creates new guidelines from the provided invoices.
+
+        Invoices are obtained by calling the `create_evaluation` method of the client.
+        (Equivalent to making a POST request to `/index/evaluations`)
+        See the [documentation](https://parlant.io/docs/concepts/customization/guidelines) for more information.
+
+        The guidelines are created in the specified agent's guideline set.
+        Tool associations and connections are automatically handled.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         invoices : typing.Sequence[Invoice]
 
@@ -106,11 +133,21 @@ class GuidelinesClient:
         Returns
         -------
         GuidelineCreationResult
-            Successful Response
+            Guidelines successfully created. Returns the created guidelines with their connections and tool associations.
 
         Examples
         --------
-        from parlant.client import Invoice, ParlantClient, Payload
+        from parlant.client import (
+            CoherenceCheck,
+            ConnectionProposition,
+            GuidelineContent,
+            GuidelineInvoiceData,
+            GuidelinePayload,
+            Invoice,
+            InvoiceData,
+            ParlantClient,
+            Payload,
+        )
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -119,9 +156,52 @@ class GuidelinesClient:
             agent_id="agent_id",
             invoices=[
                 Invoice(
-                    payload=Payload(),
-                    checksum="checksum",
+                    payload=Payload(
+                        guideline=GuidelinePayload(
+                            content=GuidelineContent(
+                                condition="when the customer asks about pricing",
+                                action="provide current pricing information",
+                            ),
+                            operation="add",
+                            coherence_check=True,
+                            connection_proposition=True,
+                        ),
+                    ),
+                    checksum="abc123",
                     approved=True,
+                    data=InvoiceData(
+                        guideline=GuidelineInvoiceData(
+                            coherence_checks=[
+                                CoherenceCheck(
+                                    kind="contradiction_with_existing_guideline",
+                                    first=GuidelineContent(
+                                        condition="User is frustrated",
+                                        action="Respond with technical details",
+                                    ),
+                                    second=GuidelineContent(
+                                        condition="User is frustrated",
+                                        action="Focus on emotional support first",
+                                    ),
+                                    issue="Conflicting approaches to handling user frustration",
+                                    severity=7,
+                                )
+                            ],
+                            connection_propositions=[
+                                ConnectionProposition(
+                                    check_kind="connection_with_existing_guideline",
+                                    source=GuidelineContent(
+                                        condition="User mentions technical problem",
+                                        action="Request system logs",
+                                    ),
+                                    target=GuidelineContent(
+                                        condition="System logs are available",
+                                        action="Analyze logs for error patterns",
+                                    ),
+                                    connection_kind="suggests",
+                                )
+                            ],
+                        ),
+                    ),
                 )
             ],
         )
@@ -148,12 +228,22 @@ class GuidelinesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -171,11 +261,18 @@ class GuidelinesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithConnectionsAndToolAssociations:
         """
+        Retrieves a specific guideline with all its connections and tool associations.
+
+        Returns both direct and indirect connections between guidelines.
+        Tool associations indicate which tools the guideline can use.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         guideline_id : str
+            Unique identifier for the guideline
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -183,7 +280,7 @@ class GuidelinesClient:
         Returns
         -------
         GuidelineWithConnectionsAndToolAssociations
-            Successful Response
+            Guideline details successfully retrieved. Returns the complete guideline with its connections and tool associations.
 
         Examples
         --------
@@ -211,12 +308,22 @@ class GuidelinesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -234,11 +341,19 @@ class GuidelinesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a guideline from the agent.
+
+        Also removes all associated connections and tool associations.
+        Deleting a non-existent guideline will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         guideline_id : str
+            Unique identifier for the guideline
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -267,12 +382,22 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -292,11 +417,27 @@ class GuidelinesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithConnectionsAndToolAssociations:
         """
+        Updates a guideline's connections and tool associations.
+
+        Only provided attributes will be updated; others remain unchanged.
+
+        Connection rules:
+
+        - A guideline cannot connect to itself
+        - Only direct connections can be removed
+        - The connection must specify this guideline as source or target
+
+        Tool Association rules:
+
+        - Tool services and tools must exist before creating associations
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         guideline_id : str
+            Unique identifier for the guideline
 
         connections : typing.Optional[GuidelineConnectionUpdateParams]
 
@@ -308,11 +449,17 @@ class GuidelinesClient:
         Returns
         -------
         GuidelineWithConnectionsAndToolAssociations
-            Successful Response
+            Guideline successfully updated. Returns the updated guideline with its connections and tool associations.
 
         Examples
         --------
-        from parlant.client import ParlantClient
+        from parlant.client import (
+            GuidelineConnectionAddition,
+            GuidelineConnectionUpdateParams,
+            GuidelineToolAssociationUpdateParams,
+            ParlantClient,
+            ToolId,
+        )
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -320,6 +467,30 @@ class GuidelinesClient:
         client.guidelines.update(
             agent_id="agent_id",
             guideline_id="guideline_id",
+            connections=GuidelineConnectionUpdateParams(
+                add=[
+                    GuidelineConnectionAddition(
+                        source="guide_123xyz",
+                        target="guide_789xyz",
+                        kind="suggests",
+                    )
+                ],
+                remove=["guide_456xyz"],
+            ),
+            tool_associations=GuidelineToolAssociationUpdateParams(
+                add=[
+                    ToolId(
+                        service_name="pricing_service",
+                        tool_name="get_prices",
+                    )
+                ],
+                remove=[
+                    ToolId(
+                        service_name="old_service",
+                        tool_name="old_tool",
+                    )
+                ],
+            ),
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -349,12 +520,22 @@ class GuidelinesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -373,9 +554,16 @@ class AsyncGuidelinesClient:
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Guideline]:
         """
+        Lists all guidelines for the specified agent.
+
+        Returns an empty list if no guidelines exist.
+        Guidelines are returned in no guaranteed order.
+        Does not include connections or tool associations.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -383,7 +571,7 @@ class AsyncGuidelinesClient:
         Returns
         -------
         typing.List[Guideline]
-            Successful Response
+            List of all guidelines for the specified agent
 
         Examples
         --------
@@ -418,12 +606,22 @@ class AsyncGuidelinesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -441,9 +639,19 @@ class AsyncGuidelinesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineCreationResult:
         """
+        Creates new guidelines from the provided invoices.
+
+        Invoices are obtained by calling the `create_evaluation` method of the client.
+        (Equivalent to making a POST request to `/index/evaluations`)
+        See the [documentation](https://parlant.io/docs/concepts/customization/guidelines) for more information.
+
+        The guidelines are created in the specified agent's guideline set.
+        Tool associations and connections are automatically handled.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         invoices : typing.Sequence[Invoice]
 
@@ -453,13 +661,23 @@ class AsyncGuidelinesClient:
         Returns
         -------
         GuidelineCreationResult
-            Successful Response
+            Guidelines successfully created. Returns the created guidelines with their connections and tool associations.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, Invoice, Payload
+        from parlant.client import (
+            AsyncParlantClient,
+            CoherenceCheck,
+            ConnectionProposition,
+            GuidelineContent,
+            GuidelineInvoiceData,
+            GuidelinePayload,
+            Invoice,
+            InvoiceData,
+            Payload,
+        )
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -471,9 +689,52 @@ class AsyncGuidelinesClient:
                 agent_id="agent_id",
                 invoices=[
                     Invoice(
-                        payload=Payload(),
-                        checksum="checksum",
+                        payload=Payload(
+                            guideline=GuidelinePayload(
+                                content=GuidelineContent(
+                                    condition="when the customer asks about pricing",
+                                    action="provide current pricing information",
+                                ),
+                                operation="add",
+                                coherence_check=True,
+                                connection_proposition=True,
+                            ),
+                        ),
+                        checksum="abc123",
                         approved=True,
+                        data=InvoiceData(
+                            guideline=GuidelineInvoiceData(
+                                coherence_checks=[
+                                    CoherenceCheck(
+                                        kind="contradiction_with_existing_guideline",
+                                        first=GuidelineContent(
+                                            condition="User is frustrated",
+                                            action="Respond with technical details",
+                                        ),
+                                        second=GuidelineContent(
+                                            condition="User is frustrated",
+                                            action="Focus on emotional support first",
+                                        ),
+                                        issue="Conflicting approaches to handling user frustration",
+                                        severity=7,
+                                    )
+                                ],
+                                connection_propositions=[
+                                    ConnectionProposition(
+                                        check_kind="connection_with_existing_guideline",
+                                        source=GuidelineContent(
+                                            condition="User mentions technical problem",
+                                            action="Request system logs",
+                                        ),
+                                        target=GuidelineContent(
+                                            condition="System logs are available",
+                                            action="Analyze logs for error patterns",
+                                        ),
+                                        connection_kind="suggests",
+                                    )
+                                ],
+                            ),
+                        ),
                     )
                 ],
             )
@@ -503,12 +764,22 @@ class AsyncGuidelinesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -526,11 +797,18 @@ class AsyncGuidelinesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithConnectionsAndToolAssociations:
         """
+        Retrieves a specific guideline with all its connections and tool associations.
+
+        Returns both direct and indirect connections between guidelines.
+        Tool associations indicate which tools the guideline can use.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         guideline_id : str
+            Unique identifier for the guideline
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -538,7 +816,7 @@ class AsyncGuidelinesClient:
         Returns
         -------
         GuidelineWithConnectionsAndToolAssociations
-            Successful Response
+            Guideline details successfully retrieved. Returns the complete guideline with its connections and tool associations.
 
         Examples
         --------
@@ -574,12 +852,22 @@ class AsyncGuidelinesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -597,11 +885,19 @@ class AsyncGuidelinesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a guideline from the agent.
+
+        Also removes all associated connections and tool associations.
+        Deleting a non-existent guideline will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         guideline_id : str
+            Unique identifier for the guideline
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -638,12 +934,22 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -663,11 +969,27 @@ class AsyncGuidelinesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithConnectionsAndToolAssociations:
         """
+        Updates a guideline's connections and tool associations.
+
+        Only provided attributes will be updated; others remain unchanged.
+
+        Connection rules:
+
+        - A guideline cannot connect to itself
+        - Only direct connections can be removed
+        - The connection must specify this guideline as source or target
+
+        Tool Association rules:
+
+        - Tool services and tools must exist before creating associations
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         guideline_id : str
+            Unique identifier for the guideline
 
         connections : typing.Optional[GuidelineConnectionUpdateParams]
 
@@ -679,13 +1001,19 @@ class AsyncGuidelinesClient:
         Returns
         -------
         GuidelineWithConnectionsAndToolAssociations
-            Successful Response
+            Guideline successfully updated. Returns the updated guideline with its connections and tool associations.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient
+        from parlant.client import (
+            AsyncParlantClient,
+            GuidelineConnectionAddition,
+            GuidelineConnectionUpdateParams,
+            GuidelineToolAssociationUpdateParams,
+            ToolId,
+        )
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -696,6 +1024,30 @@ class AsyncGuidelinesClient:
             await client.guidelines.update(
                 agent_id="agent_id",
                 guideline_id="guideline_id",
+                connections=GuidelineConnectionUpdateParams(
+                    add=[
+                        GuidelineConnectionAddition(
+                            source="guide_123xyz",
+                            target="guide_789xyz",
+                            kind="suggests",
+                        )
+                    ],
+                    remove=["guide_456xyz"],
+                ),
+                tool_associations=GuidelineToolAssociationUpdateParams(
+                    add=[
+                        ToolId(
+                            service_name="pricing_service",
+                            tool_name="get_prices",
+                        )
+                    ],
+                    remove=[
+                        ToolId(
+                            service_name="old_service",
+                            tool_name="old_tool",
+                        )
+                    ],
+                ),
             )
 
 
@@ -728,12 +1080,22 @@ class AsyncGuidelinesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
