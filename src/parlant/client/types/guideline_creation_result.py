@@ -10,6 +10,10 @@ import pydantic
 
 
 class GuidelineCreationResult(UniversalBaseModel):
+    """
+    Result wrapper for Guidelines creation.
+    """
+
     items: typing.List[GuidelineWithConnectionsAndToolAssociations]
 
     if IS_PYDANTIC_V2:

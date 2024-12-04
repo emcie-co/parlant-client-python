@@ -1,1 +1,1 @@
-# parlant-client-python
+# parlant-client

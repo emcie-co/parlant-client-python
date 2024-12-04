@@ -4,19 +4,38 @@ from ..core.pydantic_utilities import UniversalBaseModel
 from .preparation_iteration_generations import PreparationIterationGenerations
 import typing
 from .guideline_proposition import GuidelineProposition
+import pydantic
 from .tool_call import ToolCall
 from .term import Term
 from .context_variable_and_value import ContextVariableAndValue
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
-import pydantic
 
 
 class PreparationIteration(UniversalBaseModel):
+    """
+    Information about a preparation iteration.
+    """
+
     generations: PreparationIterationGenerations
-    guideline_propositions: typing.List[GuidelineProposition]
-    tool_calls: typing.List[ToolCall]
-    terms: typing.List[Term]
-    context_variables: typing.List[ContextVariableAndValue]
+    guideline_propositions: typing.List[GuidelineProposition] = pydantic.Field()
+    """
+    List of guideline propositions used in preparation for this iteration
+    """
+
+    tool_calls: typing.List[ToolCall] = pydantic.Field()
+    """
+    List of tool calls made in preparation for this iteration
+    """
+
+    terms: typing.List[Term] = pydantic.Field()
+    """
+    List of terms participating in the preparation for this iteration
+    """
+
+    context_variables: typing.List[ContextVariableAndValue] = pydantic.Field()
+    """
+    List of context variables (and their values) that participated in the preparation for this iteration
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

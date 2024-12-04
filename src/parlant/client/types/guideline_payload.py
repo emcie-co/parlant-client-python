@@ -4,16 +4,31 @@ from ..core.pydantic_utilities import UniversalBaseModel
 from .guideline_content import GuidelineContent
 from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
 import typing
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class GuidelinePayload(UniversalBaseModel):
+    """
+    Payload data for a Guideline operation
+    """
+
     content: GuidelineContent
     operation: GuidelinePayloadOperationDto
-    updated_id: typing.Optional[str] = None
-    coherence_check: bool
-    connection_proposition: bool
+    updated_id: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Unique identifier for the guideline
+    """
+
+    coherence_check: bool = pydantic.Field()
+    """
+    Whether to check for contradictions with other Guidelines
+    """
+
+    connection_proposition: bool = pydantic.Field()
+    """
+    Whether to propose logical connections with other Guidelines
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

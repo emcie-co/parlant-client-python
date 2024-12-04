@@ -10,6 +10,10 @@ import pydantic
 
 
 class GuidelineWithConnectionsAndToolAssociations(UniversalBaseModel):
+    """
+    A Guideline with its connections and tool associations.
+    """
+
     guideline: Guideline
     connections: typing.List[GuidelineConnection]
     tool_associations: typing.List[GuidelineToolAssociation]

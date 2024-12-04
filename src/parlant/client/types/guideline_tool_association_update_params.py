@@ -8,6 +8,10 @@ import pydantic
 
 
 class GuidelineToolAssociationUpdateParams(UniversalBaseModel):
+    """
+    Parameters for adding/removing tool associations.
+    """
+
     add: typing.Optional[typing.List[ToolId]] = None
     remove: typing.Optional[typing.List[ToolId]] = None
 

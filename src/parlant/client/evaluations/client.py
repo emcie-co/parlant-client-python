@@ -8,10 +8,11 @@ from ..types.evaluation import Evaluation
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..core.jsonable_encoder import jsonable_encoder
+from ..errors.not_found_error import NotFoundError
+from ..errors.gateway_timeout_error import GatewayTimeoutError
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -30,9 +31,19 @@ class EvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Evaluation:
         """
+        Creates a new evaluation task for the specified agent.
+
+        An evaluation analyzes proposed changes (payloads) to an agent's guidelines
+        to ensure coherence and consistency with existing guidelines and the agent's
+        configuration. This helps maintain predictable agent behavior by detecting
+        potential conflicts and unintended consequences before applying changes.
+
+        Returns immediately with the created evaluation's initial state.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         payloads : typing.Sequence[Payload]
 
@@ -42,18 +53,30 @@ class EvaluationsClient:
         Returns
         -------
         Evaluation
-            Successful Response
+            Evaluation successfully created. Returns the initial evaluation state.
 
         Examples
         --------
-        from parlant.client import ParlantClient, Payload
+        from parlant.client import GuidelineContent, GuidelinePayload, ParlantClient, Payload
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
         client.evaluations.create(
-            agent_id="agent_id",
-            payloads=[Payload()],
+            agent_id="a1g2e3n4t5",
+            payloads=[
+                Payload(
+                    guideline=GuidelinePayload(
+                        content=GuidelineContent(
+                            condition="when customer asks about pricing",
+                            action="provide current pricing information",
+                        ),
+                        operation="add",
+                        coherence_check=True,
+                        connection_proposition=True,
+                    ),
+                )
+            ],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -82,9 +105,9 @@ class EvaluationsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -102,11 +125,24 @@ class EvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Evaluation:
         """
+        Retrieves the current state of an evaluation.
+
+        - If wait_for_completion == 0, returns current state immediately.
+        - If wait_for_completion > 0, waits for completion/failure or timeout. Defaults to 60.
+
+        Notes:
+        When wait_for_completion > 0:
+
+        - Returns final state if evaluation completes within timeout
+        - Raises 504 if timeout is reached before completion
+
         Parameters
         ----------
         evaluation_id : str
+            Unique identifier of the evaluation to retrieve
 
         wait_for_completion : typing.Optional[int]
+            Maximum time in seconds to wait for evaluation completion
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -114,7 +150,7 @@ class EvaluationsClient:
         Returns
         -------
         Evaluation
-            Successful Response
+            Evaluation details successfully retrieved.
 
         Examples
         --------
@@ -144,12 +180,32 @@ class EvaluationsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 504:
+                raise GatewayTimeoutError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -172,9 +228,19 @@ class AsyncEvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Evaluation:
         """
+        Creates a new evaluation task for the specified agent.
+
+        An evaluation analyzes proposed changes (payloads) to an agent's guidelines
+        to ensure coherence and consistency with existing guidelines and the agent's
+        configuration. This helps maintain predictable agent behavior by detecting
+        potential conflicts and unintended consequences before applying changes.
+
+        Returns immediately with the created evaluation's initial state.
+
         Parameters
         ----------
         agent_id : str
+            Unique identifier for the agent
 
         payloads : typing.Sequence[Payload]
 
@@ -184,13 +250,18 @@ class AsyncEvaluationsClient:
         Returns
         -------
         Evaluation
-            Successful Response
+            Evaluation successfully created. Returns the initial evaluation state.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, Payload
+        from parlant.client import (
+            AsyncParlantClient,
+            GuidelineContent,
+            GuidelinePayload,
+            Payload,
+        )
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -199,8 +270,20 @@ class AsyncEvaluationsClient:
 
         async def main() -> None:
             await client.evaluations.create(
-                agent_id="agent_id",
-                payloads=[Payload()],
+                agent_id="a1g2e3n4t5",
+                payloads=[
+                    Payload(
+                        guideline=GuidelinePayload(
+                            content=GuidelineContent(
+                                condition="when customer asks about pricing",
+                                action="provide current pricing information",
+                            ),
+                            operation="add",
+                            coherence_check=True,
+                            connection_proposition=True,
+                        ),
+                    )
+                ],
             )
 
 
@@ -232,9 +315,9 @@ class AsyncEvaluationsClient:
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -252,11 +335,24 @@ class AsyncEvaluationsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Evaluation:
         """
+        Retrieves the current state of an evaluation.
+
+        - If wait_for_completion == 0, returns current state immediately.
+        - If wait_for_completion > 0, waits for completion/failure or timeout. Defaults to 60.
+
+        Notes:
+        When wait_for_completion > 0:
+
+        - Returns final state if evaluation completes within timeout
+        - Raises 504 if timeout is reached before completion
+
         Parameters
         ----------
         evaluation_id : str
+            Unique identifier of the evaluation to retrieve
 
         wait_for_completion : typing.Optional[int]
+            Maximum time in seconds to wait for evaluation completion
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -264,7 +360,7 @@ class AsyncEvaluationsClient:
         Returns
         -------
         Evaluation
-            Successful Response
+            Evaluation details successfully retrieved.
 
         Examples
         --------
@@ -302,12 +398,32 @@ class AsyncEvaluationsClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 504:
+                raise GatewayTimeoutError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )

@@ -6,8 +6,9 @@ from ..core.request_options import RequestOptions
 from ..types.service import Service
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
+from ..errors.not_found_error import NotFoundError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
-from ..types.http_validation_error import HttpValidationError
+from ..errors.service_unavailable_error import ServiceUnavailableError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..types.tool_service_kind_dto import ToolServiceKindDto
@@ -28,9 +29,24 @@ class ServicesClient:
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Service:
         """
+        Get details about a specific service including all its tools.
+
+        The response includes:
+
+        - Basic service information (name, kind, URL)
+        - Complete list of available tools
+        - Parameter definitions for each tool
+
+        Notes:
+
+        - Tools list may be empty if service is still initializing
+        - Parameters marked as required must be provided when using a tool
+        - Enum parameters restrict inputs to the listed values
+
         Parameters
         ----------
         name : str
+            Unique identifier for the service
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -38,7 +54,7 @@ class ServicesClient:
         Returns
         -------
         Service
-            Successful Response
+            Service details including all available tools
 
         Examples
         --------
@@ -65,12 +81,32 @@ class ServicesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -90,15 +126,36 @@ class ServicesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Service:
         """
+        Creates a new service or updates an existing one.
+
+        For SDK services:
+
+        - Target server must implement the Parlant SDK protocol
+        - Supports bidirectional communication and streaming
+
+        For OpenAPI services:
+
+        - Spec must be accessible and compatible with OpenAPI 3.0
+        - Limited to request/response patterns
+
+        Common requirements:
+
+        - Service names must be unique and kebab-case
+        - URLs must include http:// or https:// scheme
+        - Updates cause brief service interruption while reconnecting
+
         Parameters
         ----------
         name : str
+            Unique identifier for the service
 
         kind : ToolServiceKindDto
 
         sdk : typing.Optional[SdkServiceParams]
+            SDK service configuration parameters. Required when kind is 'sdk'.
 
         openapi : typing.Optional[OpenApiServiceParams]
+            OpenAPI service configuration parameters. Required when kind is 'openapi'.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -106,18 +163,22 @@ class ServicesClient:
         Returns
         -------
         Service
-            Successful Response
+            Service successfully created or updated. The service may take a few seconds to become fully operational as it establishes connections.
 
         Examples
         --------
-        from parlant.client import ParlantClient
+        from parlant.client import OpenApiServiceParams, ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
         client.services.create_or_update(
             name="name",
-            kind="sdk",
+            kind="openapi",
+            openapi=OpenApiServiceParams(
+                url="https://email-service.example.com/api/v1",
+                source="https://email-service.example.com/api/openapi.json",
+            ),
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -144,12 +205,22 @@ class ServicesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -163,9 +234,19 @@ class ServicesClient:
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
+        Removes a service integration.
+
+        Effects:
+
+        - Active connections are terminated immediately
+        - Service tools become unavailable to agents
+        - Historical data about tool usage is preserved
+        - Running operations may fail
+
         Parameters
         ----------
         name : str
+            Unique identifier for the service
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -193,12 +274,22 @@ class ServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -212,6 +303,12 @@ class ServicesClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Service]:
         """
+        Returns basic info about all registered services.
+
+        For performance reasons, tool details are omitted from the response.
+        Use the retrieve endpoint to get complete information including
+        tools for a specific service.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -220,7 +317,9 @@ class ServicesClient:
         Returns
         -------
         typing.List[Service]
-            Successful Response
+            List of all registered services. Tool lists are not
+                            included for performance - use the retrieve endpoint to get tools
+                            for a specific service.
 
         Examples
         --------
@@ -259,9 +358,24 @@ class AsyncServicesClient:
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Service:
         """
+        Get details about a specific service including all its tools.
+
+        The response includes:
+
+        - Basic service information (name, kind, URL)
+        - Complete list of available tools
+        - Parameter definitions for each tool
+
+        Notes:
+
+        - Tools list may be empty if service is still initializing
+        - Parameters marked as required must be provided when using a tool
+        - Enum parameters restrict inputs to the listed values
+
         Parameters
         ----------
         name : str
+            Unique identifier for the service
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -269,7 +383,7 @@ class AsyncServicesClient:
         Returns
         -------
         Service
-            Successful Response
+            Service details including all available tools
 
         Examples
         --------
@@ -304,12 +418,32 @@ class AsyncServicesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 503:
+                raise ServiceUnavailableError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -329,15 +463,36 @@ class AsyncServicesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Service:
         """
+        Creates a new service or updates an existing one.
+
+        For SDK services:
+
+        - Target server must implement the Parlant SDK protocol
+        - Supports bidirectional communication and streaming
+
+        For OpenAPI services:
+
+        - Spec must be accessible and compatible with OpenAPI 3.0
+        - Limited to request/response patterns
+
+        Common requirements:
+
+        - Service names must be unique and kebab-case
+        - URLs must include http:// or https:// scheme
+        - Updates cause brief service interruption while reconnecting
+
         Parameters
         ----------
         name : str
+            Unique identifier for the service
 
         kind : ToolServiceKindDto
 
         sdk : typing.Optional[SdkServiceParams]
+            SDK service configuration parameters. Required when kind is 'sdk'.
 
         openapi : typing.Optional[OpenApiServiceParams]
+            OpenAPI service configuration parameters. Required when kind is 'openapi'.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -345,13 +500,13 @@ class AsyncServicesClient:
         Returns
         -------
         Service
-            Successful Response
+            Service successfully created or updated. The service may take a few seconds to become fully operational as it establishes connections.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient
+        from parlant.client import AsyncParlantClient, OpenApiServiceParams
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -361,7 +516,11 @@ class AsyncServicesClient:
         async def main() -> None:
             await client.services.create_or_update(
                 name="name",
-                kind="sdk",
+                kind="openapi",
+                openapi=OpenApiServiceParams(
+                    url="https://email-service.example.com/api/v1",
+                    source="https://email-service.example.com/api/openapi.json",
+                ),
             )
 
 
@@ -391,12 +550,22 @@ class AsyncServicesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -410,9 +579,19 @@ class AsyncServicesClient:
         self, name: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
+        Removes a service integration.
+
+        Effects:
+
+        - Active connections are terminated immediately
+        - Service tools become unavailable to agents
+        - Historical data about tool usage is preserved
+        - Running operations may fail
+
         Parameters
         ----------
         name : str
+            Unique identifier for the service
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -448,12 +627,22 @@ class AsyncServicesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
                     typing.cast(
-                        HttpValidationError,
+                        typing.Optional[typing.Any],
                         parse_obj_as(
-                            type_=HttpValidationError,  # type: ignore
+                            type_=typing.Optional[typing.Any],  # type: ignore
                             object_=_response.json(),
                         ),
                     )
@@ -467,6 +656,12 @@ class AsyncServicesClient:
         self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Service]:
         """
+        Returns basic info about all registered services.
+
+        For performance reasons, tool details are omitted from the response.
+        Use the retrieve endpoint to get complete information including
+        tools for a specific service.
+
         Parameters
         ----------
         request_options : typing.Optional[RequestOptions]
@@ -475,7 +670,9 @@ class AsyncServicesClient:
         Returns
         -------
         typing.List[Service]
-            Successful Response
+            List of all registered services. Tool lists are not
+                            included for performance - use the retrieve endpoint to get tools
+                            for a specific service.
 
         Examples
         --------
