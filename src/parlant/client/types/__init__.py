@@ -15,7 +15,6 @@ from .context_variable_value import ContextVariableValue
 from .customer import Customer
 from .customer_extra_update_params import CustomerExtraUpdateParams
 from .customer_tag_update_params import CustomerTagUpdateParams
-from .day_of_week_dto import DayOfWeekDto
 from .evaluation import Evaluation
 from .evaluation_status_dto import EvaluationStatusDto
 from .event import Event
@@ -23,7 +22,6 @@ from .event_inspection_result import EventInspectionResult
 from .event_kind_dto import EventKindDto
 from .event_source_dto import EventSourceDto
 from .event_trace import EventTrace
-from .freshness_rules import FreshnessRules
 from .generation_info import GenerationInfo
 from .guideline import Guideline
 from .guideline_connection import GuidelineConnection
@@ -86,7 +84,6 @@ __all__ = [
     "Customer",
     "CustomerExtraUpdateParams",
     "CustomerTagUpdateParams",
-    "DayOfWeekDto",
     "Evaluation",
     "EvaluationStatusDto",
     "Event",
@@ -94,7 +91,6 @@ __all__ = [
     "EventKindDto",
     "EventSourceDto",
     "EventTrace",
-    "FreshnessRules",
     "GenerationInfo",
     "Guideline",
     "GuidelineConnection",

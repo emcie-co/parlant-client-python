@@ -4,7 +4,6 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
 from .tool_id import ToolId
-from .freshness_rules import FreshnessRules
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -33,9 +32,9 @@ class ContextVariable(UniversalBaseModel):
     """
 
     tool_id: typing.Optional[ToolId] = None
-    freshness_rules: typing.Optional[FreshnessRules] = pydantic.Field(default=None)
+    freshness_rules: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Rules for data freshness validation
+    Cron expression defining the freshness rules
     """
 
     if IS_PYDANTIC_V2:
