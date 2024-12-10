@@ -17,7 +17,7 @@ class Tag(UniversalBaseModel):
 
     id: str = pydantic.Field()
     """
-    Unique identifier for the tag in format 'tag\_[alphanumeric]'
+    Unique identifier for the tag
     """
 
     creation_utc: dt.datetime = pydantic.Field()
