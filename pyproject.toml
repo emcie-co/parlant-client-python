@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "parlant-client"
-version = "0.7.2"
+version = "0.7.4"
 description = "Python API client for Parlant (https://parlant.io)"
 authors = ["Yam Marcovitz <yam@emcie.co>", "Dor Zohar <dor@emcie.co>", "Nathan Dortman <nathan@emcie.co>"]
 readme = "README.md"
