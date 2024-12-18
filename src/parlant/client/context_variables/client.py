@@ -11,7 +11,6 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..types.tool_id import ToolId
-from ..types.freshness_rules import FreshnessRules
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.context_variable_read_result import ContextVariableReadResult
 from ..types.context_variable_value import ContextVariableValue
@@ -101,7 +100,7 @@ class ContextVariablesClient:
         name: str,
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
-        freshness_rules: typing.Optional[FreshnessRules] = OMIT,
+        freshness_rules: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -126,8 +125,8 @@ class ContextVariablesClient:
 
         tool_id : typing.Optional[ToolId]
 
-        freshness_rules : typing.Optional[FreshnessRules]
-            Rules for data freshness validation
+        freshness_rules : typing.Optional[str]
+            Cron expression defining the freshness rules
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -139,7 +138,7 @@ class ContextVariablesClient:
 
         Examples
         --------
-        from parlant.client import FreshnessRules, ParlantClient, ToolId
+        from parlant.client import ParlantClient, ToolId
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -152,14 +151,7 @@ class ContextVariablesClient:
                 service_name="finance_service",
                 tool_name="balance_checker",
             ),
-            freshness_rules=FreshnessRules(
-                months=[1, 6, 12],
-                days_of_month=[1, 15, 30],
-                days_of_week=["Monday", "Wednesday", "Friday"],
-                hours=[9, 13, 17],
-                minutes=[0, 30],
-                seconds=[0, 30],
-            ),
+            freshness_rules="freshness_rules",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -171,11 +163,7 @@ class ContextVariablesClient:
                 "tool_id": convert_and_respect_annotation_metadata(
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
-                "freshness_rules": convert_and_respect_annotation_metadata(
-                    object_=freshness_rules,
-                    annotation=FreshnessRules,
-                    direction="write",
-                ),
+                "freshness_rules": freshness_rules,
             },
             request_options=request_options,
             omit=OMIT,
@@ -440,7 +428,7 @@ class ContextVariablesClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
-        freshness_rules: typing.Optional[FreshnessRules] = OMIT,
+        freshness_rules: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -464,8 +452,8 @@ class ContextVariablesClient:
 
         tool_id : typing.Optional[ToolId]
 
-        freshness_rules : typing.Optional[FreshnessRules]
-            Rules for data freshness validation
+        freshness_rules : typing.Optional[str]
+            Cron expression defining the freshness rules
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -477,7 +465,7 @@ class ContextVariablesClient:
 
         Examples
         --------
-        from parlant.client import FreshnessRules, ParlantClient
+        from parlant.client import ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -486,10 +474,7 @@ class ContextVariablesClient:
             agent_id="agent_id",
             variable_id="variable_id",
             name="CustomerBalance",
-            freshness_rules=FreshnessRules(
-                hours=[8, 12, 16],
-                minutes=[0],
-            ),
+            freshness_rules="freshness_rules",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -501,11 +486,7 @@ class ContextVariablesClient:
                 "tool_id": convert_and_respect_annotation_metadata(
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
-                "freshness_rules": convert_and_respect_annotation_metadata(
-                    object_=freshness_rules,
-                    annotation=FreshnessRules,
-                    direction="write",
-                ),
+                "freshness_rules": freshness_rules,
             },
             request_options=request_options,
             omit=OMIT,
@@ -640,8 +621,9 @@ class ContextVariablesClient:
         """
         Updates the value of a context variable.
 
-        The key represents a customer identifier or a customer tag in the format `tag:{tag_id}`.
-        The data contains the actual context information being stored.
+        The `key` represents a customer identifier or a customer tag in the format `tag:{tag_id}`.
+        If `key="DEFAULT"`, the update applies to all customers.
+        The `params` parameter contains the actual context information being stored.
 
         Parameters
         ----------
@@ -893,7 +875,7 @@ class AsyncContextVariablesClient:
         name: str,
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
-        freshness_rules: typing.Optional[FreshnessRules] = OMIT,
+        freshness_rules: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -918,8 +900,8 @@ class AsyncContextVariablesClient:
 
         tool_id : typing.Optional[ToolId]
 
-        freshness_rules : typing.Optional[FreshnessRules]
-            Rules for data freshness validation
+        freshness_rules : typing.Optional[str]
+            Cron expression defining the freshness rules
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -933,7 +915,7 @@ class AsyncContextVariablesClient:
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, FreshnessRules, ToolId
+        from parlant.client import AsyncParlantClient, ToolId
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -949,14 +931,7 @@ class AsyncContextVariablesClient:
                     service_name="finance_service",
                     tool_name="balance_checker",
                 ),
-                freshness_rules=FreshnessRules(
-                    months=[1, 6, 12],
-                    days_of_month=[1, 15, 30],
-                    days_of_week=["Monday", "Wednesday", "Friday"],
-                    hours=[9, 13, 17],
-                    minutes=[0, 30],
-                    seconds=[0, 30],
-                ),
+                freshness_rules="freshness_rules",
             )
 
 
@@ -971,11 +946,7 @@ class AsyncContextVariablesClient:
                 "tool_id": convert_and_respect_annotation_metadata(
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
-                "freshness_rules": convert_and_respect_annotation_metadata(
-                    object_=freshness_rules,
-                    annotation=FreshnessRules,
-                    direction="write",
-                ),
+                "freshness_rules": freshness_rules,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1264,7 +1235,7 @@ class AsyncContextVariablesClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
-        freshness_rules: typing.Optional[FreshnessRules] = OMIT,
+        freshness_rules: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -1288,8 +1259,8 @@ class AsyncContextVariablesClient:
 
         tool_id : typing.Optional[ToolId]
 
-        freshness_rules : typing.Optional[FreshnessRules]
-            Rules for data freshness validation
+        freshness_rules : typing.Optional[str]
+            Cron expression defining the freshness rules
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1303,7 +1274,7 @@ class AsyncContextVariablesClient:
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, FreshnessRules
+        from parlant.client import AsyncParlantClient
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -1315,10 +1286,7 @@ class AsyncContextVariablesClient:
                 agent_id="agent_id",
                 variable_id="variable_id",
                 name="CustomerBalance",
-                freshness_rules=FreshnessRules(
-                    hours=[8, 12, 16],
-                    minutes=[0],
-                ),
+                freshness_rules="freshness_rules",
             )
 
 
@@ -1333,11 +1301,7 @@ class AsyncContextVariablesClient:
                 "tool_id": convert_and_respect_annotation_metadata(
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
-                "freshness_rules": convert_and_respect_annotation_metadata(
-                    object_=freshness_rules,
-                    annotation=FreshnessRules,
-                    direction="write",
-                ),
+                "freshness_rules": freshness_rules,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1480,8 +1444,9 @@ class AsyncContextVariablesClient:
         """
         Updates the value of a context variable.
 
-        The key represents a customer identifier or a customer tag in the format `tag:{tag_id}`.
-        The data contains the actual context information being stored.
+        The `key` represents a customer identifier or a customer tag in the format `tag:{tag_id}`.
+        If `key="DEFAULT"`, the update applies to all customers.
+        The `params` parameter contains the actual context information being stored.
 
         Parameters
         ----------
