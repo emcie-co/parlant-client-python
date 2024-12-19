@@ -37,6 +37,7 @@ class Event(UniversalBaseModel):
     """
 
     data: typing.Optional[typing.Any] = None
+    deleted: bool
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
