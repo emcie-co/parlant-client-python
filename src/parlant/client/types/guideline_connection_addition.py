@@ -2,7 +2,6 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
-from .connection_kind_dto import ConnectionKindDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
@@ -21,8 +20,6 @@ class GuidelineConnectionAddition(UniversalBaseModel):
     """
     `id` of guideline that is target of this connection.
     """
-
-    kind: ConnectionKindDto
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

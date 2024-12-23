@@ -3,7 +3,6 @@
 from .agent import Agent
 from .coherence_check import CoherenceCheck
 from .coherence_check_kind_dto import CoherenceCheckKindDto
-from .connection_kind_dto import ConnectionKindDto
 from .connection_proposition import ConnectionProposition
 from .connection_proposition_kind_dto import ConnectionPropositionKindDto
 from .consumption_offsets import ConsumptionOffsets
@@ -72,7 +71,6 @@ __all__ = [
     "Agent",
     "CoherenceCheck",
     "CoherenceCheckKindDto",
-    "ConnectionKindDto",
     "ConnectionProposition",
     "ConnectionPropositionKindDto",
     "ConsumptionOffsets",
