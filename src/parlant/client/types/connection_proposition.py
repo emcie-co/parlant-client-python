@@ -3,7 +3,6 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 from .connection_proposition_kind_dto import ConnectionPropositionKindDto
 from .guideline_content import GuidelineContent
-from .connection_kind_dto import ConnectionKindDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 import pydantic
@@ -17,7 +16,6 @@ class ConnectionProposition(UniversalBaseModel):
     check_kind: ConnectionPropositionKindDto
     source: GuidelineContent
     target: GuidelineContent
-    connection_kind: ConnectionKindDto
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

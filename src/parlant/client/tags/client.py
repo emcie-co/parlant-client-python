@@ -49,7 +49,7 @@ class TagsClient:
         client.tags.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "tags/",
+            "tags",
             method="GET",
             request_options=request_options,
         )
@@ -101,7 +101,7 @@ class TagsClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "tags/",
+            "tags",
             method="POST",
             json={
                 "name": name,
@@ -387,7 +387,7 @@ class AsyncTagsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "tags/",
+            "tags",
             method="GET",
             request_options=request_options,
         )
@@ -447,7 +447,7 @@ class AsyncTagsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "tags/",
+            "tags",
             method="POST",
             json={
                 "name": name,

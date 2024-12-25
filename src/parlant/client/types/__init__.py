@@ -3,7 +3,6 @@
 from .agent import Agent
 from .coherence_check import CoherenceCheck
 from .coherence_check_kind_dto import CoherenceCheckKindDto
-from .connection_kind_dto import ConnectionKindDto
 from .connection_proposition import ConnectionProposition
 from .connection_proposition_kind_dto import ConnectionPropositionKindDto
 from .consumption_offsets import ConsumptionOffsets
@@ -65,6 +64,8 @@ from .tool_parameter_type_dto import ToolParameterTypeDto
 from .tool_result import ToolResult
 from .tool_service_kind_dto import ToolServiceKindDto
 from .usage_info import UsageInfo
+from .utterance_reason_dto import UtteranceReasonDto
+from .utterance_request import UtteranceRequest
 from .validation_error import ValidationError
 from .validation_error_loc_item import ValidationErrorLocItem
 
@@ -72,7 +73,6 @@ __all__ = [
     "Agent",
     "CoherenceCheck",
     "CoherenceCheckKindDto",
-    "ConnectionKindDto",
     "ConnectionProposition",
     "ConnectionPropositionKindDto",
     "ConsumptionOffsets",
@@ -130,6 +130,8 @@ __all__ = [
     "ToolResult",
     "ToolServiceKindDto",
     "UsageInfo",
+    "UtteranceReasonDto",
+    "UtteranceRequest",
     "ValidationError",
     "ValidationErrorLocItem",
 ]
