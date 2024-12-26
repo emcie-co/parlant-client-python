@@ -197,7 +197,6 @@ class GuidelinesClient:
                                         condition="System logs are available",
                                         action="Analyze logs for error patterns",
                                     ),
-                                    connection_kind="suggests",
                                 )
                             ],
                         ),
@@ -472,7 +471,6 @@ class GuidelinesClient:
                     GuidelineConnectionAddition(
                         source="guide_123xyz",
                         target="guide_789xyz",
-                        kind="suggests",
                     )
                 ],
                 remove=["guide_456xyz"],
@@ -730,7 +728,6 @@ class AsyncGuidelinesClient:
                                             condition="System logs are available",
                                             action="Analyze logs for error patterns",
                                         ),
-                                        connection_kind="suggests",
                                     )
                                 ],
                             ),
@@ -1029,7 +1026,6 @@ class AsyncGuidelinesClient:
                         GuidelineConnectionAddition(
                             source="guide_123xyz",
                             target="guide_789xyz",
-                            kind="suggests",
                         )
                     ],
                     remove=["guide_456xyz"],

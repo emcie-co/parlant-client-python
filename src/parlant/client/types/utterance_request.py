@@ -2,24 +2,18 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
+from .utterance_reason_dto import UtteranceReasonDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
 
-class GuidelineConnectionAddition(UniversalBaseModel):
+class UtteranceRequest(UniversalBaseModel):
+    action: str = pydantic.Field()
     """
-    Used to add connections between Guidelines.
-    """
-
-    source: str = pydantic.Field()
-    """
-    `id` of guideline that is source of this connection.
+    A single action that explains what to say; i.e. "Tell the customer that you are thinking and will be right back with an answer."
     """
 
-    target: str = pydantic.Field()
-    """
-    `id` of guideline that is target of this connection.
-    """
+    reason: UtteranceReasonDto
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

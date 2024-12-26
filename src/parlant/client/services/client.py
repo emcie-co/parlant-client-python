@@ -331,7 +331,7 @@ class ServicesClient:
         client.services.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "services/",
+            "services",
             method="GET",
             request_options=request_options,
         )
@@ -692,7 +692,7 @@ class AsyncServicesClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "services/",
+            "services",
             method="GET",
             request_options=request_options,
         )

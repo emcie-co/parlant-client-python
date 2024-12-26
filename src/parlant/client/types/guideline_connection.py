@@ -3,7 +3,6 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 from .guideline import Guideline
-from .connection_kind_dto import ConnectionKindDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
@@ -11,8 +10,6 @@ import typing
 class GuidelineConnection(UniversalBaseModel):
     """
     Represents a connection between two guidelines.
-
-    The connection can be strong (with `kind`=`"entails"`) or weak (with `kind`=`"suggests"`)
     """
 
     id: str = pydantic.Field()
@@ -22,7 +19,6 @@ class GuidelineConnection(UniversalBaseModel):
 
     source: Guideline
     target: Guideline
-    kind: ConnectionKindDto
     indirect: bool = pydantic.Field()
     """
     `True` if there is a path from `source` to `target` but no direct connection

@@ -49,7 +49,7 @@ class AgentsClient:
         client.agents.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "agents/",
+            "agents",
             method="GET",
             request_options=request_options,
         )
@@ -120,7 +120,7 @@ class AgentsClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "agents/",
+            "agents",
             method="POST",
             json={
                 "name": name,
@@ -426,7 +426,7 @@ class AsyncAgentsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "agents/",
+            "agents",
             method="GET",
             request_options=request_options,
         )
@@ -505,7 +505,7 @@ class AsyncAgentsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "agents/",
+            "agents",
             method="POST",
             json={
                 "name": name,

@@ -52,7 +52,7 @@ class CustomersClient:
         client.customers.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "customers/",
+            "customers",
             method="GET",
             request_options=request_options,
         )
@@ -112,7 +112,7 @@ class CustomersClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "customers/",
+            "customers",
             method="POST",
             json={
                 "name": name,
@@ -441,7 +441,7 @@ class AsyncCustomersClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "customers/",
+            "customers",
             method="GET",
             request_options=request_options,
         )
@@ -509,7 +509,7 @@ class AsyncCustomersClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "customers/",
+            "customers",
             method="POST",
             json={
                 "name": name,

@@ -49,7 +49,7 @@ class TagsClient:
         client.tags.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "tags/",
+            "tags",
             method="GET",
             request_options=request_options,
         )
@@ -101,7 +101,7 @@ class TagsClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "tags/",
+            "tags",
             method="POST",
             json={
                 "name": name,
@@ -274,12 +274,12 @@ class TagsClient:
         *,
         name: str,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
+    ) -> Tag:
         """
         Updates an existing tag's name.
 
-        Only the name can be modified - the ID and creation timestamp are immutable.
-        Returns a 404 error if no tag exists with the specified ID.
+        Only the name can be modified,
+        The tag's ID and creation timestamp cannot be modified.
 
         Parameters
         ----------
@@ -294,7 +294,8 @@ class TagsClient:
 
         Returns
         -------
-        None
+        Tag
+            Tag successfully updated. Returns the updated tag.
 
         Examples
         --------
@@ -319,7 +320,13 @@ class TagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return
+                return typing.cast(
+                    Tag,
+                    parse_obj_as(
+                        type_=Tag,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
@@ -387,7 +394,7 @@ class AsyncTagsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "tags/",
+            "tags",
             method="GET",
             request_options=request_options,
         )
@@ -447,7 +454,7 @@ class AsyncTagsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "tags/",
+            "tags",
             method="POST",
             json={
                 "name": name,
@@ -636,12 +643,12 @@ class AsyncTagsClient:
         *,
         name: str,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
+    ) -> Tag:
         """
         Updates an existing tag's name.
 
-        Only the name can be modified - the ID and creation timestamp are immutable.
-        Returns a 404 error if no tag exists with the specified ID.
+        Only the name can be modified,
+        The tag's ID and creation timestamp cannot be modified.
 
         Parameters
         ----------
@@ -656,7 +663,8 @@ class AsyncTagsClient:
 
         Returns
         -------
-        None
+        Tag
+            Tag successfully updated. Returns the updated tag.
 
         Examples
         --------
@@ -689,7 +697,13 @@ class AsyncTagsClient:
         )
         try:
             if 200 <= _response.status_code < 300:
-                return
+                return typing.cast(
+                    Tag,
+                    parse_obj_as(
+                        type_=Tag,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(

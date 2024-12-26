@@ -17,6 +17,7 @@ from ..types.event import Event
 from ..errors.gateway_timeout_error import GatewayTimeoutError
 from ..types.event_kind_dto import EventKindDto
 from ..types.moderation import Moderation
+from ..types.utterance_request import UtteranceRequest
 from ..types.event_inspection_result import EventInspectionResult
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -65,7 +66,7 @@ class SessionsClient:
         client.sessions.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "sessions/",
+            "sessions",
             method="GET",
             params={
                 "agent_id": agent_id,
@@ -148,7 +149,7 @@ class SessionsClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "sessions/",
+            "sessions",
             method="POST",
             params={
                 "allow_greeting": allow_greeting,
@@ -221,7 +222,7 @@ class SessionsClient:
         client.sessions.delete_many()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "sessions/",
+            "sessions",
             method="DELETE",
             params={
                 "agent_id": agent_id,
@@ -602,6 +603,7 @@ class SessionsClient:
         source: EventSourceDto,
         moderation: typing.Optional[Moderation] = None,
         message: typing.Optional[str] = OMIT,
+        actions: typing.Optional[typing.Sequence[UtteranceRequest]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -623,6 +625,8 @@ class SessionsClient:
 
         message : typing.Optional[str]
             Event payload data, format depends on kind
+
+        actions : typing.Optional[typing.Sequence[UtteranceRequest]]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -656,6 +660,11 @@ class SessionsClient:
                 "kind": kind,
                 "source": source,
                 "message": message,
+                "actions": convert_and_respect_annotation_metadata(
+                    object_=actions,
+                    annotation=typing.Sequence[UtteranceRequest],
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -899,7 +908,7 @@ class AsyncSessionsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "sessions/",
+            "sessions",
             method="GET",
             params={
                 "agent_id": agent_id,
@@ -990,7 +999,7 @@ class AsyncSessionsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "sessions/",
+            "sessions",
             method="POST",
             params={
                 "allow_greeting": allow_greeting,
@@ -1071,7 +1080,7 @@ class AsyncSessionsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "sessions/",
+            "sessions",
             method="DELETE",
             params={
                 "agent_id": agent_id,
@@ -1484,6 +1493,7 @@ class AsyncSessionsClient:
         source: EventSourceDto,
         moderation: typing.Optional[Moderation] = None,
         message: typing.Optional[str] = OMIT,
+        actions: typing.Optional[typing.Sequence[UtteranceRequest]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -1505,6 +1515,8 @@ class AsyncSessionsClient:
 
         message : typing.Optional[str]
             Event payload data, format depends on kind
+
+        actions : typing.Optional[typing.Sequence[UtteranceRequest]]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1546,6 +1558,11 @@ class AsyncSessionsClient:
                 "kind": kind,
                 "source": source,
                 "message": message,
+                "actions": convert_and_respect_annotation_metadata(
+                    object_=actions,
+                    annotation=typing.Sequence[UtteranceRequest],
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
