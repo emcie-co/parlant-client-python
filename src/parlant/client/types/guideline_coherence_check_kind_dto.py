@@ -2,7 +2,7 @@
 
 import typing
 
-CoherenceCheckKindDto = typing.Union[
+GuidelineCoherenceCheckKindDto = typing.Union[
     typing.Literal[
         "contradiction_with_existing_guideline",
         "contradiction_with_another_evaluated_guideline",

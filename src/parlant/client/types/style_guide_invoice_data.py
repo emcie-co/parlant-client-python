@@ -2,21 +2,17 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .guideline_invoice_data import GuidelineInvoiceData
-from .style_guide_invoice_data import StyleGuideInvoiceData
+from .style_guide_coherence_check import StyleGuideCoherenceCheck
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class InvoiceData(UniversalBaseModel):
+class StyleGuideInvoiceData(UniversalBaseModel):
     """
-    Contains the relevant invoice data.
-
-    At this point only `guideline` is suppoerted.
+    Evaluation results for a StyleGuide, including contradiction checks
     """
 
-    guideline: typing.Optional[GuidelineInvoiceData] = None
-    style_guide: typing.Optional[StyleGuideInvoiceData] = None
+    coherence_checks: typing.List[StyleGuideCoherenceCheck]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

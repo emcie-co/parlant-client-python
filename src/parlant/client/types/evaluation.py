@@ -32,7 +32,7 @@ class Evaluation(UniversalBaseModel):
 
     error: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Error message if the evaluation failed
+    Describes any error that occurred during evaluation.
     """
 
     invoices: typing.List[Invoice]

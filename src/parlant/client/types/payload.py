@@ -4,19 +4,19 @@ from ..core.pydantic_utilities import UniversalBaseModel
 from .payload_kind_dto import PayloadKindDto
 import typing
 from .guideline_payload import GuidelinePayload
+from .style_guide_payload import StyleGuidePayload
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
 class Payload(UniversalBaseModel):
     """
-    A container for a guideline payload along with its kind
-
-    Only `"guideline"` is available at this point.
+    A container for a guideline OR style guide payload along with its kind
     """
 
-    kind: PayloadKindDto = "guideline"
+    kind: PayloadKindDto
     guideline: typing.Optional[GuidelinePayload] = None
+    style_guide: typing.Optional[StyleGuidePayload] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

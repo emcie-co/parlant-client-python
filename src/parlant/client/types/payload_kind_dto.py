@@ -2,4 +2,4 @@
 
 import typing
 
-PayloadKindDto = typing.Literal["guideline"]
+PayloadKindDto = typing.Union[typing.Literal["guideline", "style_guide"], typing.Any]

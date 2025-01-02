@@ -2,7 +2,7 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .coherence_check import CoherenceCheck
+from .guidelines_coherence_check import GuidelinesCoherenceCheck
 from .connection_proposition import ConnectionProposition
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
@@ -13,7 +13,7 @@ class GuidelineInvoiceData(UniversalBaseModel):
     Evaluation results for a Guideline, including contradiction checks and connection proposals
     """
 
-    coherence_checks: typing.List[CoherenceCheck]
+    coherence_checks: typing.List[GuidelinesCoherenceCheck]
     connection_propositions: typing.Optional[typing.List[ConnectionProposition]] = None
 
     if IS_PYDANTIC_V2:

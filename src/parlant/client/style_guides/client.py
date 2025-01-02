@@ -3,7 +3,7 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.guideline import Guideline
+from ..types.style_guide import StyleGuide
 from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.not_found_error import NotFoundError
@@ -11,34 +11,24 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..types.invoice import Invoice
-from ..types.guideline_creation_result import GuidelineCreationResult
+from ..types.style_guide_creation_result import StyleGuideCreationResult
 from ..core.serialization import convert_and_respect_annotation_metadata
-from ..types.guideline_with_connections_and_tool_associations import (
-    GuidelineWithConnectionsAndToolAssociations,
-)
-from ..types.guideline_connection_update_params import GuidelineConnectionUpdateParams
-from ..types.guideline_tool_association_update_params import (
-    GuidelineToolAssociationUpdateParams,
-)
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
 
-class GuidelinesClient:
+class StyleGuidesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[Guideline]:
+    ) -> typing.List[StyleGuide]:
         """
-        Lists all guidelines for the specified agent.
-
-        Returns an empty list if no guidelines exist.
-        Guidelines are returned in no guaranteed order.
-        Does not include connections or tool associations.
+        Lists all style guides for the specified agent (style_guide_set).
+        Returns an empty list if none exist.
 
         Parameters
         ----------
@@ -50,8 +40,8 @@ class GuidelinesClient:
 
         Returns
         -------
-        typing.List[Guideline]
-            List of all guidelines for the specified agent
+        typing.List[StyleGuide]
+            List of all style guides for the specified agent.
 
         Examples
         --------
@@ -60,21 +50,21 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.list(
+        client.style_guides.list(
             agent_id="agent_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines",
+            f"agents/{jsonable_encoder(agent_id)}/style_guides",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Guideline],
+                    typing.List[StyleGuide],
                     parse_obj_as(
-                        type_=typing.List[Guideline],  # type: ignore
+                        type_=typing.List[StyleGuide],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -109,16 +99,13 @@ class GuidelinesClient:
         *,
         invoices: typing.Sequence[Invoice],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineCreationResult:
+    ) -> StyleGuideCreationResult:
         """
-        Creates new guidelines from the provided invoices.
+        Creates new style guides from the provided invoices.
 
         Invoices are obtained by calling the `create_evaluation` method of the client.
         (Equivalent to making a POST request to `/index/evaluations`)
-        See the [documentation](https://parlant.io/docs/concepts/customization/guidelines) for more information.
-
-        The guidelines are created in the specified agent's guideline set.
-        Tool associations and connections are automatically handled.
+        See the [documentation](https://parlant.io/docs/concepts/customization/style-guides) for more information.
 
         Parameters
         ----------
@@ -132,72 +119,123 @@ class GuidelinesClient:
 
         Returns
         -------
-        GuidelineCreationResult
-            Guidelines successfully created. Returns the created guidelines with their connections and tool associations.
+        StyleGuideCreationResult
+            Style guides successfully created. Returns the created style guides.
 
         Examples
         --------
         from parlant.client import (
-            ConnectionProposition,
-            GuidelineContent,
-            GuidelineInvoiceData,
-            GuidelinePayload,
-            GuidelinesCoherenceCheck,
             Invoice,
             InvoiceData,
             ParlantClient,
             Payload,
+            StyleGuideCoherenceCheck,
+            StyleGuideContent,
+            StyleGuideEvent,
+            StyleGuideExample,
+            StyleGuideInvoiceData,
+            StyleGuidePayload,
         )
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.create(
+        client.style_guides.create(
             agent_id="agent_id",
             invoices=[
                 Invoice(
                     payload=Payload(
-                        kind="guideline",
-                        guideline=GuidelinePayload(
-                            content=GuidelineContent(
-                                condition="when the customer asks about pricing",
-                                action="provide current pricing information",
+                        kind="style_guide",
+                        style_guide=StyleGuidePayload(
+                            content=StyleGuideContent(
+                                principle="Use inclusive language and a positive tone",
+                                examples=[
+                                    StyleGuideExample(
+                                        before=[
+                                            StyleGuideEvent(
+                                                source="ai_agent",
+                                                message="Your request is denied. Try again.",
+                                            )
+                                        ],
+                                        after=[
+                                            StyleGuideEvent(
+                                                source="ai_agent",
+                                                message="Unfortunately we can't fulfill that request right now. Let's see what else we can do to help!",
+                                            )
+                                        ],
+                                        violation="The 'before' response is abrupt and lacks empathy.",
+                                    )
+                                ],
                             ),
                             operation="add",
                             coherence_check=True,
-                            connection_proposition=True,
                         ),
                     ),
                     checksum="abc123",
                     approved=True,
                     data=InvoiceData(
-                        guideline=GuidelineInvoiceData(
+                        style_guide=StyleGuideInvoiceData(
                             coherence_checks=[
-                                GuidelinesCoherenceCheck(
-                                    kind="contradiction_with_existing_guideline",
-                                    first=GuidelineContent(
-                                        condition="User is frustrated",
-                                        action="Respond with technical details",
+                                StyleGuideCoherenceCheck(
+                                    kind="contradiction_with_existing_style_guide",
+                                    first=StyleGuideContent(
+                                        principle="Use Imperial units",
+                                        examples=[
+                                            StyleGuideExample(
+                                                before=[
+                                                    StyleGuideEvent(
+                                                        source="customer",
+                                                        message="How tall do I have to be to get on the roller coaster?",
+                                                    ),
+                                                    StyleGuideEvent(
+                                                        source="ai_agent",
+                                                        message="1.8 meters",
+                                                    ),
+                                                ],
+                                                after=[
+                                                    StyleGuideEvent(
+                                                        source="customer",
+                                                        message="How tall do I have to be to get on the roller coaster?",
+                                                    ),
+                                                    StyleGuideEvent(
+                                                        source="ai_agent",
+                                                        message="5 feet 11 inches",
+                                                    ),
+                                                ],
+                                                violation="The 'before' message is in metric units, which is not imperial.",
+                                            )
+                                        ],
                                     ),
-                                    second=GuidelineContent(
-                                        condition="User is frustrated",
-                                        action="Focus on emotional support first",
+                                    second=StyleGuideContent(
+                                        principle="Use Metric units",
+                                        examples=[
+                                            StyleGuideExample(
+                                                before=[
+                                                    StyleGuideEvent(
+                                                        source="customer",
+                                                        message="How tall do I have to be to get on the roller coaster?",
+                                                    ),
+                                                    StyleGuideEvent(
+                                                        source="ai_agent",
+                                                        message="5 feet 11 inches",
+                                                    ),
+                                                ],
+                                                after=[
+                                                    StyleGuideEvent(
+                                                        source="customer",
+                                                        message="How tall do I have to be to get on the roller coaster?",
+                                                    ),
+                                                    StyleGuideEvent(
+                                                        source="ai_agent",
+                                                        message="1.8 meters",
+                                                    ),
+                                                ],
+                                                violation="The 'before' message is in imperial units, which is not metric.",
+                                            )
+                                        ],
                                     ),
-                                    issue="Conflicting approaches to handling user frustration",
-                                    severity=7,
-                                )
-                            ],
-                            connection_propositions=[
-                                ConnectionProposition(
-                                    check_kind="connection_with_existing_guideline",
-                                    source=GuidelineContent(
-                                        condition="User mentions technical problem",
-                                        action="Request system logs",
-                                    ),
-                                    target=GuidelineContent(
-                                        condition="System logs are available",
-                                        action="Analyze logs for error patterns",
-                                    ),
+                                    issue="Conflicting approaches to writing units",
+                                    severity=8,
                                 )
                             ],
                         ),
@@ -207,7 +245,7 @@ class GuidelinesClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines",
+            f"agents/{jsonable_encoder(agent_id)}/style_guides",
             method="POST",
             json={
                 "invoices": convert_and_respect_annotation_metadata(
@@ -222,9 +260,9 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineCreationResult,
+                    StyleGuideCreationResult,
                     parse_obj_as(
-                        type_=GuidelineCreationResult,  # type: ignore
+                        type_=StyleGuideCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -256,31 +294,28 @@ class GuidelinesClient:
     def retrieve(
         self,
         agent_id: str,
-        guideline_id: str,
+        style_guide_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> StyleGuide:
         """
-        Retrieves a specific guideline with all its connections and tool associations.
-
-        Returns both direct and indirect connections between guidelines.
-        Tool associations indicate which tools the guideline can use.
+        Retrieves a style guide by its ID.
 
         Parameters
         ----------
         agent_id : str
             Unique identifier for the agent
 
-        guideline_id : str
-            Unique identifier for the guideline
+        style_guide_id : str
+            Unique identifier for the style guide
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
-            Guideline details successfully retrieved. Returns the complete guideline with its connections and tool associations.
+        StyleGuide
+            Style guide details successfully retrieved.
 
         Examples
         --------
@@ -289,22 +324,22 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.retrieve(
+        client.style_guides.retrieve(
             agent_id="agent_id",
-            guideline_id="guideline_id",
+            style_guide_id="style_guide_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/style_guides/{jsonable_encoder(style_guide_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
+                    StyleGuide,
                     parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
+                        type_=StyleGuide,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -336,15 +371,14 @@ class GuidelinesClient:
     def delete(
         self,
         agent_id: str,
-        guideline_id: str,
+        style_guide_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes a guideline from the agent.
+        Deletes a style guide from the agent.
 
-        Also removes all associated connections and tool associations.
-        Deleting a non-existent guideline will return 404.
+        Deleting a non-existent style guide will return 404.
         No content will be returned from a successful deletion.
 
         Parameters
@@ -352,8 +386,8 @@ class GuidelinesClient:
         agent_id : str
             Unique identifier for the agent
 
-        guideline_id : str
-            Unique identifier for the guideline
+        style_guide_id : str
+            Unique identifier for the style guide
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -369,13 +403,13 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.delete(
+        client.style_guides.delete(
             agent_id="agent_id",
-            guideline_id="guideline_id",
+            style_guide_id="style_guide_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/style_guides/{jsonable_encoder(style_guide_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -410,112 +444,55 @@ class GuidelinesClient:
     def update(
         self,
         agent_id: str,
-        guideline_id: str,
+        style_guide_id: str,
         *,
-        connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
-        tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> StyleGuide:
         """
-        Updates a guideline's connections and tool associations.
+        Deletes a style guide from the agent.
 
-        Only provided attributes will be updated; others remain unchanged.
-
-        Connection rules:
-
-        - A guideline cannot connect to itself
-        - Only direct connections can be removed
-        - The connection must specify this guideline as source or target
-
-        Tool Association rules:
-
-        - Tool services and tools must exist before creating associations
+        Deleting a non-existent style guide will return 404.
+        No content will be returned from a successful deletion.
 
         Parameters
         ----------
         agent_id : str
             Unique identifier for the agent
 
-        guideline_id : str
-            Unique identifier for the guideline
-
-        connections : typing.Optional[GuidelineConnectionUpdateParams]
-
-        tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
+        style_guide_id : str
+            Unique identifier for the style guide
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
-            Guideline successfully updated. Returns the updated guideline with its connections and tool associations.
+        StyleGuide
+            Style guide successfully updated. Returns the updated guide.
 
         Examples
         --------
-        from parlant.client import (
-            GuidelineConnectionAddition,
-            GuidelineConnectionUpdateParams,
-            GuidelineToolAssociationUpdateParams,
-            ParlantClient,
-            ToolId,
-        )
+        from parlant.client import ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.update(
+        client.style_guides.update(
             agent_id="agent_id",
-            guideline_id="guideline_id",
-            connections=GuidelineConnectionUpdateParams(
-                add=[
-                    GuidelineConnectionAddition(
-                        source="guide_123xyz",
-                        target="guide_789xyz",
-                    )
-                ],
-                remove=["guide_456xyz"],
-            ),
-            tool_associations=GuidelineToolAssociationUpdateParams(
-                add=[
-                    ToolId(
-                        service_name="pricing_service",
-                        tool_name="get_prices",
-                    )
-                ],
-                remove=[
-                    ToolId(
-                        service_name="old_service",
-                        tool_name="old_tool",
-                    )
-                ],
-            ),
+            style_guide_id="style_guide_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/style_guides/{jsonable_encoder(style_guide_id)}",
             method="PATCH",
-            json={
-                "connections": convert_and_respect_annotation_metadata(
-                    object_=connections,
-                    annotation=GuidelineConnectionUpdateParams,
-                    direction="write",
-                ),
-                "tool_associations": convert_and_respect_annotation_metadata(
-                    object_=tool_associations,
-                    annotation=GuidelineToolAssociationUpdateParams,
-                    direction="write",
-                ),
-            },
             request_options=request_options,
-            omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
+                    StyleGuide,
                     parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
+                        type_=StyleGuide,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -545,19 +522,16 @@ class GuidelinesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncGuidelinesClient:
+class AsyncStyleGuidesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(
         self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[Guideline]:
+    ) -> typing.List[StyleGuide]:
         """
-        Lists all guidelines for the specified agent.
-
-        Returns an empty list if no guidelines exist.
-        Guidelines are returned in no guaranteed order.
-        Does not include connections or tool associations.
+        Lists all style guides for the specified agent (style_guide_set).
+        Returns an empty list if none exist.
 
         Parameters
         ----------
@@ -569,8 +543,8 @@ class AsyncGuidelinesClient:
 
         Returns
         -------
-        typing.List[Guideline]
-            List of all guidelines for the specified agent
+        typing.List[StyleGuide]
+            List of all style guides for the specified agent.
 
         Examples
         --------
@@ -584,7 +558,7 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.list(
+            await client.style_guides.list(
                 agent_id="agent_id",
             )
 
@@ -592,16 +566,16 @@ class AsyncGuidelinesClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines",
+            f"agents/{jsonable_encoder(agent_id)}/style_guides",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Guideline],
+                    typing.List[StyleGuide],
                     parse_obj_as(
-                        type_=typing.List[Guideline],  # type: ignore
+                        type_=typing.List[StyleGuide],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -636,16 +610,13 @@ class AsyncGuidelinesClient:
         *,
         invoices: typing.Sequence[Invoice],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineCreationResult:
+    ) -> StyleGuideCreationResult:
         """
-        Creates new guidelines from the provided invoices.
+        Creates new style guides from the provided invoices.
 
         Invoices are obtained by calling the `create_evaluation` method of the client.
         (Equivalent to making a POST request to `/index/evaluations`)
-        See the [documentation](https://parlant.io/docs/concepts/customization/guidelines) for more information.
-
-        The guidelines are created in the specified agent's guideline set.
-        Tool associations and connections are automatically handled.
+        See the [documentation](https://parlant.io/docs/concepts/customization/style-guides) for more information.
 
         Parameters
         ----------
@@ -659,8 +630,8 @@ class AsyncGuidelinesClient:
 
         Returns
         -------
-        GuidelineCreationResult
-            Guidelines successfully created. Returns the created guidelines with their connections and tool associations.
+        StyleGuideCreationResult
+            Style guides successfully created. Returns the created style guides.
 
         Examples
         --------
@@ -668,14 +639,15 @@ class AsyncGuidelinesClient:
 
         from parlant.client import (
             AsyncParlantClient,
-            ConnectionProposition,
-            GuidelineContent,
-            GuidelineInvoiceData,
-            GuidelinePayload,
-            GuidelinesCoherenceCheck,
             Invoice,
             InvoiceData,
             Payload,
+            StyleGuideCoherenceCheck,
+            StyleGuideContent,
+            StyleGuideEvent,
+            StyleGuideExample,
+            StyleGuideInvoiceData,
+            StyleGuidePayload,
         )
 
         client = AsyncParlantClient(
@@ -684,52 +656,102 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.create(
+            await client.style_guides.create(
                 agent_id="agent_id",
                 invoices=[
                     Invoice(
                         payload=Payload(
-                            kind="guideline",
-                            guideline=GuidelinePayload(
-                                content=GuidelineContent(
-                                    condition="when the customer asks about pricing",
-                                    action="provide current pricing information",
+                            kind="style_guide",
+                            style_guide=StyleGuidePayload(
+                                content=StyleGuideContent(
+                                    principle="Use inclusive language and a positive tone",
+                                    examples=[
+                                        StyleGuideExample(
+                                            before=[
+                                                StyleGuideEvent(
+                                                    source="ai_agent",
+                                                    message="Your request is denied. Try again.",
+                                                )
+                                            ],
+                                            after=[
+                                                StyleGuideEvent(
+                                                    source="ai_agent",
+                                                    message="Unfortunately we can't fulfill that request right now. Let's see what else we can do to help!",
+                                                )
+                                            ],
+                                            violation="The 'before' response is abrupt and lacks empathy.",
+                                        )
+                                    ],
                                 ),
                                 operation="add",
                                 coherence_check=True,
-                                connection_proposition=True,
                             ),
                         ),
                         checksum="abc123",
                         approved=True,
                         data=InvoiceData(
-                            guideline=GuidelineInvoiceData(
+                            style_guide=StyleGuideInvoiceData(
                                 coherence_checks=[
-                                    GuidelinesCoherenceCheck(
-                                        kind="contradiction_with_existing_guideline",
-                                        first=GuidelineContent(
-                                            condition="User is frustrated",
-                                            action="Respond with technical details",
+                                    StyleGuideCoherenceCheck(
+                                        kind="contradiction_with_existing_style_guide",
+                                        first=StyleGuideContent(
+                                            principle="Use Imperial units",
+                                            examples=[
+                                                StyleGuideExample(
+                                                    before=[
+                                                        StyleGuideEvent(
+                                                            source="customer",
+                                                            message="How tall do I have to be to get on the roller coaster?",
+                                                        ),
+                                                        StyleGuideEvent(
+                                                            source="ai_agent",
+                                                            message="1.8 meters",
+                                                        ),
+                                                    ],
+                                                    after=[
+                                                        StyleGuideEvent(
+                                                            source="customer",
+                                                            message="How tall do I have to be to get on the roller coaster?",
+                                                        ),
+                                                        StyleGuideEvent(
+                                                            source="ai_agent",
+                                                            message="5 feet 11 inches",
+                                                        ),
+                                                    ],
+                                                    violation="The 'before' message is in metric units, which is not imperial.",
+                                                )
+                                            ],
                                         ),
-                                        second=GuidelineContent(
-                                            condition="User is frustrated",
-                                            action="Focus on emotional support first",
+                                        second=StyleGuideContent(
+                                            principle="Use Metric units",
+                                            examples=[
+                                                StyleGuideExample(
+                                                    before=[
+                                                        StyleGuideEvent(
+                                                            source="customer",
+                                                            message="How tall do I have to be to get on the roller coaster?",
+                                                        ),
+                                                        StyleGuideEvent(
+                                                            source="ai_agent",
+                                                            message="5 feet 11 inches",
+                                                        ),
+                                                    ],
+                                                    after=[
+                                                        StyleGuideEvent(
+                                                            source="customer",
+                                                            message="How tall do I have to be to get on the roller coaster?",
+                                                        ),
+                                                        StyleGuideEvent(
+                                                            source="ai_agent",
+                                                            message="1.8 meters",
+                                                        ),
+                                                    ],
+                                                    violation="The 'before' message is in imperial units, which is not metric.",
+                                                )
+                                            ],
                                         ),
-                                        issue="Conflicting approaches to handling user frustration",
-                                        severity=7,
-                                    )
-                                ],
-                                connection_propositions=[
-                                    ConnectionProposition(
-                                        check_kind="connection_with_existing_guideline",
-                                        source=GuidelineContent(
-                                            condition="User mentions technical problem",
-                                            action="Request system logs",
-                                        ),
-                                        target=GuidelineContent(
-                                            condition="System logs are available",
-                                            action="Analyze logs for error patterns",
-                                        ),
+                                        issue="Conflicting approaches to writing units",
+                                        severity=8,
                                     )
                                 ],
                             ),
@@ -742,7 +764,7 @@ class AsyncGuidelinesClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines",
+            f"agents/{jsonable_encoder(agent_id)}/style_guides",
             method="POST",
             json={
                 "invoices": convert_and_respect_annotation_metadata(
@@ -757,9 +779,9 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineCreationResult,
+                    StyleGuideCreationResult,
                     parse_obj_as(
-                        type_=GuidelineCreationResult,  # type: ignore
+                        type_=StyleGuideCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -791,31 +813,28 @@ class AsyncGuidelinesClient:
     async def retrieve(
         self,
         agent_id: str,
-        guideline_id: str,
+        style_guide_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> StyleGuide:
         """
-        Retrieves a specific guideline with all its connections and tool associations.
-
-        Returns both direct and indirect connections between guidelines.
-        Tool associations indicate which tools the guideline can use.
+        Retrieves a style guide by its ID.
 
         Parameters
         ----------
         agent_id : str
             Unique identifier for the agent
 
-        guideline_id : str
-            Unique identifier for the guideline
+        style_guide_id : str
+            Unique identifier for the style guide
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
-            Guideline details successfully retrieved. Returns the complete guideline with its connections and tool associations.
+        StyleGuide
+            Style guide details successfully retrieved.
 
         Examples
         --------
@@ -829,25 +848,25 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.retrieve(
+            await client.style_guides.retrieve(
                 agent_id="agent_id",
-                guideline_id="guideline_id",
+                style_guide_id="style_guide_id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/style_guides/{jsonable_encoder(style_guide_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
+                    StyleGuide,
                     parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
+                        type_=StyleGuide,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -879,15 +898,14 @@ class AsyncGuidelinesClient:
     async def delete(
         self,
         agent_id: str,
-        guideline_id: str,
+        style_guide_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes a guideline from the agent.
+        Deletes a style guide from the agent.
 
-        Also removes all associated connections and tool associations.
-        Deleting a non-existent guideline will return 404.
+        Deleting a non-existent style guide will return 404.
         No content will be returned from a successful deletion.
 
         Parameters
@@ -895,8 +913,8 @@ class AsyncGuidelinesClient:
         agent_id : str
             Unique identifier for the agent
 
-        guideline_id : str
-            Unique identifier for the guideline
+        style_guide_id : str
+            Unique identifier for the style guide
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -917,16 +935,16 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.delete(
+            await client.style_guides.delete(
                 agent_id="agent_id",
-                guideline_id="guideline_id",
+                style_guide_id="style_guide_id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/style_guides/{jsonable_encoder(style_guide_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -961,58 +979,37 @@ class AsyncGuidelinesClient:
     async def update(
         self,
         agent_id: str,
-        guideline_id: str,
+        style_guide_id: str,
         *,
-        connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
-        tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> StyleGuide:
         """
-        Updates a guideline's connections and tool associations.
+        Deletes a style guide from the agent.
 
-        Only provided attributes will be updated; others remain unchanged.
-
-        Connection rules:
-
-        - A guideline cannot connect to itself
-        - Only direct connections can be removed
-        - The connection must specify this guideline as source or target
-
-        Tool Association rules:
-
-        - Tool services and tools must exist before creating associations
+        Deleting a non-existent style guide will return 404.
+        No content will be returned from a successful deletion.
 
         Parameters
         ----------
         agent_id : str
             Unique identifier for the agent
 
-        guideline_id : str
-            Unique identifier for the guideline
-
-        connections : typing.Optional[GuidelineConnectionUpdateParams]
-
-        tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
+        style_guide_id : str
+            Unique identifier for the style guide
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
-            Guideline successfully updated. Returns the updated guideline with its connections and tool associations.
+        StyleGuide
+            Style guide successfully updated. Returns the updated guide.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import (
-            AsyncParlantClient,
-            GuidelineConnectionAddition,
-            GuidelineConnectionUpdateParams,
-            GuidelineToolAssociationUpdateParams,
-            ToolId,
-        )
+        from parlant.client import AsyncParlantClient
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -1020,61 +1017,25 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.update(
+            await client.style_guides.update(
                 agent_id="agent_id",
-                guideline_id="guideline_id",
-                connections=GuidelineConnectionUpdateParams(
-                    add=[
-                        GuidelineConnectionAddition(
-                            source="guide_123xyz",
-                            target="guide_789xyz",
-                        )
-                    ],
-                    remove=["guide_456xyz"],
-                ),
-                tool_associations=GuidelineToolAssociationUpdateParams(
-                    add=[
-                        ToolId(
-                            service_name="pricing_service",
-                            tool_name="get_prices",
-                        )
-                    ],
-                    remove=[
-                        ToolId(
-                            service_name="old_service",
-                            tool_name="old_tool",
-                        )
-                    ],
-                ),
+                style_guide_id="style_guide_id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/style_guides/{jsonable_encoder(style_guide_id)}",
             method="PATCH",
-            json={
-                "connections": convert_and_respect_annotation_metadata(
-                    object_=connections,
-                    annotation=GuidelineConnectionUpdateParams,
-                    direction="write",
-                ),
-                "tool_associations": convert_and_respect_annotation_metadata(
-                    object_=tool_associations,
-                    annotation=GuidelineToolAssociationUpdateParams,
-                    direction="write",
-                ),
-            },
             request_options=request_options,
-            omit=OMIT,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
+                    StyleGuide,
                     parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
+                        type_=StyleGuide,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

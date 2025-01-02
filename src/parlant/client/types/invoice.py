@@ -12,24 +12,31 @@ class Invoice(UniversalBaseModel):
     """
     Represents the result of evaluating a single payload in an evaluation task.
 
-    An invoice is a comprehensive record of the evaluation results for a single payload.
+    An Invoice is a comprehensive record of the evaluation results, including:
+
+    - A `payload` describing what kind of data was evaluated (e.g., guideline or style_guide).
+    - A `checksum` to verify the integrity of the content.
+    - An `approved` flag indicating whether the results are finalized.
+    - An optional `data` object containing detailed findings (coherence checks, connections, etc.),
+      if the evaluation is approved.
+    - An optional `error` message if the evaluation failed.
     """
 
     payload: Payload
     checksum: str = pydantic.Field()
     """
-    Checksum of the invoice content
+    Checksum of the invoice content.
     """
 
     approved: bool = pydantic.Field()
     """
-    Whether the evaluation task the invoice represents has been approved
+    Indicates whether the evaluation task the invoice represents has been approved.
     """
 
     data: typing.Optional[InvoiceData] = None
     error: typing.Optional[str] = pydantic.Field(default=None)
     """
-    Error message if the evaluation failed
+    Describes any error that occurred during evaluation.
     """
 
     if IS_PYDANTIC_V2:

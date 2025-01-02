@@ -66,6 +66,7 @@ class EvaluationsClient:
             agent_id="a1g2e3n4t5",
             payloads=[
                 Payload(
+                    kind="guideline",
                     guideline=GuidelinePayload(
                         content=GuidelineContent(
                             condition="when customer asks about pricing",
@@ -273,6 +274,7 @@ class AsyncEvaluationsClient:
                 agent_id="a1g2e3n4t5",
                 payloads=[
                     Payload(
+                        kind="guideline",
                         guideline=GuidelinePayload(
                             content=GuidelineContent(
                                 condition="when customer asks about pricing",

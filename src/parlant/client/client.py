@@ -5,6 +5,7 @@ import httpx
 from .core.client_wrapper import SyncClientWrapper
 from .agents.client import AgentsClient
 from .guidelines.client import GuidelinesClient
+from .style_guides.client import StyleGuidesClient
 from .glossary.client import GlossaryClient
 from .context_variables.client import ContextVariablesClient
 from .sessions.client import SessionsClient
@@ -15,6 +16,7 @@ from .customers.client import CustomersClient
 from .core.client_wrapper import AsyncClientWrapper
 from .agents.client import AsyncAgentsClient
 from .guidelines.client import AsyncGuidelinesClient
+from .style_guides.client import AsyncStyleGuidesClient
 from .glossary.client import AsyncGlossaryClient
 from .context_variables.client import AsyncContextVariablesClient
 from .sessions.client import AsyncSessionsClient
@@ -75,6 +77,7 @@ class ParlantClient:
         )
         self.agents = AgentsClient(client_wrapper=self._client_wrapper)
         self.guidelines = GuidelinesClient(client_wrapper=self._client_wrapper)
+        self.style_guides = StyleGuidesClient(client_wrapper=self._client_wrapper)
         self.glossary = GlossaryClient(client_wrapper=self._client_wrapper)
         self.context_variables = ContextVariablesClient(
             client_wrapper=self._client_wrapper
@@ -137,6 +140,7 @@ class AsyncParlantClient:
         )
         self.agents = AsyncAgentsClient(client_wrapper=self._client_wrapper)
         self.guidelines = AsyncGuidelinesClient(client_wrapper=self._client_wrapper)
+        self.style_guides = AsyncStyleGuidesClient(client_wrapper=self._client_wrapper)
         self.glossary = AsyncGlossaryClient(client_wrapper=self._client_wrapper)
         self.context_variables = AsyncContextVariablesClient(
             client_wrapper=self._client_wrapper
