@@ -12,6 +12,17 @@ from .evaluations.client import EvaluationsClient
 from .services.client import ServicesClient
 from .tags.client import TagsClient
 from .customers.client import CustomersClient
+from .fragments.client import FragmentsClient
+from .core.request_options import RequestOptions
+from .types.fragment import Fragment
+from .core.pydantic_utilities import parse_obj_as
+from json.decoder import JSONDecodeError
+from .core.api_error import ApiError
+from .core.jsonable_encoder import jsonable_encoder
+from .errors.unprocessable_entity_error import UnprocessableEntityError
+from .types.slot import Slot
+from .types.fragment_tag_update_params import FragmentTagUpdateParams
+from .core.serialization import convert_and_respect_annotation_metadata
 from .core.client_wrapper import AsyncClientWrapper
 from .agents.client import AsyncAgentsClient
 from .guidelines.client import AsyncGuidelinesClient
@@ -22,6 +33,10 @@ from .evaluations.client import AsyncEvaluationsClient
 from .services.client import AsyncServicesClient
 from .tags.client import AsyncTagsClient
 from .customers.client import AsyncCustomersClient
+from .fragments.client import AsyncFragmentsClient
+
+# this is used as the default value for optional parameters
+OMIT = typing.cast(typing.Any, ...)
 
 
 class ParlantClient:
@@ -84,6 +99,195 @@ class ParlantClient:
         self.services = ServicesClient(client_wrapper=self._client_wrapper)
         self.tags = TagsClient(client_wrapper=self._client_wrapper)
         self.customers = CustomersClient(client_wrapper=self._client_wrapper)
+        self.fragments = FragmentsClient(client_wrapper=self._client_wrapper)
+
+    def list_fragments(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[Fragment]:
+        """
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[Fragment]
+            Successful Response
+
+        Examples
+        --------
+        from parlant.client import ParlantClient
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.list_fragments()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "fragments",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    typing.List[Fragment],
+                    parse_obj_as(
+                        type_=typing.List[Fragment],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def delete_fragment(
+        self,
+        fragment_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> None:
+        """
+        Parameters
+        ----------
+        fragment_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from parlant.client import ParlantClient
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.delete_fragment(
+            fragment_id="fragment_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"fragments/{jsonable_encoder(fragment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update_fragment(
+        self,
+        fragment_id: str,
+        *,
+        value: typing.Optional[str] = OMIT,
+        slots: typing.Optional[typing.Sequence[Slot]] = OMIT,
+        tags: typing.Optional[FragmentTagUpdateParams] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Fragment:
+        """
+        Updates an existing fragment's attributes.
+
+        Only provided attributes will be updated; others remain unchanged.
+        The fragment's ID and creation timestamp cannot be modified.
+        Extra metadata and tags can be added or removed independently.
+
+        Parameters
+        ----------
+        fragment_id : str
+
+        value : typing.Optional[str]
+            The textual content of the fragment.
+
+        slots : typing.Optional[typing.Sequence[Slot]]
+            A sequence of slots associated with the fragment.
+
+        tags : typing.Optional[FragmentTagUpdateParams]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        Fragment
+            Successful Response
+
+        Examples
+        --------
+        from parlant.client import ParlantClient, Slot
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.update_fragment(
+            fragment_id="fragment_id",
+            value="Your updated balance is {balance}",
+            slots=[
+                Slot(
+                    name="balance",
+                    description="Updated account balance",
+                    examples=["10000"],
+                )
+            ],
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"fragments/{jsonable_encoder(fragment_id)}",
+            method="PATCH",
+            json={
+                "value": value,
+                "slots": convert_and_respect_annotation_metadata(
+                    object_=slots, annotation=typing.Sequence[Slot], direction="write"
+                ),
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=FragmentTagUpdateParams, direction="write"
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Fragment,
+                    parse_obj_as(
+                        type_=Fragment,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
 class AsyncParlantClient:
@@ -146,3 +350,216 @@ class AsyncParlantClient:
         self.services = AsyncServicesClient(client_wrapper=self._client_wrapper)
         self.tags = AsyncTagsClient(client_wrapper=self._client_wrapper)
         self.customers = AsyncCustomersClient(client_wrapper=self._client_wrapper)
+        self.fragments = AsyncFragmentsClient(client_wrapper=self._client_wrapper)
+
+    async def list_fragments(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[Fragment]:
+        """
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[Fragment]
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.list_fragments()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "fragments",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    typing.List[Fragment],
+                    parse_obj_as(
+                        type_=typing.List[Fragment],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete_fragment(
+        self,
+        fragment_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> None:
+        """
+        Parameters
+        ----------
+        fragment_id : str
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.delete_fragment(
+                fragment_id="fragment_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"fragments/{jsonable_encoder(fragment_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_fragment(
+        self,
+        fragment_id: str,
+        *,
+        value: typing.Optional[str] = OMIT,
+        slots: typing.Optional[typing.Sequence[Slot]] = OMIT,
+        tags: typing.Optional[FragmentTagUpdateParams] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Fragment:
+        """
+        Updates an existing fragment's attributes.
+
+        Only provided attributes will be updated; others remain unchanged.
+        The fragment's ID and creation timestamp cannot be modified.
+        Extra metadata and tags can be added or removed independently.
+
+        Parameters
+        ----------
+        fragment_id : str
+
+        value : typing.Optional[str]
+            The textual content of the fragment.
+
+        slots : typing.Optional[typing.Sequence[Slot]]
+            A sequence of slots associated with the fragment.
+
+        tags : typing.Optional[FragmentTagUpdateParams]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        Fragment
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient, Slot
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.update_fragment(
+                fragment_id="fragment_id",
+                value="Your updated balance is {balance}",
+                slots=[
+                    Slot(
+                        name="balance",
+                        description="Updated account balance",
+                        examples=["10000"],
+                    )
+                ],
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"fragments/{jsonable_encoder(fragment_id)}",
+            method="PATCH",
+            json={
+                "value": value,
+                "slots": convert_and_respect_annotation_metadata(
+                    object_=slots, annotation=typing.Sequence[Slot], direction="write"
+                ),
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=FragmentTagUpdateParams, direction="write"
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Fragment,
+                    parse_obj_as(
+                        type_=Fragment,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)

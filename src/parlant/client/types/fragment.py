@@ -4,40 +4,34 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import datetime as dt
 import typing
+from .slot import Slot
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class Customer(UniversalBaseModel):
-    """
-    Represents a customer in the system.
-
-    Customers are entities that interact with agents through sessions. Each customer
-    can have metadata stored in the extra field and can be tagged for categorization.
-    """
-
+class Fragment(UniversalBaseModel):
     id: str = pydantic.Field()
     """
-    Unique identifier for the customer
+    Unique identifier for the tag
     """
 
     creation_utc: dt.datetime = pydantic.Field()
     """
-    UTC timestamp of when the customer was created
+    UTC timestamp of when the fragment was created
     """
 
-    name: str = pydantic.Field()
+    value: str = pydantic.Field()
     """
-    An arbitrary string that indentifies and/or describes the customer
+    The textual content of the fragment.
     """
 
-    extra: typing.Dict[str, str] = pydantic.Field()
+    slots: typing.List[Slot] = pydantic.Field()
     """
-    Key-value pairs (`str: str`) to describe the customer
+    A sequence of slots associated with the fragment.
     """
 
     tags: typing.List[str] = pydantic.Field()
     """
-    Collection of ids of tags that describe the customer
+    Collection of tag IDs associated with the fragment.
     """
 
     if IS_PYDANTIC_V2:
