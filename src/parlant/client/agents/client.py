@@ -10,6 +10,7 @@ from ..core.api_error import ApiError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
+from ..types.composition_mode_dto import CompositionModeDto
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -295,6 +296,7 @@ class AgentsClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
@@ -316,6 +318,8 @@ class AgentsClient:
 
         max_engine_iterations : typing.Optional[int]
             Maximum number of processing iterations the agent can perform per request
+
+        composition_mode : typing.Optional[CompositionModeDto]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -346,6 +350,7 @@ class AgentsClient:
                 "name": name,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
+                "composition_mode": composition_mode,
             },
             request_options=request_options,
             omit=OMIT,
@@ -696,6 +701,7 @@ class AsyncAgentsClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
@@ -717,6 +723,8 @@ class AsyncAgentsClient:
 
         max_engine_iterations : typing.Optional[int]
             Maximum number of processing iterations the agent can perform per request
+
+        composition_mode : typing.Optional[CompositionModeDto]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -755,6 +763,7 @@ class AsyncAgentsClient:
                 "name": name,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
+                "composition_mode": composition_mode,
             },
             request_options=request_options,
             omit=OMIT,

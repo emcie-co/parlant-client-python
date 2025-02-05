@@ -4,6 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
 import datetime as dt
+from .composition_mode_dto import CompositionModeDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -41,6 +42,8 @@ class Agent(UniversalBaseModel):
     """
     Maximum number of processing iterations the agent can perform per request
     """
+
+    composition_mode: CompositionModeDto
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
