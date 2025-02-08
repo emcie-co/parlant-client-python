@@ -3,42 +3,45 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.agent import Agent
+from ..types.fragment import Fragment
 from ..core.pydantic_utilities import parse_obj_as
+from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..errors.unprocessable_entity_error import UnprocessableEntityError
+from ..types.fragment_field import FragmentField
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.composition_mode_dto import CompositionModeDto
+from ..types.fragment_tag_update_params import FragmentTagUpdateParams
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
 
-class AgentsClient:
+class FragmentsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[Agent]:
+        self,
+        *,
+        tags: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.List[Fragment]:
         """
-        Retrieves a list of all agents in the system.
-
-        Returns an empty list if no agents exist.
-        Agents are returned in no guaranteed order.
-
         Parameters
         ----------
+        tags : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            Filter fragments by tags
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Agent]
-            List of all agents in the system
+        typing.List[Fragment]
+            List of all fragments in the system
 
         Examples
         --------
@@ -47,21 +50,34 @@ class AgentsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.agents.list()
+        client.fragments.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "agents",
+            "fragments",
             method="GET",
+            params={
+                "tags": tags,
+            },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Agent],
+                    typing.List[Fragment],
                     parse_obj_as(
-                        type_=typing.List[Agent],  # type: ignore
+                        type_=typing.List[Fragment],  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -71,62 +87,55 @@ class AgentsClient:
     def create(
         self,
         *,
-        name: str,
-        description: typing.Optional[str] = OMIT,
-        max_engine_iterations: typing.Optional[int] = OMIT,
+        value: str,
+        fragment_fields: typing.Sequence[FragmentField],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Agent:
+    ) -> Fragment:
         """
-        Creates a new agent in the system.
-
-        The agent will be initialized with the provided name and optional settings.
-        A unique identifier will be automatically generated.
-
-        Default behaviors:
-
-        - `name` defaults to `"Unnamed Agent"` if not provided
-        - `description` defaults to `None`
-        - `max_engine_iterations` defaults to `None` (uses system default)
-
         Parameters
         ----------
-        name : str
-            The display name of the agent, mainly for management purposes
+        value : str
+            The textual content of the fragment.
 
-        description : typing.Optional[str]
-            Detailed description of the agent's purpose and capabilities
-
-        max_engine_iterations : typing.Optional[int]
-            Maximum number of processing iterations the agent can perform per request
+        fragment_fields : typing.Sequence[FragmentField]
+            A sequence of fragment fields associated with the fragment.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Agent
-            Agent successfully created. Returns the complete agent object including generated ID.
+        Fragment
+            Fragment successfully created.
 
         Examples
         --------
-        from parlant.client import ParlantClient
+        from parlant.client import FragmentField, ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.agents.create(
-            name="Haxon",
-            description="Technical Support Assistant",
-            max_engine_iterations=3,
+        client.fragments.create(
+            value="Your account balance is {balance}",
+            fragment_fields=[
+                FragmentField(
+                    name="balance",
+                    description="Account's balance",
+                    examples=["9000"],
+                )
+            ],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "agents",
+            "fragments",
             method="POST",
             json={
-                "name": name,
-                "description": description,
-                "max_engine_iterations": max_engine_iterations,
+                "value": value,
+                "fragment_fields": convert_and_respect_annotation_metadata(
+                    object_=fragment_fields,
+                    annotation=typing.Sequence[FragmentField],
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -134,9 +143,9 @@ class AgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Agent,
+                    Fragment,
                     parse_obj_as(
-                        type_=Agent,  # type: ignore
+                        type_=Fragment,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -156,23 +165,25 @@ class AgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def retrieve(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> Agent:
+        self,
+        fragment_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Fragment:
         """
-        Retrieves details of a specific agent by ID.
+        Retrieves details of a specific fragment by ID.
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent
+        fragment_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Agent
-            Agent details successfully retrieved. Returns the complete agent object.
+        Fragment
+            Fragment details successfully retrieved. Returns the Fragment object.
 
         Examples
         --------
@@ -181,21 +192,21 @@ class AgentsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.agents.retrieve(
-            agent_id="agent_id",
+        client.fragments.retrieve(
+            fragment_id="fragment_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}",
+            f"fragments/{jsonable_encoder(fragment_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Agent,
+                    Fragment,
                     parse_obj_as(
-                        type_=Agent,  # type: ignore
+                        type_=Fragment,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -225,18 +236,15 @@ class AgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        fragment_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes an agent from the agent.
-
-        Deleting a non-existent agent will return 404.
-        No content will be returned from a successful deletion.
-
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent
+        fragment_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -252,12 +260,12 @@ class AgentsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.agents.delete(
-            agent_id="agent_id",
+        client.fragments.delete(
+            fragment_id="fragment_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}",
+            f"fragments/{jsonable_encoder(fragment_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -291,66 +299,72 @@ class AgentsClient:
 
     def update(
         self,
-        agent_id: str,
+        fragment_id: str,
         *,
-        name: typing.Optional[str] = OMIT,
-        description: typing.Optional[str] = OMIT,
-        max_engine_iterations: typing.Optional[int] = OMIT,
-        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        value: typing.Optional[str] = OMIT,
+        fragment_fields: typing.Optional[typing.Sequence[FragmentField]] = OMIT,
+        tags: typing.Optional[FragmentTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Agent:
+    ) -> Fragment:
         """
-        Updates an existing agent's attributes.
+        Updates an existing fragment's attributes.
 
-        Only the provided attributes will be updated; others will remain unchanged.
-        The agent's ID and creation timestamp cannot be modified.
+        Only provided attributes will be updated; others remain unchanged.
+        The fragment's ID and creation timestamp cannot be modified.
+        Extra metadata and tags can be added or removed independently.
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent
+        fragment_id : str
 
-        name : typing.Optional[str]
-            The display name of the agent, mainly for management purposes
+        value : typing.Optional[str]
+            The textual content of the fragment.
 
-        description : typing.Optional[str]
-            Detailed description of the agent's purpose and capabilities
+        fragment_fields : typing.Optional[typing.Sequence[FragmentField]]
+            A sequence of fragment fields associated with the fragment.
 
-        max_engine_iterations : typing.Optional[int]
-            Maximum number of processing iterations the agent can perform per request
-
-        composition_mode : typing.Optional[CompositionModeDto]
+        tags : typing.Optional[FragmentTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Agent
-            Agent successfully updated. Returns the updated agent.
+        Fragment
+            Fragment successfully updated. Returns the updated Fragment object.
 
         Examples
         --------
-        from parlant.client import ParlantClient
+        from parlant.client import FragmentField, ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.agents.update(
-            agent_id="agent_id",
-            name="Haxon",
-            description="Technical Support Assistant",
-            max_engine_iterations=3,
+        client.fragments.update(
+            fragment_id="fragment_id",
+            value="Your updated balance is {balance}",
+            fragment_fields=[
+                FragmentField(
+                    name="balance",
+                    description="Updated account balance",
+                    examples=["10000"],
+                )
+            ],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}",
+            f"fragments/{jsonable_encoder(fragment_id)}",
             method="PATCH",
             json={
-                "name": name,
-                "description": description,
-                "max_engine_iterations": max_engine_iterations,
-                "composition_mode": composition_mode,
+                "value": value,
+                "fragment_fields": convert_and_respect_annotation_metadata(
+                    object_=fragment_fields,
+                    annotation=typing.Sequence[FragmentField],
+                    direction="write",
+                ),
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=FragmentTagUpdateParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -358,9 +372,9 @@ class AgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Agent,
+                    Fragment,
                     parse_obj_as(
-                        type_=Agent,  # type: ignore
+                        type_=Fragment,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -390,28 +404,29 @@ class AgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncAgentsClient:
+class AsyncFragmentsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[Agent]:
+        self,
+        *,
+        tags: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.List[Fragment]:
         """
-        Retrieves a list of all agents in the system.
-
-        Returns an empty list if no agents exist.
-        Agents are returned in no guaranteed order.
-
         Parameters
         ----------
+        tags : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            Filter fragments by tags
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Agent]
-            List of all agents in the system
+        typing.List[Fragment]
+            List of all fragments in the system
 
         Examples
         --------
@@ -425,24 +440,37 @@ class AsyncAgentsClient:
 
 
         async def main() -> None:
-            await client.agents.list()
+            await client.fragments.list()
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "agents",
+            "fragments",
             method="GET",
+            params={
+                "tags": tags,
+            },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Agent],
+                    typing.List[Fragment],
                     parse_obj_as(
-                        type_=typing.List[Agent],  # type: ignore
+                        type_=typing.List[Fragment],  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -452,47 +480,32 @@ class AsyncAgentsClient:
     async def create(
         self,
         *,
-        name: str,
-        description: typing.Optional[str] = OMIT,
-        max_engine_iterations: typing.Optional[int] = OMIT,
+        value: str,
+        fragment_fields: typing.Sequence[FragmentField],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Agent:
+    ) -> Fragment:
         """
-        Creates a new agent in the system.
-
-        The agent will be initialized with the provided name and optional settings.
-        A unique identifier will be automatically generated.
-
-        Default behaviors:
-
-        - `name` defaults to `"Unnamed Agent"` if not provided
-        - `description` defaults to `None`
-        - `max_engine_iterations` defaults to `None` (uses system default)
-
         Parameters
         ----------
-        name : str
-            The display name of the agent, mainly for management purposes
+        value : str
+            The textual content of the fragment.
 
-        description : typing.Optional[str]
-            Detailed description of the agent's purpose and capabilities
-
-        max_engine_iterations : typing.Optional[int]
-            Maximum number of processing iterations the agent can perform per request
+        fragment_fields : typing.Sequence[FragmentField]
+            A sequence of fragment fields associated with the fragment.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Agent
-            Agent successfully created. Returns the complete agent object including generated ID.
+        Fragment
+            Fragment successfully created.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient
+        from parlant.client import AsyncParlantClient, FragmentField
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -500,22 +513,30 @@ class AsyncAgentsClient:
 
 
         async def main() -> None:
-            await client.agents.create(
-                name="Haxon",
-                description="Technical Support Assistant",
-                max_engine_iterations=3,
+            await client.fragments.create(
+                value="Your account balance is {balance}",
+                fragment_fields=[
+                    FragmentField(
+                        name="balance",
+                        description="Account's balance",
+                        examples=["9000"],
+                    )
+                ],
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "agents",
+            "fragments",
             method="POST",
             json={
-                "name": name,
-                "description": description,
-                "max_engine_iterations": max_engine_iterations,
+                "value": value,
+                "fragment_fields": convert_and_respect_annotation_metadata(
+                    object_=fragment_fields,
+                    annotation=typing.Sequence[FragmentField],
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -523,9 +544,9 @@ class AsyncAgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Agent,
+                    Fragment,
                     parse_obj_as(
-                        type_=Agent,  # type: ignore
+                        type_=Fragment,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -545,23 +566,25 @@ class AsyncAgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def retrieve(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> Agent:
+        self,
+        fragment_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Fragment:
         """
-        Retrieves details of a specific agent by ID.
+        Retrieves details of a specific fragment by ID.
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent
+        fragment_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Agent
-            Agent details successfully retrieved. Returns the complete agent object.
+        Fragment
+            Fragment details successfully retrieved. Returns the Fragment object.
 
         Examples
         --------
@@ -575,24 +598,24 @@ class AsyncAgentsClient:
 
 
         async def main() -> None:
-            await client.agents.retrieve(
-                agent_id="agent_id",
+            await client.fragments.retrieve(
+                fragment_id="fragment_id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}",
+            f"fragments/{jsonable_encoder(fragment_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Agent,
+                    Fragment,
                     parse_obj_as(
-                        type_=Agent,  # type: ignore
+                        type_=Fragment,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -622,18 +645,15 @@ class AsyncAgentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        fragment_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes an agent from the agent.
-
-        Deleting a non-existent agent will return 404.
-        No content will be returned from a successful deletion.
-
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent
+        fragment_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -654,15 +674,15 @@ class AsyncAgentsClient:
 
 
         async def main() -> None:
-            await client.agents.delete(
-                agent_id="agent_id",
+            await client.fragments.delete(
+                fragment_id="fragment_id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}",
+            f"fragments/{jsonable_encoder(fragment_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -696,49 +716,45 @@ class AsyncAgentsClient:
 
     async def update(
         self,
-        agent_id: str,
+        fragment_id: str,
         *,
-        name: typing.Optional[str] = OMIT,
-        description: typing.Optional[str] = OMIT,
-        max_engine_iterations: typing.Optional[int] = OMIT,
-        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        value: typing.Optional[str] = OMIT,
+        fragment_fields: typing.Optional[typing.Sequence[FragmentField]] = OMIT,
+        tags: typing.Optional[FragmentTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Agent:
+    ) -> Fragment:
         """
-        Updates an existing agent's attributes.
+        Updates an existing fragment's attributes.
 
-        Only the provided attributes will be updated; others will remain unchanged.
-        The agent's ID and creation timestamp cannot be modified.
+        Only provided attributes will be updated; others remain unchanged.
+        The fragment's ID and creation timestamp cannot be modified.
+        Extra metadata and tags can be added or removed independently.
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent
+        fragment_id : str
 
-        name : typing.Optional[str]
-            The display name of the agent, mainly for management purposes
+        value : typing.Optional[str]
+            The textual content of the fragment.
 
-        description : typing.Optional[str]
-            Detailed description of the agent's purpose and capabilities
+        fragment_fields : typing.Optional[typing.Sequence[FragmentField]]
+            A sequence of fragment fields associated with the fragment.
 
-        max_engine_iterations : typing.Optional[int]
-            Maximum number of processing iterations the agent can perform per request
-
-        composition_mode : typing.Optional[CompositionModeDto]
+        tags : typing.Optional[FragmentTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Agent
-            Agent successfully updated. Returns the updated agent.
+        Fragment
+            Fragment successfully updated. Returns the updated Fragment object.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient
+        from parlant.client import AsyncParlantClient, FragmentField
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -746,24 +762,34 @@ class AsyncAgentsClient:
 
 
         async def main() -> None:
-            await client.agents.update(
-                agent_id="agent_id",
-                name="Haxon",
-                description="Technical Support Assistant",
-                max_engine_iterations=3,
+            await client.fragments.update(
+                fragment_id="fragment_id",
+                value="Your updated balance is {balance}",
+                fragment_fields=[
+                    FragmentField(
+                        name="balance",
+                        description="Updated account balance",
+                        examples=["10000"],
+                    )
+                ],
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}",
+            f"fragments/{jsonable_encoder(fragment_id)}",
             method="PATCH",
             json={
-                "name": name,
-                "description": description,
-                "max_engine_iterations": max_engine_iterations,
-                "composition_mode": composition_mode,
+                "value": value,
+                "fragment_fields": convert_and_respect_annotation_metadata(
+                    object_=fragment_fields,
+                    annotation=typing.Sequence[FragmentField],
+                    direction="write",
+                ),
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=FragmentTagUpdateParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -771,9 +797,9 @@ class AsyncAgentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Agent,
+                    Fragment,
                     parse_obj_as(
-                        type_=Agent,  # type: ignore
+                        type_=Fragment,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

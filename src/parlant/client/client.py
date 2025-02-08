@@ -12,6 +12,7 @@ from .evaluations.client import EvaluationsClient
 from .services.client import ServicesClient
 from .tags.client import TagsClient
 from .customers.client import CustomersClient
+from .fragments.client import FragmentsClient
 from .core.client_wrapper import AsyncClientWrapper
 from .agents.client import AsyncAgentsClient
 from .guidelines.client import AsyncGuidelinesClient
@@ -22,6 +23,7 @@ from .evaluations.client import AsyncEvaluationsClient
 from .services.client import AsyncServicesClient
 from .tags.client import AsyncTagsClient
 from .customers.client import AsyncCustomersClient
+from .fragments.client import AsyncFragmentsClient
 
 
 class ParlantClient:
@@ -84,6 +86,7 @@ class ParlantClient:
         self.services = ServicesClient(client_wrapper=self._client_wrapper)
         self.tags = TagsClient(client_wrapper=self._client_wrapper)
         self.customers = CustomersClient(client_wrapper=self._client_wrapper)
+        self.fragments = FragmentsClient(client_wrapper=self._client_wrapper)
 
 
 class AsyncParlantClient:
@@ -146,3 +149,4 @@ class AsyncParlantClient:
         self.services = AsyncServicesClient(client_wrapper=self._client_wrapper)
         self.tags = AsyncTagsClient(client_wrapper=self._client_wrapper)
         self.customers = AsyncCustomersClient(client_wrapper=self._client_wrapper)
+        self.fragments = AsyncFragmentsClient(client_wrapper=self._client_wrapper)

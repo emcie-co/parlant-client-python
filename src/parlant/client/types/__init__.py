@@ -3,6 +3,7 @@
 from .agent import Agent
 from .coherence_check import CoherenceCheck
 from .coherence_check_kind_dto import CoherenceCheckKindDto
+from .composition_mode_dto import CompositionModeDto
 from .connection_proposition import ConnectionProposition
 from .connection_proposition_kind_dto import ConnectionPropositionKindDto
 from .consumption_offsets import ConsumptionOffsets
@@ -21,6 +22,9 @@ from .event_inspection_result import EventInspectionResult
 from .event_kind_dto import EventKindDto
 from .event_source_dto import EventSourceDto
 from .event_trace import EventTrace
+from .fragment import Fragment
+from .fragment_field import FragmentField
+from .fragment_tag_update_params import FragmentTagUpdateParams
 from .generation_info import GenerationInfo
 from .guideline import Guideline
 from .guideline_connection import GuidelineConnection
@@ -43,9 +47,11 @@ from .guideline_with_connections_and_tool_associations import (
 from .http_validation_error import HttpValidationError
 from .invoice import Invoice
 from .invoice_data import InvoiceData
+from .message_event_data import MessageEventData
 from .message_generation_inspection import MessageGenerationInspection
 from .moderation import Moderation
 from .open_api_service_params import OpenApiServiceParams
+from .participant import Participant
 from .payload import Payload
 from .payload_kind_dto import PayloadKindDto
 from .preparation_iteration import PreparationIteration
@@ -73,6 +79,7 @@ __all__ = [
     "Agent",
     "CoherenceCheck",
     "CoherenceCheckKindDto",
+    "CompositionModeDto",
     "ConnectionProposition",
     "ConnectionPropositionKindDto",
     "ConsumptionOffsets",
@@ -91,6 +98,9 @@ __all__ = [
     "EventKindDto",
     "EventSourceDto",
     "EventTrace",
+    "Fragment",
+    "FragmentField",
+    "FragmentTagUpdateParams",
     "GenerationInfo",
     "Guideline",
     "GuidelineConnection",
@@ -109,9 +119,11 @@ __all__ = [
     "HttpValidationError",
     "Invoice",
     "InvoiceData",
+    "MessageEventData",
     "MessageGenerationInspection",
     "Moderation",
     "OpenApiServiceParams",
+    "Participant",
     "Payload",
     "PayloadKindDto",
     "PreparationIteration",

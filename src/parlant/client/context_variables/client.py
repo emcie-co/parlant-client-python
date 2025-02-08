@@ -151,7 +151,7 @@ class ContextVariablesClient:
                 service_name="finance_service",
                 tool_name="balance_checker",
             ),
-            freshness_rules="freshness_rules",
+            freshness_rules="30 2 * * *",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -465,7 +465,7 @@ class ContextVariablesClient:
 
         Examples
         --------
-        from parlant.client import ParlantClient
+        from parlant.client import ParlantClient, ToolId
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -474,7 +474,12 @@ class ContextVariablesClient:
             agent_id="agent_id",
             variable_id="variable_id",
             name="CustomerBalance",
-            freshness_rules="freshness_rules",
+            description="Stores the account balances of users",
+            tool_id=ToolId(
+                service_name="finance_service",
+                tool_name="balance_checker",
+            ),
+            freshness_rules="0 8,20 * * *",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -931,7 +936,7 @@ class AsyncContextVariablesClient:
                     service_name="finance_service",
                     tool_name="balance_checker",
                 ),
-                freshness_rules="freshness_rules",
+                freshness_rules="30 2 * * *",
             )
 
 
@@ -1274,7 +1279,7 @@ class AsyncContextVariablesClient:
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient
+        from parlant.client import AsyncParlantClient, ToolId
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -1286,7 +1291,12 @@ class AsyncContextVariablesClient:
                 agent_id="agent_id",
                 variable_id="variable_id",
                 name="CustomerBalance",
-                freshness_rules="freshness_rules",
+                description="Stores the account balances of users",
+                tool_id=ToolId(
+                    service_name="finance_service",
+                    tool_name="balance_checker",
+                ),
+                freshness_rules="0 8,20 * * *",
             )
 
 
