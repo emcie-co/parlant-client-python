@@ -88,7 +88,7 @@ class FragmentsClient:
         self,
         *,
         value: str,
-        fragment_fields: typing.Sequence[FragmentField],
+        fields: typing.Sequence[FragmentField],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Fragment:
         """
@@ -97,7 +97,7 @@ class FragmentsClient:
         value : str
             The textual content of the fragment.
 
-        fragment_fields : typing.Sequence[FragmentField]
+        fields : typing.Sequence[FragmentField]
             A sequence of fragment fields associated with the fragment.
 
         request_options : typing.Optional[RequestOptions]
@@ -117,7 +117,7 @@ class FragmentsClient:
         )
         client.fragments.create(
             value="Your account balance is {balance}",
-            fragment_fields=[
+            fields=[
                 FragmentField(
                     name="balance",
                     description="Account's balance",
@@ -131,8 +131,8 @@ class FragmentsClient:
             method="POST",
             json={
                 "value": value,
-                "fragment_fields": convert_and_respect_annotation_metadata(
-                    object_=fragment_fields,
+                "fields": convert_and_respect_annotation_metadata(
+                    object_=fields,
                     annotation=typing.Sequence[FragmentField],
                     direction="write",
                 ),
@@ -302,7 +302,7 @@ class FragmentsClient:
         fragment_id: str,
         *,
         value: typing.Optional[str] = OMIT,
-        fragment_fields: typing.Optional[typing.Sequence[FragmentField]] = OMIT,
+        fields: typing.Optional[typing.Sequence[FragmentField]] = OMIT,
         tags: typing.Optional[FragmentTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Fragment:
@@ -320,7 +320,7 @@ class FragmentsClient:
         value : typing.Optional[str]
             The textual content of the fragment.
 
-        fragment_fields : typing.Optional[typing.Sequence[FragmentField]]
+        fields : typing.Optional[typing.Sequence[FragmentField]]
             A sequence of fragment fields associated with the fragment.
 
         tags : typing.Optional[FragmentTagUpdateParams]
@@ -343,7 +343,7 @@ class FragmentsClient:
         client.fragments.update(
             fragment_id="fragment_id",
             value="Your updated balance is {balance}",
-            fragment_fields=[
+            fields=[
                 FragmentField(
                     name="balance",
                     description="Updated account balance",
@@ -357,8 +357,8 @@ class FragmentsClient:
             method="PATCH",
             json={
                 "value": value,
-                "fragment_fields": convert_and_respect_annotation_metadata(
-                    object_=fragment_fields,
+                "fields": convert_and_respect_annotation_metadata(
+                    object_=fields,
                     annotation=typing.Sequence[FragmentField],
                     direction="write",
                 ),
@@ -481,7 +481,7 @@ class AsyncFragmentsClient:
         self,
         *,
         value: str,
-        fragment_fields: typing.Sequence[FragmentField],
+        fields: typing.Sequence[FragmentField],
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Fragment:
         """
@@ -490,7 +490,7 @@ class AsyncFragmentsClient:
         value : str
             The textual content of the fragment.
 
-        fragment_fields : typing.Sequence[FragmentField]
+        fields : typing.Sequence[FragmentField]
             A sequence of fragment fields associated with the fragment.
 
         request_options : typing.Optional[RequestOptions]
@@ -515,7 +515,7 @@ class AsyncFragmentsClient:
         async def main() -> None:
             await client.fragments.create(
                 value="Your account balance is {balance}",
-                fragment_fields=[
+                fields=[
                     FragmentField(
                         name="balance",
                         description="Account's balance",
@@ -532,8 +532,8 @@ class AsyncFragmentsClient:
             method="POST",
             json={
                 "value": value,
-                "fragment_fields": convert_and_respect_annotation_metadata(
-                    object_=fragment_fields,
+                "fields": convert_and_respect_annotation_metadata(
+                    object_=fields,
                     annotation=typing.Sequence[FragmentField],
                     direction="write",
                 ),
@@ -719,7 +719,7 @@ class AsyncFragmentsClient:
         fragment_id: str,
         *,
         value: typing.Optional[str] = OMIT,
-        fragment_fields: typing.Optional[typing.Sequence[FragmentField]] = OMIT,
+        fields: typing.Optional[typing.Sequence[FragmentField]] = OMIT,
         tags: typing.Optional[FragmentTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Fragment:
@@ -737,7 +737,7 @@ class AsyncFragmentsClient:
         value : typing.Optional[str]
             The textual content of the fragment.
 
-        fragment_fields : typing.Optional[typing.Sequence[FragmentField]]
+        fields : typing.Optional[typing.Sequence[FragmentField]]
             A sequence of fragment fields associated with the fragment.
 
         tags : typing.Optional[FragmentTagUpdateParams]
@@ -765,7 +765,7 @@ class AsyncFragmentsClient:
             await client.fragments.update(
                 fragment_id="fragment_id",
                 value="Your updated balance is {balance}",
-                fragment_fields=[
+                fields=[
                     FragmentField(
                         name="balance",
                         description="Updated account balance",
@@ -782,8 +782,8 @@ class AsyncFragmentsClient:
             method="PATCH",
             json={
                 "value": value,
-                "fragment_fields": convert_and_respect_annotation_metadata(
-                    object_=fragment_fields,
+                "fields": convert_and_respect_annotation_metadata(
+                    object_=fields,
                     annotation=typing.Sequence[FragmentField],
                     direction="write",
                 ),

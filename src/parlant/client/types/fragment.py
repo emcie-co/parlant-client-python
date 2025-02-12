@@ -24,7 +24,7 @@ class Fragment(UniversalBaseModel):
     The textual content of the fragment.
     """
 
-    fragment_fields: typing.List[FragmentField] = pydantic.Field()
+    fields: typing.List[FragmentField] = pydantic.Field()
     """
     A sequence of fragment fields associated with the fragment.
     """
