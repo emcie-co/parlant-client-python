@@ -26,6 +26,11 @@ class Guideline(UniversalBaseModel):
     This action will be performed if the condition is satisfied
     """
 
+    enabled: bool = pydantic.Field()
+    """
+    Whether the guideline is enabled
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
             extra="allow", frozen=True

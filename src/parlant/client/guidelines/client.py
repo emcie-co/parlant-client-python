@@ -31,7 +31,11 @@ class GuidelinesClient:
         self._client_wrapper = client_wrapper
 
     def list(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        agent_id: str,
+        *,
+        show_disabled: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Guideline]:
         """
         Lists all guidelines for the specified agent.
@@ -44,6 +48,8 @@ class GuidelinesClient:
         ----------
         agent_id : str
             Unique identifier for the agent
+
+        show_disabled : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -67,6 +73,9 @@ class GuidelinesClient:
         _response = self._client_wrapper.httpx_client.request(
             f"agents/{jsonable_encoder(agent_id)}/guidelines",
             method="GET",
+            params={
+                "show_disabled": show_disabled,
+            },
             request_options=request_options,
         )
         try:
@@ -413,6 +422,7 @@ class GuidelinesClient:
         *,
         connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
+        enabled: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithConnectionsAndToolAssociations:
         """
@@ -441,6 +451,8 @@ class GuidelinesClient:
         connections : typing.Optional[GuidelineConnectionUpdateParams]
 
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
+
+        enabled : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -489,6 +501,7 @@ class GuidelinesClient:
                     )
                 ],
             ),
+            enabled=True,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -505,6 +518,7 @@ class GuidelinesClient:
                     annotation=GuidelineToolAssociationUpdateParams,
                     direction="write",
                 ),
+                "enabled": enabled,
             },
             request_options=request_options,
             omit=OMIT,
@@ -549,7 +563,11 @@ class AsyncGuidelinesClient:
         self._client_wrapper = client_wrapper
 
     async def list(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        agent_id: str,
+        *,
+        show_disabled: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Guideline]:
         """
         Lists all guidelines for the specified agent.
@@ -562,6 +580,8 @@ class AsyncGuidelinesClient:
         ----------
         agent_id : str
             Unique identifier for the agent
+
+        show_disabled : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -593,6 +613,9 @@ class AsyncGuidelinesClient:
         _response = await self._client_wrapper.httpx_client.request(
             f"agents/{jsonable_encoder(agent_id)}/guidelines",
             method="GET",
+            params={
+                "show_disabled": show_disabled,
+            },
             request_options=request_options,
         )
         try:
@@ -963,6 +986,7 @@ class AsyncGuidelinesClient:
         *,
         connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
+        enabled: typing.Optional[bool] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithConnectionsAndToolAssociations:
         """
@@ -991,6 +1015,8 @@ class AsyncGuidelinesClient:
         connections : typing.Optional[GuidelineConnectionUpdateParams]
 
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
+
+        enabled : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1044,6 +1070,7 @@ class AsyncGuidelinesClient:
                         )
                     ],
                 ),
+                enabled=True,
             )
 
 
@@ -1063,6 +1090,7 @@ class AsyncGuidelinesClient:
                     annotation=GuidelineToolAssociationUpdateParams,
                     direction="write",
                 ),
+                "enabled": enabled,
             },
             request_options=request_options,
             omit=OMIT,
