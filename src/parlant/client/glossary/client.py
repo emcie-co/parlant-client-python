@@ -5,9 +5,9 @@ from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
 from ..types.term import Term
 from ..core.pydantic_utilities import parse_obj_as
+from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
 from ..types.term_tags_update_params import TermTagsUpdateParams
@@ -23,7 +23,10 @@ class GlossaryClient:
         self._client_wrapper = client_wrapper
 
     def list_terms(
-        self, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        tag_id: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Term]:
         """
         Retrieves a list of all terms in the glossary.
@@ -33,6 +36,9 @@ class GlossaryClient:
 
         Parameters
         ----------
+        tag_id : typing.Optional[str]
+            Filter terms by tag ID
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -53,6 +59,9 @@ class GlossaryClient:
         _response = self._client_wrapper.httpx_client.request(
             "terms",
             method="GET",
+            params={
+                "tag_id": tag_id,
+            },
             request_options=request_options,
         )
         try:
@@ -63,6 +72,16 @@ class GlossaryClient:
                         type_=typing.List[Term],  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -399,7 +418,10 @@ class AsyncGlossaryClient:
         self._client_wrapper = client_wrapper
 
     async def list_terms(
-        self, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        tag_id: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Term]:
         """
         Retrieves a list of all terms in the glossary.
@@ -409,6 +431,9 @@ class AsyncGlossaryClient:
 
         Parameters
         ----------
+        tag_id : typing.Optional[str]
+            Filter terms by tag ID
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -437,6 +462,9 @@ class AsyncGlossaryClient:
         _response = await self._client_wrapper.httpx_client.request(
             "terms",
             method="GET",
+            params={
+                "tag_id": tag_id,
+            },
             request_options=request_options,
         )
         try:
@@ -447,6 +475,16 @@ class AsyncGlossaryClient:
                         type_=typing.List[Term],  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
