@@ -162,7 +162,7 @@ class TagsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.tags.retrieve(
-            tag_id="tag_id",
+            tag_id="tag_123xyz",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -305,7 +305,7 @@ class TagsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.tags.update(
-            tag_id="tag_id",
+            tag_id="tag_123xyz",
             name="enterprise-customer",
         )
         """
@@ -520,7 +520,7 @@ class AsyncTagsClient:
 
         async def main() -> None:
             await client.tags.retrieve(
-                tag_id="tag_id",
+                tag_id="tag_123xyz",
             )
 
 
@@ -679,7 +679,7 @@ class AsyncTagsClient:
 
         async def main() -> None:
             await client.tags.update(
-                tag_id="tag_id",
+                tag_id="tag_123xyz",
                 name="enterprise-customer",
             )
 

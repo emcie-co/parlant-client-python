@@ -193,7 +193,7 @@ class FragmentsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.fragments.retrieve(
-            fragment_id="fragment_id",
+            fragment_id="t9a8g703f4",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -261,7 +261,7 @@ class FragmentsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.fragments.delete(
-            fragment_id="fragment_id",
+            fragment_id="t9a8g703f4",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -341,7 +341,7 @@ class FragmentsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.fragments.update(
-            fragment_id="fragment_id",
+            fragment_id="t9a8g703f4",
             value="Your updated balance is {balance}",
             fields=[
                 FragmentField(
@@ -599,7 +599,7 @@ class AsyncFragmentsClient:
 
         async def main() -> None:
             await client.fragments.retrieve(
-                fragment_id="fragment_id",
+                fragment_id="t9a8g703f4",
             )
 
 
@@ -675,7 +675,7 @@ class AsyncFragmentsClient:
 
         async def main() -> None:
             await client.fragments.delete(
-                fragment_id="fragment_id",
+                fragment_id="t9a8g703f4",
             )
 
 
@@ -763,7 +763,7 @@ class AsyncFragmentsClient:
 
         async def main() -> None:
             await client.fragments.update(
-                fragment_id="fragment_id",
+                fragment_id="t9a8g703f4",
                 value="Your updated balance is {balance}",
                 fields=[
                     FragmentField(

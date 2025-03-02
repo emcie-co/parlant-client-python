@@ -2,17 +2,18 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
+from ..types.tool_id import ToolId
 from ..core.request_options import RequestOptions
 from ..types.context_variable import ContextVariable
-from ..core.jsonable_encoder import jsonable_encoder
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.not_found_error import NotFoundError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.tool_id import ToolId
-from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.context_variable_read_result import ContextVariableReadResult
+from ..core.jsonable_encoder import jsonable_encoder
+from ..types.context_variable_tags_update_params import ContextVariableTagsUpdateParams
 from ..types.context_variable_value import ContextVariableValue
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -24,78 +25,8 @@ class ContextVariablesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[ContextVariable]:
-        """
-        Lists all context variables set for the provided agent
-
-        Parameters
-        ----------
-        agent_id : str
-            Unique identifier of the agent
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        typing.List[ContextVariable]
-            List of all context variable for the provided agent
-
-        Examples
-        --------
-        from parlant.client import ParlantClient
-
-        client = ParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-        client.context_variables.list(
-            agent_id="agent_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.List[ContextVariable],
-                    parse_obj_as(
-                        type_=typing.List[ContextVariable],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     def create(
         self,
-        agent_id: str,
         *,
         name: str,
         description: typing.Optional[str] = OMIT,
@@ -104,19 +35,15 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
-        Creates a new context variable for tracking customer-specific or tag-specific data.
+        Creates a new context variable
 
         Example uses:
-
         - Track subscription tiers to control feature access
         - Store usage patterns for personalized recommendations
-        - Remember customer preferences for tailored responses
+        - Remember preferences for tailored responses
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         name : str
             Name of the context variable
 
@@ -144,7 +71,6 @@ class ContextVariablesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.context_variables.create(
-            agent_id="agent_id",
             name="UserBalance",
             description="Stores the account balances of users",
             tool_id=ToolId(
@@ -155,7 +81,7 @@ class ContextVariablesClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables",
+            "context-variables",
             method="POST",
             json={
                 "name": name,
@@ -203,15 +129,18 @@ class ContextVariablesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete_many(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        tag_id: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes all context variables and their values for the provided agent ID
+        Deletes all context variables for the provided tag
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
+        tag_id : typing.Optional[str]
+            The tag ID to filter context variables by
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -227,13 +156,14 @@ class ContextVariablesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.context_variables.delete_many(
-            agent_id="agent_id",
-        )
+        client.context_variables.delete_many()
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables",
+            "context-variables",
             method="DELETE",
+            params={
+                "tag_id": tag_id,
+            },
             request_options=request_options,
         )
         try:
@@ -266,7 +196,6 @@ class ContextVariablesClient:
 
     def retrieve(
         self,
-        agent_id: str,
         variable_id: str,
         *,
         include_values: typing.Optional[bool] = None,
@@ -279,9 +208,6 @@ class ContextVariablesClient:
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         variable_id : str
             Unique identifier for the context variable
 
@@ -294,7 +220,7 @@ class ContextVariablesClient:
         Returns
         -------
         ContextVariableReadResult
-            Context variable details with optional values
+            Context variable details successfully retrieved
 
         Examples
         --------
@@ -304,12 +230,12 @@ class ContextVariablesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.context_variables.retrieve(
-            agent_id="agent_id",
-            variable_id="variable_id",
+            variable_id="v9a8r7i6b5",
+            include_values=True,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}",
+            f"context-variables/{jsonable_encoder(variable_id)}",
             method="GET",
             params={
                 "include_values": include_values,
@@ -350,85 +276,15 @@ class ContextVariablesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete(
-        self,
-        agent_id: str,
-        variable_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
-        """
-        Deletes a specific context variable and all its values.
-
-        Parameters
-        ----------
-        agent_id : str
-            Unique identifier of the agent
-
-        variable_id : str
-            Unique identifier for the context variable
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        from parlant.client import ParlantClient
-
-        client = ParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-        client.context_variables.delete(
-            agent_id="agent_id",
-            variable_id="variable_id",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     def update(
         self,
-        agent_id: str,
         variable_id: str,
         *,
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
         freshness_rules: typing.Optional[str] = OMIT,
+        tags: typing.Optional[ContextVariableTagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -438,9 +294,6 @@ class ContextVariablesClient:
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         variable_id : str
             Unique identifier for the context variable
 
@@ -454,6 +307,8 @@ class ContextVariablesClient:
 
         freshness_rules : typing.Optional[str]
             Cron expression defining the freshness rules
+
+        tags : typing.Optional[ContextVariableTagsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -471,8 +326,7 @@ class ContextVariablesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.context_variables.update(
-            agent_id="agent_id",
-            variable_id="variable_id",
+            variable_id="v9a8r7i6b5",
             name="CustomerBalance",
             description="Stores the account balances of users",
             tool_id=ToolId(
@@ -483,7 +337,7 @@ class ContextVariablesClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}",
+            f"context-variables/{jsonable_encoder(variable_id)}",
             method="PATCH",
             json={
                 "name": name,
@@ -492,6 +346,11 @@ class ContextVariablesClient:
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
                 "freshness_rules": freshness_rules,
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags,
+                    annotation=ContextVariableTagsUpdateParams,
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -530,24 +389,18 @@ class ContextVariablesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def get_value(
+    def read_value(
         self,
-        agent_id: str,
         variable_id: str,
         key: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
-        Retrieves the value of a context variable for a specific customer or tag.
-
-        The key should be a customer identifier or a customer tag in the format `tag:{tag_id}`.
+        Retrieves a customer or tag value for the provided context variable
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         variable_id : str
             Unique identifier for the context variable
 
@@ -569,14 +422,13 @@ class ContextVariablesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.context_variables.get_value(
-            agent_id="agent_id",
-            variable_id="variable_id",
-            key="key",
+        client.context_variables.read_value(
+            variable_id="v9a8r7i6b5",
+            key="user_1",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
+            f"context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
             method="GET",
             request_options=request_options,
         )
@@ -614,9 +466,8 @@ class ContextVariablesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def set_value(
+    def update_value(
         self,
-        agent_id: str,
         variable_id: str,
         key: str,
         *,
@@ -624,17 +475,10 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
-        Updates the value of a context variable.
-
-        The `key` represents a customer identifier or a customer tag in the format `tag:{tag_id}`.
-        If `key="DEFAULT"`, the update applies to all customers.
-        The `params` parameter contains the actual context information being stored.
+        Updates a customer or tag value for the provided context variable
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         variable_id : str
             Unique identifier for the context variable
 
@@ -658,10 +502,9 @@ class ContextVariablesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.context_variables.set_value(
-            agent_id="agent_id",
-            variable_id="variable_id",
-            key="key",
+        client.context_variables.update_value(
+            variable_id="v9a8r7i6b5",
+            key="user_1",
             data={
                 "balance": 5000.5,
                 "currency": "USD",
@@ -671,7 +514,7 @@ class ContextVariablesClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
+            f"context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
             method="PUT",
             json={
                 "data": data,
@@ -715,23 +558,16 @@ class ContextVariablesClient:
 
     def delete_value(
         self,
-        agent_id: str,
         variable_id: str,
         key: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes a specific customer's or tag's value for this context variable.
-
-        The key should be a customer identifier or a customer tag in the format `tag:{tag_id}`.
-        Removes only the value for the specified key while keeping the variable's configuration.
+        Deletes a customer or tag value for the provided context variable
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         variable_id : str
             Unique identifier for the context variable
 
@@ -753,13 +589,12 @@ class ContextVariablesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.context_variables.delete_value(
-            agent_id="agent_id",
-            variable_id="variable_id",
-            key="key",
+            variable_id="v9a8r7i6b5",
+            key="user_1",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
+            f"context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -796,86 +631,8 @@ class AsyncContextVariablesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[ContextVariable]:
-        """
-        Lists all context variables set for the provided agent
-
-        Parameters
-        ----------
-        agent_id : str
-            Unique identifier of the agent
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        typing.List[ContextVariable]
-            List of all context variable for the provided agent
-
-        Examples
-        --------
-        import asyncio
-
-        from parlant.client import AsyncParlantClient
-
-        client = AsyncParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-
-
-        async def main() -> None:
-            await client.context_variables.list(
-                agent_id="agent_id",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    typing.List[ContextVariable],
-                    parse_obj_as(
-                        type_=typing.List[ContextVariable],  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     async def create(
         self,
-        agent_id: str,
         *,
         name: str,
         description: typing.Optional[str] = OMIT,
@@ -884,19 +641,15 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
-        Creates a new context variable for tracking customer-specific or tag-specific data.
+        Creates a new context variable
 
         Example uses:
-
         - Track subscription tiers to control feature access
         - Store usage patterns for personalized recommendations
-        - Remember customer preferences for tailored responses
+        - Remember preferences for tailored responses
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         name : str
             Name of the context variable
 
@@ -929,7 +682,6 @@ class AsyncContextVariablesClient:
 
         async def main() -> None:
             await client.context_variables.create(
-                agent_id="agent_id",
                 name="UserBalance",
                 description="Stores the account balances of users",
                 tool_id=ToolId(
@@ -943,7 +695,7 @@ class AsyncContextVariablesClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables",
+            "context-variables",
             method="POST",
             json={
                 "name": name,
@@ -991,15 +743,18 @@ class AsyncContextVariablesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete_many(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        tag_id: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes all context variables and their values for the provided agent ID
+        Deletes all context variables for the provided tag
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
+        tag_id : typing.Optional[str]
+            The tag ID to filter context variables by
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1020,16 +775,17 @@ class AsyncContextVariablesClient:
 
 
         async def main() -> None:
-            await client.context_variables.delete_many(
-                agent_id="agent_id",
-            )
+            await client.context_variables.delete_many()
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables",
+            "context-variables",
             method="DELETE",
+            params={
+                "tag_id": tag_id,
+            },
             request_options=request_options,
         )
         try:
@@ -1062,7 +818,6 @@ class AsyncContextVariablesClient:
 
     async def retrieve(
         self,
-        agent_id: str,
         variable_id: str,
         *,
         include_values: typing.Optional[bool] = None,
@@ -1075,9 +830,6 @@ class AsyncContextVariablesClient:
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         variable_id : str
             Unique identifier for the context variable
 
@@ -1090,7 +842,7 @@ class AsyncContextVariablesClient:
         Returns
         -------
         ContextVariableReadResult
-            Context variable details with optional values
+            Context variable details successfully retrieved
 
         Examples
         --------
@@ -1105,15 +857,15 @@ class AsyncContextVariablesClient:
 
         async def main() -> None:
             await client.context_variables.retrieve(
-                agent_id="agent_id",
-                variable_id="variable_id",
+                variable_id="v9a8r7i6b5",
+                include_values=True,
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}",
+            f"context-variables/{jsonable_encoder(variable_id)}",
             method="GET",
             params={
                 "include_values": include_values,
@@ -1154,93 +906,15 @@ class AsyncContextVariablesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete(
-        self,
-        agent_id: str,
-        variable_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> None:
-        """
-        Deletes a specific context variable and all its values.
-
-        Parameters
-        ----------
-        agent_id : str
-            Unique identifier of the agent
-
-        variable_id : str
-            Unique identifier for the context variable
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        import asyncio
-
-        from parlant.client import AsyncParlantClient
-
-        client = AsyncParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-
-
-        async def main() -> None:
-            await client.context_variables.delete(
-                agent_id="agent_id",
-                variable_id="variable_id",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}",
-            method="DELETE",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
     async def update(
         self,
-        agent_id: str,
         variable_id: str,
         *,
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
         freshness_rules: typing.Optional[str] = OMIT,
+        tags: typing.Optional[ContextVariableTagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -1250,9 +924,6 @@ class AsyncContextVariablesClient:
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         variable_id : str
             Unique identifier for the context variable
 
@@ -1266,6 +937,8 @@ class AsyncContextVariablesClient:
 
         freshness_rules : typing.Optional[str]
             Cron expression defining the freshness rules
+
+        tags : typing.Optional[ContextVariableTagsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1288,8 +961,7 @@ class AsyncContextVariablesClient:
 
         async def main() -> None:
             await client.context_variables.update(
-                agent_id="agent_id",
-                variable_id="variable_id",
+                variable_id="v9a8r7i6b5",
                 name="CustomerBalance",
                 description="Stores the account balances of users",
                 tool_id=ToolId(
@@ -1303,7 +975,7 @@ class AsyncContextVariablesClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}",
+            f"context-variables/{jsonable_encoder(variable_id)}",
             method="PATCH",
             json={
                 "name": name,
@@ -1312,6 +984,11 @@ class AsyncContextVariablesClient:
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
                 "freshness_rules": freshness_rules,
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags,
+                    annotation=ContextVariableTagsUpdateParams,
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -1350,24 +1027,18 @@ class AsyncContextVariablesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def get_value(
+    async def read_value(
         self,
-        agent_id: str,
         variable_id: str,
         key: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
-        Retrieves the value of a context variable for a specific customer or tag.
-
-        The key should be a customer identifier or a customer tag in the format `tag:{tag_id}`.
+        Retrieves a customer or tag value for the provided context variable
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         variable_id : str
             Unique identifier for the context variable
 
@@ -1394,17 +1065,16 @@ class AsyncContextVariablesClient:
 
 
         async def main() -> None:
-            await client.context_variables.get_value(
-                agent_id="agent_id",
-                variable_id="variable_id",
-                key="key",
+            await client.context_variables.read_value(
+                variable_id="v9a8r7i6b5",
+                key="user_1",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
+            f"context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
             method="GET",
             request_options=request_options,
         )
@@ -1442,9 +1112,8 @@ class AsyncContextVariablesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def set_value(
+    async def update_value(
         self,
-        agent_id: str,
         variable_id: str,
         key: str,
         *,
@@ -1452,17 +1121,10 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
-        Updates the value of a context variable.
-
-        The `key` represents a customer identifier or a customer tag in the format `tag:{tag_id}`.
-        If `key="DEFAULT"`, the update applies to all customers.
-        The `params` parameter contains the actual context information being stored.
+        Updates a customer or tag value for the provided context variable
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         variable_id : str
             Unique identifier for the context variable
 
@@ -1491,10 +1153,9 @@ class AsyncContextVariablesClient:
 
 
         async def main() -> None:
-            await client.context_variables.set_value(
-                agent_id="agent_id",
-                variable_id="variable_id",
-                key="key",
+            await client.context_variables.update_value(
+                variable_id="v9a8r7i6b5",
+                key="user_1",
                 data={
                     "balance": 5000.5,
                     "currency": "USD",
@@ -1507,7 +1168,7 @@ class AsyncContextVariablesClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
+            f"context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
             method="PUT",
             json={
                 "data": data,
@@ -1551,23 +1212,16 @@ class AsyncContextVariablesClient:
 
     async def delete_value(
         self,
-        agent_id: str,
         variable_id: str,
         key: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes a specific customer's or tag's value for this context variable.
-
-        The key should be a customer identifier or a customer tag in the format `tag:{tag_id}`.
-        Removes only the value for the specified key while keeping the variable's configuration.
+        Deletes a customer or tag value for the provided context variable
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier of the agent
-
         variable_id : str
             Unique identifier for the context variable
 
@@ -1594,16 +1248,15 @@ class AsyncContextVariablesClient:
 
         async def main() -> None:
             await client.context_variables.delete_value(
-                agent_id="agent_id",
-                variable_id="variable_id",
-                key="key",
+                variable_id="v9a8r7i6b5",
+                key="user_1",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
+            f"context-variables/{jsonable_encoder(variable_id)}/{jsonable_encoder(key)}",
             method="DELETE",
             request_options=request_options,
         )

@@ -127,12 +127,11 @@ class EvaluationsClient:
         """
         Retrieves the current state of an evaluation.
 
-        - If wait_for_completion == 0, returns current state immediately.
-        - If wait_for_completion > 0, waits for completion/failure or timeout. Defaults to 60.
+        * If wait_for_completion == 0, returns current state immediately.
+        * If wait_for_completion > 0, waits for completion/failure or timeout. Defaults to 60.
 
         Notes:
         When wait_for_completion > 0:
-
         - Returns final state if evaluation completes within timeout
         - Raises 504 if timeout is reached before completion
 
@@ -160,7 +159,7 @@ class EvaluationsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.evaluations.retrieve(
-            evaluation_id="evaluation_id",
+            evaluation_id="eval_123xz",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -337,12 +336,11 @@ class AsyncEvaluationsClient:
         """
         Retrieves the current state of an evaluation.
 
-        - If wait_for_completion == 0, returns current state immediately.
-        - If wait_for_completion > 0, waits for completion/failure or timeout. Defaults to 60.
+        * If wait_for_completion == 0, returns current state immediately.
+        * If wait_for_completion > 0, waits for completion/failure or timeout. Defaults to 60.
 
         Notes:
         When wait_for_completion > 0:
-
         - Returns final state if evaluation completes within timeout
         - Raises 504 if timeout is reached before completion
 
@@ -375,7 +373,7 @@ class AsyncEvaluationsClient:
 
         async def main() -> None:
             await client.evaluations.retrieve(
-                evaluation_id="evaluation_id",
+                evaluation_id="eval_123xz",
             )
 
 

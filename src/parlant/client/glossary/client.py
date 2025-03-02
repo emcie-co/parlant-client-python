@@ -4,12 +4,14 @@ import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
 from ..types.term import Term
-from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
-from ..errors.not_found_error import NotFoundError
-from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..errors.unprocessable_entity_error import UnprocessableEntityError
+from ..core.jsonable_encoder import jsonable_encoder
+from ..errors.not_found_error import NotFoundError
+from ..types.term_tags_update_params import TermTagsUpdateParams
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -21,26 +23,23 @@ class GlossaryClient:
         self._client_wrapper = client_wrapper
 
     def list_terms(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Term]:
         """
-        Retrieves a list of all terms in the agent's glossary.
+        Retrieves a list of all terms in the glossary.
 
-        Returns an empty list if no terms associated to the provided agent's ID.
+        Returns an empty list if no terms exist.
         Terms are returned in no guaranteed order.
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent associated with the term.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
         typing.List[Term]
-            List of all terms in the agent's glossary.
+            List of all terms in the glossary.
 
         Examples
         --------
@@ -49,12 +48,10 @@ class GlossaryClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.glossary.list_terms(
-            agent_id="agent_id",
-        )
+        client.glossary.list_terms()
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/terms",
+            "terms",
             method="GET",
             request_options=request_options,
         )
@@ -67,26 +64,6 @@ class GlossaryClient:
                         object_=_response.json(),
                     ),
                 )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -94,7 +71,6 @@ class GlossaryClient:
 
     def create_term(
         self,
-        agent_id: str,
         *,
         name: str,
         description: str,
@@ -102,21 +78,16 @@ class GlossaryClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
-        Creates a new term in the agent's glossary.
+        Creates a new term in the glossary.
 
         The term will be initialized with the provided name and description, and optional synonyms.
-        The term will be associated with the specified agent.
         A unique identifier will be automatically generated.
 
         Default behaviors:
-
         - `synonyms` defaults to an empty list if not provided
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent associated with the term.
-
         name : str
             The name of the term, e.g., 'Gas' in blockchain.
 
@@ -142,14 +113,13 @@ class GlossaryClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.glossary.create_term(
-            agent_id="agent_id",
             name="Gas",
             description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
             synonyms=["Transaction Fee", "Blockchain Fuel"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/terms",
+            "terms",
             method="POST",
             json={
                 "name": name,
@@ -184,20 +154,13 @@ class GlossaryClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def retrieve_term(
-        self,
-        agent_id: str,
-        term_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
+        self, term_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Term:
         """
-        Retrieves details of a specific term by ID for a given agent.
+        Retrieves details of a specific term by ID.
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent associated with the term.
-
         term_id : str
             Unique identifier for the term
 
@@ -217,12 +180,11 @@ class GlossaryClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.glossary.retrieve_term(
-            agent_id="agent_id",
-            term_id="term_id",
+            term_id="term-eth01",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/terms/{jsonable_encoder(term_id)}",
+            f"terms/{jsonable_encoder(term_id)}",
             method="GET",
             request_options=request_options,
         )
@@ -261,23 +223,16 @@ class GlossaryClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def delete_term(
-        self,
-        agent_id: str,
-        term_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
+        self, term_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
-        Deletes a term from the agent.
+        Deletes a term from the glossary.
 
         Deleting a non-existent term will return 404.
         No content will be returned from a successful deletion.
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent associated with the term.
-
         term_id : str
             Unique identifier for the term
 
@@ -296,12 +251,11 @@ class GlossaryClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.glossary.delete_term(
-            agent_id="agent_id",
-            term_id="term_id",
+            term_id="term-eth01",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/terms/{jsonable_encoder(term_id)}",
+            f"terms/{jsonable_encoder(term_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -335,20 +289,22 @@ class GlossaryClient:
 
     def update_term(
         self,
-        agent_id: str,
         term_id: str,
         *,
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
+        tags: typing.Optional[TermTagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
+        Updates an existing term's attributes in the glossary.
+
+        Only the provided attributes will be updated; others will remain unchanged.
+        The term's ID and creation timestamp cannot be modified.
+
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent associated with the term.
-
         term_id : str
             Unique identifier for the term
 
@@ -361,6 +317,8 @@ class GlossaryClient:
         synonyms : typing.Optional[typing.Sequence[str]]
             A list of synonyms for the term, including alternate contexts if applicable.
 
+        tags : typing.Optional[TermTagsUpdateParams]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -371,26 +329,32 @@ class GlossaryClient:
 
         Examples
         --------
-        from parlant.client import ParlantClient
+        from parlant.client import ParlantClient, TermTagsUpdateParams
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
         client.glossary.update_term(
-            agent_id="agent_id",
-            term_id="term_id",
+            term_id="term-eth01",
             name="Gas",
             description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
             synonyms=["Transaction Fee", "Blockchain Fuel"],
+            tags=TermTagsUpdateParams(
+                add=["tag1", "tag2"],
+                remove=["tag3", "tag4"],
+            ),
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/terms/{jsonable_encoder(term_id)}",
+            f"terms/{jsonable_encoder(term_id)}",
             method="PATCH",
             json={
                 "name": name,
                 "description": description,
                 "synonyms": synonyms,
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=TermTagsUpdateParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -435,26 +399,23 @@ class AsyncGlossaryClient:
         self._client_wrapper = client_wrapper
 
     async def list_terms(
-        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
+        self, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Term]:
         """
-        Retrieves a list of all terms in the agent's glossary.
+        Retrieves a list of all terms in the glossary.
 
-        Returns an empty list if no terms associated to the provided agent's ID.
+        Returns an empty list if no terms exist.
         Terms are returned in no guaranteed order.
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent associated with the term.
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
         typing.List[Term]
-            List of all terms in the agent's glossary.
+            List of all terms in the glossary.
 
         Examples
         --------
@@ -468,15 +429,13 @@ class AsyncGlossaryClient:
 
 
         async def main() -> None:
-            await client.glossary.list_terms(
-                agent_id="agent_id",
-            )
+            await client.glossary.list_terms()
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/terms",
+            "terms",
             method="GET",
             request_options=request_options,
         )
@@ -489,26 +448,6 @@ class AsyncGlossaryClient:
                         object_=_response.json(),
                     ),
                 )
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -516,7 +455,6 @@ class AsyncGlossaryClient:
 
     async def create_term(
         self,
-        agent_id: str,
         *,
         name: str,
         description: str,
@@ -524,21 +462,16 @@ class AsyncGlossaryClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
-        Creates a new term in the agent's glossary.
+        Creates a new term in the glossary.
 
         The term will be initialized with the provided name and description, and optional synonyms.
-        The term will be associated with the specified agent.
         A unique identifier will be automatically generated.
 
         Default behaviors:
-
         - `synonyms` defaults to an empty list if not provided
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent associated with the term.
-
         name : str
             The name of the term, e.g., 'Gas' in blockchain.
 
@@ -569,7 +502,6 @@ class AsyncGlossaryClient:
 
         async def main() -> None:
             await client.glossary.create_term(
-                agent_id="agent_id",
                 name="Gas",
                 description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
                 synonyms=["Transaction Fee", "Blockchain Fuel"],
@@ -579,7 +511,7 @@ class AsyncGlossaryClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/terms",
+            "terms",
             method="POST",
             json={
                 "name": name,
@@ -614,20 +546,13 @@ class AsyncGlossaryClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def retrieve_term(
-        self,
-        agent_id: str,
-        term_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
+        self, term_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> Term:
         """
-        Retrieves details of a specific term by ID for a given agent.
+        Retrieves details of a specific term by ID.
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent associated with the term.
-
         term_id : str
             Unique identifier for the term
 
@@ -652,15 +577,14 @@ class AsyncGlossaryClient:
 
         async def main() -> None:
             await client.glossary.retrieve_term(
-                agent_id="agent_id",
-                term_id="term_id",
+                term_id="term-eth01",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/terms/{jsonable_encoder(term_id)}",
+            f"terms/{jsonable_encoder(term_id)}",
             method="GET",
             request_options=request_options,
         )
@@ -699,23 +623,16 @@ class AsyncGlossaryClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def delete_term(
-        self,
-        agent_id: str,
-        term_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
+        self, term_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> None:
         """
-        Deletes a term from the agent.
+        Deletes a term from the glossary.
 
         Deleting a non-existent term will return 404.
         No content will be returned from a successful deletion.
 
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent associated with the term.
-
         term_id : str
             Unique identifier for the term
 
@@ -739,15 +656,14 @@ class AsyncGlossaryClient:
 
         async def main() -> None:
             await client.glossary.delete_term(
-                agent_id="agent_id",
-                term_id="term_id",
+                term_id="term-eth01",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/terms/{jsonable_encoder(term_id)}",
+            f"terms/{jsonable_encoder(term_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -781,20 +697,22 @@ class AsyncGlossaryClient:
 
     async def update_term(
         self,
-        agent_id: str,
         term_id: str,
         *,
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
+        tags: typing.Optional[TermTagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
+        Updates an existing term's attributes in the glossary.
+
+        Only the provided attributes will be updated; others will remain unchanged.
+        The term's ID and creation timestamp cannot be modified.
+
         Parameters
         ----------
-        agent_id : str
-            Unique identifier for the agent associated with the term.
-
         term_id : str
             Unique identifier for the term
 
@@ -806,6 +724,8 @@ class AsyncGlossaryClient:
 
         synonyms : typing.Optional[typing.Sequence[str]]
             A list of synonyms for the term, including alternate contexts if applicable.
+
+        tags : typing.Optional[TermTagsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -819,7 +739,7 @@ class AsyncGlossaryClient:
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient
+        from parlant.client import AsyncParlantClient, TermTagsUpdateParams
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -828,23 +748,29 @@ class AsyncGlossaryClient:
 
         async def main() -> None:
             await client.glossary.update_term(
-                agent_id="agent_id",
-                term_id="term_id",
+                term_id="term-eth01",
                 name="Gas",
                 description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
                 synonyms=["Transaction Fee", "Blockchain Fuel"],
+                tags=TermTagsUpdateParams(
+                    add=["tag1", "tag2"],
+                    remove=["tag3", "tag4"],
+                ),
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"agents/{jsonable_encoder(agent_id)}/terms/{jsonable_encoder(term_id)}",
+            f"terms/{jsonable_encoder(term_id)}",
             method="PATCH",
             json={
                 "name": name,
                 "description": description,
                 "synonyms": synonyms,
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=TermTagsUpdateParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,

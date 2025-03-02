@@ -7,9 +7,13 @@ from .tool_id import ToolId
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class ContextVariable(UniversalBaseModel):
+class LegacyContextVariable(UniversalBaseModel):
     """
-    Represents a context variable type.
+    Represents a type of customer or tag data that the agent tracks.
+
+    Context variables store information that helps the agent provide
+    personalized responses based on each customer's or group's specific situation,
+    such as their subscription tier, usage patterns, or preferences.
     """
 
     id: str = pydantic.Field()
@@ -31,11 +35,6 @@ class ContextVariable(UniversalBaseModel):
     freshness_rules: typing.Optional[str] = pydantic.Field(default=None)
     """
     Cron expression defining the freshness rules
-    """
-
-    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
-    """
-    List of tags associated with the context variable
     """
 
     if IS_PYDANTIC_V2:

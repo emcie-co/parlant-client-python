@@ -178,7 +178,7 @@ class CustomersClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.customers.retrieve(
-            customer_id="customer_id",
+            customer_id="ck_IdAXUtp",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -252,7 +252,7 @@ class CustomersClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.customers.delete(
-            customer_id="customer_id",
+            customer_id="ck_IdAXUtp",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -336,7 +336,7 @@ class CustomersClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.customers.update(
-            customer_id="customer_id",
+            customer_id="ck_IdAXUtp",
             name="Scooby",
             extra=CustomerExtraUpdateParams(
                 add={"VIP": "Yes", "email": "scooby@dooby.do"},
@@ -580,7 +580,7 @@ class AsyncCustomersClient:
 
         async def main() -> None:
             await client.customers.retrieve(
-                customer_id="customer_id",
+                customer_id="ck_IdAXUtp",
             )
 
 
@@ -662,7 +662,7 @@ class AsyncCustomersClient:
 
         async def main() -> None:
             await client.customers.delete(
-                customer_id="customer_id",
+                customer_id="ck_IdAXUtp",
             )
 
 
@@ -754,7 +754,7 @@ class AsyncCustomersClient:
 
         async def main() -> None:
             await client.customers.update(
-                customer_id="customer_id",
+                customer_id="ck_IdAXUtp",
                 name="Scooby",
                 extra=CustomerExtraUpdateParams(
                     add={"VIP": "Yes", "email": "scooby@dooby.do"},
