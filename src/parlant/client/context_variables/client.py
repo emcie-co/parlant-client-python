@@ -2,15 +2,15 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
-from ..types.tool_id import ToolId
 from ..core.request_options import RequestOptions
 from ..types.context_variable import ContextVariable
-from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.not_found_error import NotFoundError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.tool_id import ToolId
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.context_variable_read_result import ContextVariableReadResult
 from ..core.jsonable_encoder import jsonable_encoder
 from ..types.context_variable_tags_update_params import ContextVariableTagsUpdateParams
@@ -24,6 +24,79 @@ OMIT = typing.cast(typing.Any, ...)
 class ContextVariablesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
+
+    def list(
+        self,
+        *,
+        tag_id: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.List[ContextVariable]:
+        """
+        Lists all context variables set for the provided tag or all context variables if no tag is provided
+
+        Parameters
+        ----------
+        tag_id : typing.Optional[str]
+            The tag ID to filter context variables by
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[ContextVariable]
+            List of all context variables
+
+        Examples
+        --------
+        from parlant.client import ParlantClient
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.context_variables.list()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "context-variables",
+            method="GET",
+            params={
+                "tag_id": tag_id,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    typing.List[ContextVariable],
+                    parse_obj_as(
+                        type_=typing.List[ContextVariable],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     def create(
         self,
@@ -389,7 +462,7 @@ class ContextVariablesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def read_value(
+    def get_value(
         self,
         variable_id: str,
         key: str,
@@ -422,7 +495,7 @@ class ContextVariablesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.context_variables.read_value(
+        client.context_variables.get_value(
             variable_id="v9a8r7i6b5",
             key="user_1",
         )
@@ -466,7 +539,7 @@ class ContextVariablesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_value(
+    def set_value(
         self,
         variable_id: str,
         key: str,
@@ -502,7 +575,7 @@ class ContextVariablesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.context_variables.update_value(
+        client.context_variables.set_value(
             variable_id="v9a8r7i6b5",
             key="user_1",
             data={
@@ -630,6 +703,87 @@ class ContextVariablesClient:
 class AsyncContextVariablesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
+
+    async def list(
+        self,
+        *,
+        tag_id: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.List[ContextVariable]:
+        """
+        Lists all context variables set for the provided tag or all context variables if no tag is provided
+
+        Parameters
+        ----------
+        tag_id : typing.Optional[str]
+            The tag ID to filter context variables by
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[ContextVariable]
+            List of all context variables
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.context_variables.list()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "context-variables",
+            method="GET",
+            params={
+                "tag_id": tag_id,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    typing.List[ContextVariable],
+                    parse_obj_as(
+                        type_=typing.List[ContextVariable],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
     async def create(
         self,
@@ -1027,7 +1181,7 @@ class AsyncContextVariablesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def read_value(
+    async def get_value(
         self,
         variable_id: str,
         key: str,
@@ -1065,7 +1219,7 @@ class AsyncContextVariablesClient:
 
 
         async def main() -> None:
-            await client.context_variables.read_value(
+            await client.context_variables.get_value(
                 variable_id="v9a8r7i6b5",
                 key="user_1",
             )
@@ -1112,7 +1266,7 @@ class AsyncContextVariablesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_value(
+    async def set_value(
         self,
         variable_id: str,
         key: str,
@@ -1153,7 +1307,7 @@ class AsyncContextVariablesClient:
 
 
         async def main() -> None:
-            await client.context_variables.update_value(
+            await client.context_variables.set_value(
                 variable_id="v9a8r7i6b5",
                 key="user_1",
                 data={
