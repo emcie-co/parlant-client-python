@@ -318,6 +318,8 @@ class GuidelinesClient:
         self,
         guideline_id: str,
         *,
+        condition: typing.Optional[str] = OMIT,
+        action: typing.Optional[str] = OMIT,
         connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
@@ -341,6 +343,12 @@ class GuidelinesClient:
         ----------
         guideline_id : str
             Unique identifier for the guideline
+
+        condition : typing.Optional[str]
+            If this condition is satisfied, the action will be performed
+
+        action : typing.Optional[str]
+            This action will be performed if the condition is satisfied
 
         connections : typing.Optional[GuidelineConnectionUpdateParams]
 
@@ -404,6 +412,8 @@ class GuidelinesClient:
             f"guidelines/{jsonable_encoder(guideline_id)}",
             method="PATCH",
             json={
+                "condition": condition,
+                "action": action,
                 "connections": convert_and_respect_annotation_metadata(
                     object_=connections,
                     annotation=GuidelineConnectionUpdateParams,
@@ -784,6 +794,8 @@ class AsyncGuidelinesClient:
         self,
         guideline_id: str,
         *,
+        condition: typing.Optional[str] = OMIT,
+        action: typing.Optional[str] = OMIT,
         connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
@@ -807,6 +819,12 @@ class AsyncGuidelinesClient:
         ----------
         guideline_id : str
             Unique identifier for the guideline
+
+        condition : typing.Optional[str]
+            If this condition is satisfied, the action will be performed
+
+        action : typing.Optional[str]
+            This action will be performed if the condition is satisfied
 
         connections : typing.Optional[GuidelineConnectionUpdateParams]
 
@@ -878,6 +896,8 @@ class AsyncGuidelinesClient:
             f"guidelines/{jsonable_encoder(guideline_id)}",
             method="PATCH",
             json={
+                "condition": condition,
+                "action": action,
                 "connections": convert_and_respect_annotation_metadata(
                     object_=connections,
                     annotation=GuidelineConnectionUpdateParams,
