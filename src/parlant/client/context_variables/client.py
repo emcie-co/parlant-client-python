@@ -349,6 +349,71 @@ class ContextVariablesClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def delete(
+        self,
+        variable_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> None:
+        """
+        Deletes a context variable
+
+        Parameters
+        ----------
+        variable_id : str
+            Unique identifier for the context variable
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        from parlant.client import ParlantClient
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.context_variables.delete(
+            variable_id="v9a8r7i6b5",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"context-variables/{jsonable_encoder(variable_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def update(
         self,
         variable_id: str,
@@ -1035,6 +1100,79 @@ class AsyncContextVariablesClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def delete(
+        self,
+        variable_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> None:
+        """
+        Deletes a context variable
+
+        Parameters
+        ----------
+        variable_id : str
+            Unique identifier for the context variable
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.context_variables.delete(
+                variable_id="v9a8r7i6b5",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"context-variables/{jsonable_encoder(variable_id)}",
+            method="DELETE",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
