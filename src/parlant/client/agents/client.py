@@ -77,6 +77,7 @@ class AgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
@@ -103,6 +104,9 @@ class AgentsClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tag IDs associated with the agent
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -123,6 +127,7 @@ class AgentsClient:
             description="Technical Support Assistant",
             max_engine_iterations=3,
             composition_mode="fluid",
+            tags=["tag1", "tag2"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -133,6 +138,7 @@ class AgentsClient:
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -469,6 +475,7 @@ class AsyncAgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
@@ -495,6 +502,9 @@ class AsyncAgentsClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tag IDs associated with the agent
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -520,6 +530,7 @@ class AsyncAgentsClient:
                 description="Technical Support Assistant",
                 max_engine_iterations=3,
                 composition_mode="fluid",
+                tags=["tag1", "tag2"],
             )
 
 
@@ -533,6 +544,7 @@ class AsyncAgentsClient:
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
