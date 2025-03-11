@@ -105,6 +105,7 @@ class ContextVariablesClient:
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
         freshness_rules: typing.Optional[str] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -127,6 +128,9 @@ class ContextVariablesClient:
 
         freshness_rules : typing.Optional[str]
             Cron expression defining the freshness rules
+
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tags associated with the context variable
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -163,6 +167,7 @@ class ContextVariablesClient:
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
                 "freshness_rules": freshness_rules,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -458,20 +463,24 @@ class ContextVariablesClient:
 
         Examples
         --------
-        from parlant.client import ParlantClient, ToolId
+        from parlant.client import ContextVariableTagsUpdateParams, ParlantClient, ToolId
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
         client.context_variables.update(
             variable_id="v9a8r7i6b5",
-            name="CustomerBalance",
+            name="UserBalance",
             description="Stores the account balances of users",
             tool_id=ToolId(
                 service_name="finance_service",
                 tool_name="balance_checker",
             ),
             freshness_rules="0 8,20 * * *",
+            tags=ContextVariableTagsUpdateParams(
+                add=["tag:123", "tag:456"],
+                remove=["tag:789", "tag:012"],
+            ),
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -857,6 +866,7 @@ class AsyncContextVariablesClient:
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
         freshness_rules: typing.Optional[str] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -879,6 +889,9 @@ class AsyncContextVariablesClient:
 
         freshness_rules : typing.Optional[str]
             Cron expression defining the freshness rules
+
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tags associated with the context variable
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -923,6 +936,7 @@ class AsyncContextVariablesClient:
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
                 "freshness_rules": freshness_rules,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1244,7 +1258,7 @@ class AsyncContextVariablesClient:
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, ToolId
+        from parlant.client import AsyncParlantClient, ContextVariableTagsUpdateParams, ToolId
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -1254,13 +1268,17 @@ class AsyncContextVariablesClient:
         async def main() -> None:
             await client.context_variables.update(
                 variable_id="v9a8r7i6b5",
-                name="CustomerBalance",
+                name="UserBalance",
                 description="Stores the account balances of users",
                 tool_id=ToolId(
                     service_name="finance_service",
                     tool_name="balance_checker",
                 ),
                 freshness_rules="0 8,20 * * *",
+                tags=ContextVariableTagsUpdateParams(
+                    add=["tag:123", "tag:456"],
+                    remove=["tag:789", "tag:012"],
+                ),
             )
 
 

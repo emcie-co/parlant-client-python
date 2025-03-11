@@ -102,6 +102,7 @@ class GuidelinesClient:
         condition: str,
         action: str,
         enabled: typing.Optional[bool] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Guideline:
         """
@@ -119,6 +120,9 @@ class GuidelinesClient:
 
         enabled : typing.Optional[bool]
             Whether the guideline is enabled
+
+        tags : typing.Optional[typing.Sequence[str]]
+            The tags associated with the guideline
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -148,6 +152,7 @@ class GuidelinesClient:
                 "condition": condition,
                 "action": action,
                 "enabled": enabled,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -554,6 +559,7 @@ class AsyncGuidelinesClient:
         condition: str,
         action: str,
         enabled: typing.Optional[bool] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Guideline:
         """
@@ -571,6 +577,9 @@ class AsyncGuidelinesClient:
 
         enabled : typing.Optional[bool]
             Whether the guideline is enabled
+
+        tags : typing.Optional[typing.Sequence[str]]
+            The tags associated with the guideline
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -608,6 +617,7 @@ class AsyncGuidelinesClient:
                 "condition": condition,
                 "action": action,
                 "enabled": enabled,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,

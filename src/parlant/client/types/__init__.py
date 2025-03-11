@@ -50,6 +50,7 @@ from .http_validation_error import HttpValidationError
 from .invoice import Invoice
 from .invoice_data import InvoiceData
 from .legacy_context_variable import LegacyContextVariable
+from .legacy_context_variable_creation_params import LegacyContextVariableCreationParams
 from .legacy_context_variable_read_result import LegacyContextVariableReadResult
 from .legacy_context_variable_update_params import LegacyContextVariableUpdateParams
 from .legacy_guideline import LegacyGuideline
@@ -61,6 +62,7 @@ from .legacy_guideline_with_connections_and_tool_associations import (
     LegacyGuidelineWithConnectionsAndToolAssociations,
 )
 from .legacy_term import LegacyTerm
+from .legacy_term_creation_params import LegacyTermCreationParams
 from .legacy_term_update_params import LegacyTermUpdateParams
 from .message_generation_inspection import MessageGenerationInspection
 from .moderation import Moderation
@@ -137,6 +139,7 @@ __all__ = [
     "Invoice",
     "InvoiceData",
     "LegacyContextVariable",
+    "LegacyContextVariableCreationParams",
     "LegacyContextVariableReadResult",
     "LegacyContextVariableUpdateParams",
     "LegacyGuideline",
@@ -146,6 +149,7 @@ __all__ = [
     "LegacyGuidelineUpdateParams",
     "LegacyGuidelineWithConnectionsAndToolAssociations",
     "LegacyTerm",
+    "LegacyTermCreationParams",
     "LegacyTermUpdateParams",
     "MessageGenerationInspection",
     "Moderation",

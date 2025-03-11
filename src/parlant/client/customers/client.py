@@ -75,6 +75,7 @@ class CustomersClient:
         *,
         name: str,
         extra: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
@@ -90,6 +91,9 @@ class CustomersClient:
 
         extra : typing.Optional[typing.Dict[str, typing.Optional[str]]]
             Key-value pairs (`str: str`) to describe the customer
+
+        tags : typing.Optional[typing.Sequence[str]]
+            Collection of ids of tags that describe the customer
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -117,6 +121,7 @@ class CustomersClient:
             json={
                 "name": name,
                 "extra": extra,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -464,6 +469,7 @@ class AsyncCustomersClient:
         *,
         name: str,
         extra: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
@@ -479,6 +485,9 @@ class AsyncCustomersClient:
 
         extra : typing.Optional[typing.Dict[str, typing.Optional[str]]]
             Key-value pairs (`str: str`) to describe the customer
+
+        tags : typing.Optional[typing.Sequence[str]]
+            Collection of ids of tags that describe the customer
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -514,6 +523,7 @@ class AsyncCustomersClient:
             json={
                 "name": name,
                 "extra": extra,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
