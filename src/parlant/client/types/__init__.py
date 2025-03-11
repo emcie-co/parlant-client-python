@@ -62,11 +62,9 @@ from .legacy_guideline_with_connections_and_tool_associations import (
 )
 from .legacy_term import LegacyTerm
 from .legacy_term_update_params import LegacyTermUpdateParams
-from .message_event_data import MessageEventData
 from .message_generation_inspection import MessageGenerationInspection
 from .moderation import Moderation
 from .open_api_service_params import OpenApiServiceParams
-from .participant import Participant
 from .payload import Payload
 from .payload_kind_dto import PayloadKindDto
 from .preparation_iteration import PreparationIteration
@@ -149,11 +147,9 @@ __all__ = [
     "LegacyGuidelineWithConnectionsAndToolAssociations",
     "LegacyTerm",
     "LegacyTermUpdateParams",
-    "MessageEventData",
     "MessageGenerationInspection",
     "Moderation",
     "OpenApiServiceParams",
-    "Participant",
     "Payload",
     "PayloadKindDto",
     "PreparationIteration",
