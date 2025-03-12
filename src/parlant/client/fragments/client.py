@@ -89,6 +89,7 @@ class FragmentsClient:
         *,
         value: str,
         fields: typing.Sequence[FragmentField],
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Fragment:
         """
@@ -99,6 +100,9 @@ class FragmentsClient:
 
         fields : typing.Sequence[FragmentField]
             A sequence of fragment fields associated with the fragment.
+
+        tags : typing.Optional[typing.Sequence[str]]
+            Collection of tag IDs associated with the fragment.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -136,6 +140,7 @@ class FragmentsClient:
                     annotation=typing.Sequence[FragmentField],
                     direction="write",
                 ),
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -482,6 +487,7 @@ class AsyncFragmentsClient:
         *,
         value: str,
         fields: typing.Sequence[FragmentField],
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Fragment:
         """
@@ -492,6 +498,9 @@ class AsyncFragmentsClient:
 
         fields : typing.Sequence[FragmentField]
             A sequence of fragment fields associated with the fragment.
+
+        tags : typing.Optional[typing.Sequence[str]]
+            Collection of tag IDs associated with the fragment.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -537,6 +546,7 @@ class AsyncFragmentsClient:
                     annotation=typing.Sequence[FragmentField],
                     direction="write",
                 ),
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
