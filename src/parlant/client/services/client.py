@@ -32,13 +32,11 @@ class ServicesClient:
         Get details about a specific service including all its tools.
 
         The response includes:
-
         - Basic service information (name, kind, URL)
         - Complete list of available tools
         - Parameter definitions for each tool
 
         Notes:
-
         - Tools list may be empty if service is still initializing
         - Parameters marked as required must be provided when using a tool
         - Enum parameters restrict inputs to the listed values
@@ -64,7 +62,7 @@ class ServicesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.services.retrieve(
-            name="name",
+            name="email-service",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -129,17 +127,14 @@ class ServicesClient:
         Creates a new service or updates an existing one.
 
         For SDK services:
-
         - Target server must implement the Parlant SDK protocol
         - Supports bidirectional communication and streaming
 
         For OpenAPI services:
-
         - Spec must be accessible and compatible with OpenAPI 3.0
         - Limited to request/response patterns
 
         Common requirements:
-
         - Service names must be unique and kebab-case
         - URLs must include http:// or https:// scheme
         - Updates cause brief service interruption while reconnecting
@@ -173,7 +168,7 @@ class ServicesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.services.create_or_update(
-            name="name",
+            name="email-service",
             kind="openapi",
             openapi=OpenApiServiceParams(
                 url="https://email-service.example.com/api/v1",
@@ -237,7 +232,6 @@ class ServicesClient:
         Removes a service integration.
 
         Effects:
-
         - Active connections are terminated immediately
         - Service tools become unavailable to agents
         - Historical data about tool usage is preserved
@@ -263,7 +257,7 @@ class ServicesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.services.delete(
-            name="name",
+            name="email-service",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -361,13 +355,11 @@ class AsyncServicesClient:
         Get details about a specific service including all its tools.
 
         The response includes:
-
         - Basic service information (name, kind, URL)
         - Complete list of available tools
         - Parameter definitions for each tool
 
         Notes:
-
         - Tools list may be empty if service is still initializing
         - Parameters marked as required must be provided when using a tool
         - Enum parameters restrict inputs to the listed values
@@ -398,7 +390,7 @@ class AsyncServicesClient:
 
         async def main() -> None:
             await client.services.retrieve(
-                name="name",
+                name="email-service",
             )
 
 
@@ -466,17 +458,14 @@ class AsyncServicesClient:
         Creates a new service or updates an existing one.
 
         For SDK services:
-
         - Target server must implement the Parlant SDK protocol
         - Supports bidirectional communication and streaming
 
         For OpenAPI services:
-
         - Spec must be accessible and compatible with OpenAPI 3.0
         - Limited to request/response patterns
 
         Common requirements:
-
         - Service names must be unique and kebab-case
         - URLs must include http:// or https:// scheme
         - Updates cause brief service interruption while reconnecting
@@ -515,7 +504,7 @@ class AsyncServicesClient:
 
         async def main() -> None:
             await client.services.create_or_update(
-                name="name",
+                name="email-service",
                 kind="openapi",
                 openapi=OpenApiServiceParams(
                     url="https://email-service.example.com/api/v1",
@@ -582,7 +571,6 @@ class AsyncServicesClient:
         Removes a service integration.
 
         Effects:
-
         - Active connections are terminated immediately
         - Service tools become unavailable to agents
         - Historical data about tool usage is preserved
@@ -613,7 +601,7 @@ class AsyncServicesClient:
 
         async def main() -> None:
             await client.services.delete(
-                name="name",
+                name="email-service",
             )
 
 

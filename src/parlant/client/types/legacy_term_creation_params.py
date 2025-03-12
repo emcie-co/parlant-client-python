@@ -6,16 +6,11 @@ import typing
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class Term(UniversalBaseModel):
+class LegacyTermCreationParams(UniversalBaseModel):
     """
-    Represents a glossary term associated with an agent.
+    Parameters for creating a new glossary term.
 
-    Use this model for representing complete term information in API responses.
-    """
-
-    id: str = pydantic.Field()
-    """
-    Unique identifier for the term
+    Use this model when adding new terms to an agent's glossary.
     """
 
     name: str = pydantic.Field()
@@ -31,11 +26,6 @@ class Term(UniversalBaseModel):
     synonyms: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
     A list of synonyms for the term, including alternate contexts if applicable.
-    """
-
-    tags: typing.List[str] = pydantic.Field()
-    """
-    List of tag IDs associated with the term
     """
 
     if IS_PYDANTIC_V2:

@@ -6,7 +6,7 @@ import typing
 from .guideline_proposition import GuidelineProposition
 import pydantic
 from .tool_call import ToolCall
-from .term import Term
+from .preparation_iteration_term import PreparationIterationTerm
 from .context_variable_and_value import ContextVariableAndValue
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -27,7 +27,7 @@ class PreparationIteration(UniversalBaseModel):
     List of tool calls made in preparation for this iteration
     """
 
-    terms: typing.List[Term] = pydantic.Field()
+    terms: typing.List[PreparationIterationTerm] = pydantic.Field()
     """
     List of terms participating in the preparation for this iteration
     """

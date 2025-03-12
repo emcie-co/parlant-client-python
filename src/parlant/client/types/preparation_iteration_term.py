@@ -3,39 +3,32 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
-from .tool_id import ToolId
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class ContextVariable(UniversalBaseModel):
+class PreparationIterationTerm(UniversalBaseModel):
     """
-    Represents a context variable type.
+    A term participating in the preparation for an iteration.
     """
 
     id: str = pydantic.Field()
     """
-    Unique identifier for the context variable
+    Unique identifier for the term
     """
 
     name: str = pydantic.Field()
     """
-    Name of the context variable
+    The name of the term, e.g., 'Gas' in blockchain.
     """
 
-    description: typing.Optional[str] = pydantic.Field(default=None)
+    description: str = pydantic.Field()
     """
-    Description of the context variable's purpose
-    """
-
-    tool_id: typing.Optional[ToolId] = None
-    freshness_rules: typing.Optional[str] = pydantic.Field(default=None)
-    """
-    Cron expression defining the freshness rules
+    A detailed description of the term
     """
 
-    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    synonyms: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    List of tags associated with the context variable
+    A list of synonyms for the term, including alternate contexts if applicable.
     """
 
     if IS_PYDANTIC_V2:

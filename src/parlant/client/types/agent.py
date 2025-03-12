@@ -44,6 +44,10 @@ class Agent(UniversalBaseModel):
     """
 
     composition_mode: CompositionModeDto
+    tags: typing.List[str] = pydantic.Field()
+    """
+    List of tag IDs associated with the agent
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
