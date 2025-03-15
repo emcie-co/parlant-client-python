@@ -6,9 +6,9 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
 
-class GuidelineProposition(UniversalBaseModel):
+class GuidelineMatchItem(UniversalBaseModel):
     """
-    A proposed guideline action.
+    A matched guideline action.
     """
 
     guideline_id: str = pydantic.Field()

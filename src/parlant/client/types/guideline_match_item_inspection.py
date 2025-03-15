@@ -7,14 +7,14 @@ from .generation_info import GenerationInfo
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class GuidelinePropositionInspection(UniversalBaseModel):
+class GuidelineMatchItemInspection(UniversalBaseModel):
     """
-    Inspection data for guideline proposition.
+    Inspection data for guideline match item.
     """
 
     total_duration: float = pydantic.Field()
     """
-    Amount of time spent proposing guidelines
+    Amount of time spent matching guidelines
     """
 
     batches: typing.List[GenerationInfo] = pydantic.Field()

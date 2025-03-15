@@ -3,7 +3,7 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 from .preparation_iteration_generations import PreparationIterationGenerations
 import typing
-from .guideline_proposition import GuidelineProposition
+from .guideline_match_item import GuidelineMatchItem
 import pydantic
 from .tool_call import ToolCall
 from .preparation_iteration_term import PreparationIterationTerm
@@ -17,9 +17,9 @@ class PreparationIteration(UniversalBaseModel):
     """
 
     generations: PreparationIterationGenerations
-    guideline_propositions: typing.List[GuidelineProposition] = pydantic.Field()
+    guideline_match_items: typing.List[GuidelineMatchItem] = pydantic.Field()
     """
-    List of guideline propositions used in preparation for this iteration
+    List of guideline match items used in preparation for this iteration
     """
 
     tool_calls: typing.List[ToolCall] = pydantic.Field()
