@@ -34,8 +34,8 @@ from .guideline_connection_addition import GuidelineConnectionAddition
 from .guideline_connection_update_params import GuidelineConnectionUpdateParams
 from .guideline_content import GuidelineContent
 from .guideline_invoice_data import GuidelineInvoiceData
-from .guideline_match_item import GuidelineMatchItem
-from .guideline_match_item_inspection import GuidelineMatchItemInspection
+from .guideline_match import GuidelineMatch
+from .guideline_matching_inspection import GuidelineMatchingInspection
 from .guideline_payload import GuidelinePayload
 from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
 from .guideline_tags_update_params import GuidelineTagsUpdateParams
@@ -127,8 +127,8 @@ __all__ = [
     "GuidelineConnectionUpdateParams",
     "GuidelineContent",
     "GuidelineInvoiceData",
-    "GuidelineMatchItem",
-    "GuidelineMatchItemInspection",
+    "GuidelineMatch",
+    "GuidelineMatchingInspection",
     "GuidelinePayload",
     "GuidelinePayloadOperationDto",
     "GuidelineTagsUpdateParams",

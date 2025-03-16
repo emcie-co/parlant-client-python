@@ -2,24 +2,38 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
-import typing
-from .generation_info import GenerationInfo
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
+import typing
 
 
-class GuidelineMatchItemInspection(UniversalBaseModel):
+class GuidelineMatch(UniversalBaseModel):
     """
-    Inspection data for guideline match item.
-    """
-
-    total_duration: float = pydantic.Field()
-    """
-    Amount of time spent matching guidelines
+    A matched guideline.
     """
 
-    batches: typing.List[GenerationInfo] = pydantic.Field()
+    guideline_id: str = pydantic.Field()
     """
-    A list of `GenerationInfoDTO` describing the batches of generation executed
+    Unique identifier for the guideline
+    """
+
+    condition: str = pydantic.Field()
+    """
+    The condition for the guideline
+    """
+
+    action: str = pydantic.Field()
+    """
+    The action for the guideline
+    """
+
+    score: int = pydantic.Field()
+    """
+    The score for the guideline
+    """
+
+    rationale: str = pydantic.Field()
+    """
+    The rationale for the guideline
     """
 
     if IS_PYDANTIC_V2:
