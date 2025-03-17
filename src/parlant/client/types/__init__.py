@@ -34,10 +34,10 @@ from .guideline_connection_addition import GuidelineConnectionAddition
 from .guideline_connection_update_params import GuidelineConnectionUpdateParams
 from .guideline_content import GuidelineContent
 from .guideline_invoice_data import GuidelineInvoiceData
+from .guideline_match import GuidelineMatch
+from .guideline_matching_inspection import GuidelineMatchingInspection
 from .guideline_payload import GuidelinePayload
 from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
-from .guideline_proposition import GuidelineProposition
-from .guideline_proposition_inspection import GuidelinePropositionInspection
 from .guideline_tags_update_params import GuidelineTagsUpdateParams
 from .guideline_tool_association import GuidelineToolAssociation
 from .guideline_tool_association_update_params import (
@@ -127,10 +127,10 @@ __all__ = [
     "GuidelineConnectionUpdateParams",
     "GuidelineContent",
     "GuidelineInvoiceData",
+    "GuidelineMatch",
+    "GuidelineMatchingInspection",
     "GuidelinePayload",
     "GuidelinePayloadOperationDto",
-    "GuidelineProposition",
-    "GuidelinePropositionInspection",
     "GuidelineTagsUpdateParams",
     "GuidelineToolAssociation",
     "GuidelineToolAssociationUpdateParams",
