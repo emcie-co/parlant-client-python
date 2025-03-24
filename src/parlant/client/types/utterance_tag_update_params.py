@@ -6,22 +6,22 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class FragmentTagUpdateParams(UniversalBaseModel):
+class UtteranceTagUpdateParams(UniversalBaseModel):
     """
-    Parameters for updating a fragment's tags.
+    Parameters for updating an utterance's tags.
 
-    Allows adding new tags to and removing existing tags from a fragment.
+    Allows adding new tags to and removing existing tags from an utterance.
     Both operations can be performed in a single request.
     """
 
     add: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    Optional collection of tag ids to add to the fragment's tags
+    Optional collection of tag ids to add to the utterance's tags
     """
 
     remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    Optional collection of tag ids to remove from the fragment's tags
+    Optional collection of tag ids to remove from the utterance's tags
     """
 
     if IS_PYDANTIC_V2:

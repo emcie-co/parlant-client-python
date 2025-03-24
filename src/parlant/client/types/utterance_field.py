@@ -6,15 +6,15 @@ import typing
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class FragmentField(UniversalBaseModel):
+class UtteranceField(UniversalBaseModel):
     name: str = pydantic.Field()
     """
-    The name of the fragment field.
+    The name of the utterance field.
     """
 
     description: str = pydantic.Field()
     """
-    A description of the fragment field.
+    A description of the utterance field.
     """
 
     examples: typing.List[str]

@@ -10,7 +10,7 @@ from .services.client import ServicesClient
 from .tags.client import TagsClient
 from .glossary.client import GlossaryClient
 from .customers.client import CustomersClient
-from .fragments.client import FragmentsClient
+from .utterances.client import UtterancesClient
 from .context_variables.client import ContextVariablesClient
 from .guidelines.client import GuidelinesClient
 from .core.client_wrapper import AsyncClientWrapper
@@ -21,7 +21,7 @@ from .services.client import AsyncServicesClient
 from .tags.client import AsyncTagsClient
 from .glossary.client import AsyncGlossaryClient
 from .customers.client import AsyncCustomersClient
-from .fragments.client import AsyncFragmentsClient
+from .utterances.client import AsyncUtterancesClient
 from .context_variables.client import AsyncContextVariablesClient
 from .guidelines.client import AsyncGuidelinesClient
 
@@ -82,7 +82,7 @@ class ParlantClient:
         self.tags = TagsClient(client_wrapper=self._client_wrapper)
         self.glossary = GlossaryClient(client_wrapper=self._client_wrapper)
         self.customers = CustomersClient(client_wrapper=self._client_wrapper)
-        self.fragments = FragmentsClient(client_wrapper=self._client_wrapper)
+        self.utterances = UtterancesClient(client_wrapper=self._client_wrapper)
         self.context_variables = ContextVariablesClient(
             client_wrapper=self._client_wrapper
         )
@@ -145,7 +145,7 @@ class AsyncParlantClient:
         self.tags = AsyncTagsClient(client_wrapper=self._client_wrapper)
         self.glossary = AsyncGlossaryClient(client_wrapper=self._client_wrapper)
         self.customers = AsyncCustomersClient(client_wrapper=self._client_wrapper)
-        self.fragments = AsyncFragmentsClient(client_wrapper=self._client_wrapper)
+        self.utterances = AsyncUtterancesClient(client_wrapper=self._client_wrapper)
         self.context_variables = AsyncContextVariablesClient(
             client_wrapper=self._client_wrapper
         )

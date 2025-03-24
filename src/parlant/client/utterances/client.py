@@ -3,23 +3,23 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.fragment import Fragment
+from ..types.utterance import Utterance
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.fragment_field import FragmentField
+from ..types.utterance_field import UtteranceField
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.fragment_tag_update_params import FragmentTagUpdateParams
+from ..types.utterance_tag_update_params import UtteranceTagUpdateParams
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
 
-class FragmentsClient:
+class UtterancesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
@@ -28,20 +28,20 @@ class FragmentsClient:
         *,
         tags: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Fragment]:
+    ) -> typing.List[Utterance]:
         """
         Parameters
         ----------
         tags : typing.Optional[typing.Union[str, typing.Sequence[str]]]
-            Filter fragments by tags
+            Filter utterances by tags
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Fragment]
-            List of all fragments in the system
+        typing.List[Utterance]
+            List of all utterances in the system
 
         Examples
         --------
@@ -50,10 +50,10 @@ class FragmentsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.fragments.list()
+        client.utterances.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "fragments",
+            "utterances",
             method="GET",
             params={
                 "tags": tags,
@@ -63,9 +63,9 @@ class FragmentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Fragment],
+                    typing.List[Utterance],
                     parse_obj_as(
-                        type_=typing.List[Fragment],  # type: ignore
+                        type_=typing.List[Utterance],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -88,41 +88,41 @@ class FragmentsClient:
         self,
         *,
         value: str,
-        fields: typing.Sequence[FragmentField],
+        fields: typing.Sequence[UtteranceField],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Fragment:
+    ) -> Utterance:
         """
         Parameters
         ----------
         value : str
-            The textual content of the fragment.
+            The textual content of the utterance.
 
-        fields : typing.Sequence[FragmentField]
-            A sequence of fragment fields associated with the fragment.
+        fields : typing.Sequence[UtteranceField]
+            A sequence of utterance fields associated with the utterance.
 
         tags : typing.Optional[typing.Sequence[str]]
-            Collection of tag IDs associated with the fragment.
+            Collection of tag IDs associated with the utterance.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Fragment
-            Fragment successfully created.
+        Utterance
+            Utterance successfully created.
 
         Examples
         --------
-        from parlant.client import FragmentField, ParlantClient
+        from parlant.client import ParlantClient, UtteranceField
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.fragments.create(
+        client.utterances.create(
             value="Your account balance is {balance}",
             fields=[
-                FragmentField(
+                UtteranceField(
                     name="balance",
                     description="Account's balance",
                     examples=["9000"],
@@ -131,13 +131,13 @@ class FragmentsClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "fragments",
+            "utterances",
             method="POST",
             json={
                 "value": value,
                 "fields": convert_and_respect_annotation_metadata(
                     object_=fields,
-                    annotation=typing.Sequence[FragmentField],
+                    annotation=typing.Sequence[UtteranceField],
                     direction="write",
                 ),
                 "tags": tags,
@@ -148,9 +148,9 @@ class FragmentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Fragment,
+                    Utterance,
                     parse_obj_as(
-                        type_=Fragment,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -171,24 +171,24 @@ class FragmentsClient:
 
     def retrieve(
         self,
-        fragment_id: str,
+        utterance_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Fragment:
+    ) -> Utterance:
         """
-        Retrieves details of a specific fragment by ID.
+        Retrieves details of a specific utterance by ID.
 
         Parameters
         ----------
-        fragment_id : str
+        utterance_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Fragment
-            Fragment details successfully retrieved. Returns the Fragment object.
+        Utterance
+            Utterance details successfully retrieved. Returns the Utterance object.
 
         Examples
         --------
@@ -197,21 +197,21 @@ class FragmentsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.fragments.retrieve(
-            fragment_id="t9a8g703f4",
+        client.utterances.retrieve(
+            utterance_id="t9a8g703f4",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"fragments/{jsonable_encoder(fragment_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Fragment,
+                    Utterance,
                     parse_obj_as(
-                        type_=Fragment,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -242,14 +242,14 @@ class FragmentsClient:
 
     def delete(
         self,
-        fragment_id: str,
+        utterance_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
         Parameters
         ----------
-        fragment_id : str
+        utterance_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -265,12 +265,12 @@ class FragmentsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.fragments.delete(
-            fragment_id="t9a8g703f4",
+        client.utterances.delete(
+            utterance_id="t9a8g703f4",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"fragments/{jsonable_encoder(fragment_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -304,52 +304,52 @@ class FragmentsClient:
 
     def update(
         self,
-        fragment_id: str,
+        utterance_id: str,
         *,
         value: typing.Optional[str] = OMIT,
-        fields: typing.Optional[typing.Sequence[FragmentField]] = OMIT,
-        tags: typing.Optional[FragmentTagUpdateParams] = OMIT,
+        fields: typing.Optional[typing.Sequence[UtteranceField]] = OMIT,
+        tags: typing.Optional[UtteranceTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Fragment:
+    ) -> Utterance:
         """
-        Updates an existing fragment's attributes.
+        Updates an existing utterance's attributes.
 
         Only provided attributes will be updated; others remain unchanged.
-        The fragment's ID and creation timestamp cannot be modified.
+        The utterance's ID and creation timestamp cannot be modified.
         Extra metadata and tags can be added or removed independently.
 
         Parameters
         ----------
-        fragment_id : str
+        utterance_id : str
 
         value : typing.Optional[str]
-            The textual content of the fragment.
+            The textual content of the utterance.
 
-        fields : typing.Optional[typing.Sequence[FragmentField]]
-            A sequence of fragment fields associated with the fragment.
+        fields : typing.Optional[typing.Sequence[UtteranceField]]
+            A sequence of utterance fields associated with the utterance.
 
-        tags : typing.Optional[FragmentTagUpdateParams]
+        tags : typing.Optional[UtteranceTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Fragment
-            Fragment successfully updated. Returns the updated Fragment object.
+        Utterance
+            Utterance successfully updated. Returns the updated Utterance object.
 
         Examples
         --------
-        from parlant.client import FragmentField, ParlantClient
+        from parlant.client import ParlantClient, UtteranceField
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.fragments.update(
-            fragment_id="t9a8g703f4",
+        client.utterances.update(
+            utterance_id="t9a8g703f4",
             value="Your updated balance is {balance}",
             fields=[
-                FragmentField(
+                UtteranceField(
                     name="balance",
                     description="Updated account balance",
                     examples=["10000"],
@@ -358,17 +358,17 @@ class FragmentsClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"fragments/{jsonable_encoder(fragment_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="PATCH",
             json={
                 "value": value,
                 "fields": convert_and_respect_annotation_metadata(
                     object_=fields,
-                    annotation=typing.Sequence[FragmentField],
+                    annotation=typing.Sequence[UtteranceField],
                     direction="write",
                 ),
                 "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=FragmentTagUpdateParams, direction="write"
+                    object_=tags, annotation=UtteranceTagUpdateParams, direction="write"
                 ),
             },
             request_options=request_options,
@@ -377,9 +377,9 @@ class FragmentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Fragment,
+                    Utterance,
                     parse_obj_as(
-                        type_=Fragment,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -409,7 +409,7 @@ class FragmentsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncFragmentsClient:
+class AsyncUtterancesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
@@ -418,20 +418,20 @@ class AsyncFragmentsClient:
         *,
         tags: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Fragment]:
+    ) -> typing.List[Utterance]:
         """
         Parameters
         ----------
         tags : typing.Optional[typing.Union[str, typing.Sequence[str]]]
-            Filter fragments by tags
+            Filter utterances by tags
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Fragment]
-            List of all fragments in the system
+        typing.List[Utterance]
+            List of all utterances in the system
 
         Examples
         --------
@@ -445,13 +445,13 @@ class AsyncFragmentsClient:
 
 
         async def main() -> None:
-            await client.fragments.list()
+            await client.utterances.list()
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "fragments",
+            "utterances",
             method="GET",
             params={
                 "tags": tags,
@@ -461,9 +461,9 @@ class AsyncFragmentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Fragment],
+                    typing.List[Utterance],
                     parse_obj_as(
-                        type_=typing.List[Fragment],  # type: ignore
+                        type_=typing.List[Utterance],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -486,35 +486,35 @@ class AsyncFragmentsClient:
         self,
         *,
         value: str,
-        fields: typing.Sequence[FragmentField],
+        fields: typing.Sequence[UtteranceField],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Fragment:
+    ) -> Utterance:
         """
         Parameters
         ----------
         value : str
-            The textual content of the fragment.
+            The textual content of the utterance.
 
-        fields : typing.Sequence[FragmentField]
-            A sequence of fragment fields associated with the fragment.
+        fields : typing.Sequence[UtteranceField]
+            A sequence of utterance fields associated with the utterance.
 
         tags : typing.Optional[typing.Sequence[str]]
-            Collection of tag IDs associated with the fragment.
+            Collection of tag IDs associated with the utterance.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Fragment
-            Fragment successfully created.
+        Utterance
+            Utterance successfully created.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, FragmentField
+        from parlant.client import AsyncParlantClient, UtteranceField
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -522,10 +522,10 @@ class AsyncFragmentsClient:
 
 
         async def main() -> None:
-            await client.fragments.create(
+            await client.utterances.create(
                 value="Your account balance is {balance}",
                 fields=[
-                    FragmentField(
+                    UtteranceField(
                         name="balance",
                         description="Account's balance",
                         examples=["9000"],
@@ -537,13 +537,13 @@ class AsyncFragmentsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "fragments",
+            "utterances",
             method="POST",
             json={
                 "value": value,
                 "fields": convert_and_respect_annotation_metadata(
                     object_=fields,
-                    annotation=typing.Sequence[FragmentField],
+                    annotation=typing.Sequence[UtteranceField],
                     direction="write",
                 ),
                 "tags": tags,
@@ -554,9 +554,9 @@ class AsyncFragmentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Fragment,
+                    Utterance,
                     parse_obj_as(
-                        type_=Fragment,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -577,24 +577,24 @@ class AsyncFragmentsClient:
 
     async def retrieve(
         self,
-        fragment_id: str,
+        utterance_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Fragment:
+    ) -> Utterance:
         """
-        Retrieves details of a specific fragment by ID.
+        Retrieves details of a specific utterance by ID.
 
         Parameters
         ----------
-        fragment_id : str
+        utterance_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Fragment
-            Fragment details successfully retrieved. Returns the Fragment object.
+        Utterance
+            Utterance details successfully retrieved. Returns the Utterance object.
 
         Examples
         --------
@@ -608,24 +608,24 @@ class AsyncFragmentsClient:
 
 
         async def main() -> None:
-            await client.fragments.retrieve(
-                fragment_id="t9a8g703f4",
+            await client.utterances.retrieve(
+                utterance_id="t9a8g703f4",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"fragments/{jsonable_encoder(fragment_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Fragment,
+                    Utterance,
                     parse_obj_as(
-                        type_=Fragment,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -656,14 +656,14 @@ class AsyncFragmentsClient:
 
     async def delete(
         self,
-        fragment_id: str,
+        utterance_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
         Parameters
         ----------
-        fragment_id : str
+        utterance_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -684,15 +684,15 @@ class AsyncFragmentsClient:
 
 
         async def main() -> None:
-            await client.fragments.delete(
-                fragment_id="t9a8g703f4",
+            await client.utterances.delete(
+                utterance_id="t9a8g703f4",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"fragments/{jsonable_encoder(fragment_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -726,45 +726,45 @@ class AsyncFragmentsClient:
 
     async def update(
         self,
-        fragment_id: str,
+        utterance_id: str,
         *,
         value: typing.Optional[str] = OMIT,
-        fields: typing.Optional[typing.Sequence[FragmentField]] = OMIT,
-        tags: typing.Optional[FragmentTagUpdateParams] = OMIT,
+        fields: typing.Optional[typing.Sequence[UtteranceField]] = OMIT,
+        tags: typing.Optional[UtteranceTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Fragment:
+    ) -> Utterance:
         """
-        Updates an existing fragment's attributes.
+        Updates an existing utterance's attributes.
 
         Only provided attributes will be updated; others remain unchanged.
-        The fragment's ID and creation timestamp cannot be modified.
+        The utterance's ID and creation timestamp cannot be modified.
         Extra metadata and tags can be added or removed independently.
 
         Parameters
         ----------
-        fragment_id : str
+        utterance_id : str
 
         value : typing.Optional[str]
-            The textual content of the fragment.
+            The textual content of the utterance.
 
-        fields : typing.Optional[typing.Sequence[FragmentField]]
-            A sequence of fragment fields associated with the fragment.
+        fields : typing.Optional[typing.Sequence[UtteranceField]]
+            A sequence of utterance fields associated with the utterance.
 
-        tags : typing.Optional[FragmentTagUpdateParams]
+        tags : typing.Optional[UtteranceTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Fragment
-            Fragment successfully updated. Returns the updated Fragment object.
+        Utterance
+            Utterance successfully updated. Returns the updated Utterance object.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, FragmentField
+        from parlant.client import AsyncParlantClient, UtteranceField
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -772,11 +772,11 @@ class AsyncFragmentsClient:
 
 
         async def main() -> None:
-            await client.fragments.update(
-                fragment_id="t9a8g703f4",
+            await client.utterances.update(
+                utterance_id="t9a8g703f4",
                 value="Your updated balance is {balance}",
                 fields=[
-                    FragmentField(
+                    UtteranceField(
                         name="balance",
                         description="Updated account balance",
                         examples=["10000"],
@@ -788,17 +788,17 @@ class AsyncFragmentsClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"fragments/{jsonable_encoder(fragment_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="PATCH",
             json={
                 "value": value,
                 "fields": convert_and_respect_annotation_metadata(
                     object_=fields,
-                    annotation=typing.Sequence[FragmentField],
+                    annotation=typing.Sequence[UtteranceField],
                     direction="write",
                 ),
                 "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=FragmentTagUpdateParams, direction="write"
+                    object_=tags, annotation=UtteranceTagUpdateParams, direction="write"
                 ),
             },
             request_options=request_options,
@@ -807,9 +807,9 @@ class AsyncFragmentsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Fragment,
+                    Utterance,
                     parse_obj_as(
-                        type_=Fragment,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

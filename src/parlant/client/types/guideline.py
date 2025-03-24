@@ -26,7 +26,7 @@ class Guideline(UniversalBaseModel):
     This action will be performed if the condition is satisfied
     """
 
-    enabled: bool = pydantic.Field()
+    enabled: typing.Optional[bool] = pydantic.Field(default=None)
     """
     Whether the guideline is enabled
     """

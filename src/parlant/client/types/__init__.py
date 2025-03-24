@@ -24,9 +24,6 @@ from .event_inspection_result import EventInspectionResult
 from .event_kind_dto import EventKindDto
 from .event_source_dto import EventSourceDto
 from .event_trace import EventTrace
-from .fragment import Fragment
-from .fragment_field import FragmentField
-from .fragment_tag_update_params import FragmentTagUpdateParams
 from .generation_info import GenerationInfo
 from .guideline import Guideline
 from .guideline_connection import GuidelineConnection
@@ -87,8 +84,11 @@ from .tool_parameter_type_dto import ToolParameterTypeDto
 from .tool_result import ToolResult
 from .tool_service_kind_dto import ToolServiceKindDto
 from .usage_info import UsageInfo
+from .utterance import Utterance
+from .utterance_field import UtteranceField
 from .utterance_reason_dto import UtteranceReasonDto
 from .utterance_request import UtteranceRequest
+from .utterance_tag_update_params import UtteranceTagUpdateParams
 from .validation_error import ValidationError
 from .validation_error_loc_item import ValidationErrorLocItem
 
@@ -117,9 +117,6 @@ __all__ = [
     "EventKindDto",
     "EventSourceDto",
     "EventTrace",
-    "Fragment",
-    "FragmentField",
-    "FragmentTagUpdateParams",
     "GenerationInfo",
     "Guideline",
     "GuidelineConnection",
@@ -174,8 +171,11 @@ __all__ = [
     "ToolResult",
     "ToolServiceKindDto",
     "UsageInfo",
+    "Utterance",
+    "UtteranceField",
     "UtteranceReasonDto",
     "UtteranceRequest",
+    "UtteranceTagUpdateParams",
     "ValidationError",
     "ValidationErrorLocItem",
 ]

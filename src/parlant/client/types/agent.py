@@ -38,13 +38,13 @@ class Agent(UniversalBaseModel):
     UTC timestamp of when the agent was created
     """
 
-    max_engine_iterations: int = pydantic.Field()
+    max_engine_iterations: typing.Optional[int] = pydantic.Field(default=None)
     """
     Maximum number of processing iterations the agent can perform per request
     """
 
     composition_mode: CompositionModeDto
-    tags: typing.List[str] = pydantic.Field()
+    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
     List of tag IDs associated with the agent
     """

@@ -3,6 +3,8 @@
 import typing
 
 CompositionModeDto = typing.Union[
-    typing.Literal["fluid", "strict_assembly", "composited_assembly", "fluid_assembly"],
+    typing.Literal[
+        "fluid", "strict_utterance", "composited_utterance", "fluid_utterance"
+    ],
     typing.Any,
 ]

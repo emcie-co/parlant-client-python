@@ -4,11 +4,11 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import datetime as dt
 import typing
-from .fragment_field import FragmentField
+from .utterance_field import UtteranceField
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class Fragment(UniversalBaseModel):
+class Utterance(UniversalBaseModel):
     id: str = pydantic.Field()
     """
     Unique identifier for the tag
@@ -16,22 +16,22 @@ class Fragment(UniversalBaseModel):
 
     creation_utc: dt.datetime = pydantic.Field()
     """
-    UTC timestamp of when the fragment was created
+    UTC timestamp of when the utterance was created
     """
 
     value: str = pydantic.Field()
     """
-    The textual content of the fragment.
+    The textual content of the utterance.
     """
 
-    fields: typing.List[FragmentField] = pydantic.Field()
+    fields: typing.List[UtteranceField] = pydantic.Field()
     """
-    A sequence of fragment fields associated with the fragment.
+    A sequence of utterance fields associated with the utterance.
     """
 
     tags: typing.List[str] = pydantic.Field()
     """
-    Collection of tag IDs associated with the fragment.
+    Collection of tag IDs associated with the utterance.
     """
 
     if IS_PYDANTIC_V2:
