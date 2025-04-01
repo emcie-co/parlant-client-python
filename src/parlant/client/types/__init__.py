@@ -26,22 +26,23 @@ from .event_source_dto import EventSourceDto
 from .event_trace import EventTrace
 from .generation_info import GenerationInfo
 from .guideline import Guideline
-from .guideline_connection import GuidelineConnection
-from .guideline_connection_addition import GuidelineConnectionAddition
-from .guideline_connection_update_params import GuidelineConnectionUpdateParams
 from .guideline_content import GuidelineContent
 from .guideline_invoice_data import GuidelineInvoiceData
 from .guideline_match import GuidelineMatch
 from .guideline_matching_inspection import GuidelineMatchingInspection
 from .guideline_payload import GuidelinePayload
 from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
+from .guideline_relationship import GuidelineRelationship
+from .guideline_relationship_addition import GuidelineRelationshipAddition
+from .guideline_relationship_kind_dto import GuidelineRelationshipKindDto
+from .guideline_relationship_update_params import GuidelineRelationshipUpdateParams
 from .guideline_tags_update_params import GuidelineTagsUpdateParams
 from .guideline_tool_association import GuidelineToolAssociation
 from .guideline_tool_association_update_params import (
     GuidelineToolAssociationUpdateParams,
 )
-from .guideline_with_connections_and_tool_associations import (
-    GuidelineWithConnectionsAndToolAssociations,
+from .guideline_with_relationships_and_tool_associations import (
+    GuidelineWithRelationshipsAndToolAssociations,
 )
 from .http_validation_error import HttpValidationError
 from .invoice import Invoice
@@ -52,6 +53,10 @@ from .legacy_context_variable_read_result import LegacyContextVariableReadResult
 from .legacy_context_variable_update_params import LegacyContextVariableUpdateParams
 from .legacy_guideline import LegacyGuideline
 from .legacy_guideline_connection import LegacyGuidelineConnection
+from .legacy_guideline_connection_addition import LegacyGuidelineConnectionAddition
+from .legacy_guideline_connection_update_params import (
+    LegacyGuidelineConnectionUpdateParams,
+)
 from .legacy_guideline_creation_params import LegacyGuidelineCreationParams
 from .legacy_guideline_creation_result import LegacyGuidelineCreationResult
 from .legacy_guideline_update_params import LegacyGuidelineUpdateParams
@@ -119,19 +124,20 @@ __all__ = [
     "EventTrace",
     "GenerationInfo",
     "Guideline",
-    "GuidelineConnection",
-    "GuidelineConnectionAddition",
-    "GuidelineConnectionUpdateParams",
     "GuidelineContent",
     "GuidelineInvoiceData",
     "GuidelineMatch",
     "GuidelineMatchingInspection",
     "GuidelinePayload",
     "GuidelinePayloadOperationDto",
+    "GuidelineRelationship",
+    "GuidelineRelationshipAddition",
+    "GuidelineRelationshipKindDto",
+    "GuidelineRelationshipUpdateParams",
     "GuidelineTagsUpdateParams",
     "GuidelineToolAssociation",
     "GuidelineToolAssociationUpdateParams",
-    "GuidelineWithConnectionsAndToolAssociations",
+    "GuidelineWithRelationshipsAndToolAssociations",
     "HttpValidationError",
     "Invoice",
     "InvoiceData",
@@ -141,6 +147,8 @@ __all__ = [
     "LegacyContextVariableUpdateParams",
     "LegacyGuideline",
     "LegacyGuidelineConnection",
+    "LegacyGuidelineConnectionAddition",
+    "LegacyGuidelineConnectionUpdateParams",
     "LegacyGuidelineCreationParams",
     "LegacyGuidelineCreationResult",
     "LegacyGuidelineUpdateParams",

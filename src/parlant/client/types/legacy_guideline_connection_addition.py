@@ -6,7 +6,7 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
 
-class GuidelineConnectionAddition(UniversalBaseModel):
+class LegacyGuidelineConnectionAddition(UniversalBaseModel):
     """
     Used to add connections between Guidelines.
     """
