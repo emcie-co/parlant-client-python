@@ -18,6 +18,7 @@ from .customer import Customer
 from .customer_extra_update_params import CustomerExtraUpdateParams
 from .customer_tag_update_params import CustomerTagUpdateParams
 from .evaluation import Evaluation
+from .evaluation_creation_params import EvaluationCreationParams
 from .evaluation_status_dto import EvaluationStatusDto
 from .event import Event
 from .event_inspection_result import EventInspectionResult
@@ -116,6 +117,7 @@ __all__ = [
     "CustomerExtraUpdateParams",
     "CustomerTagUpdateParams",
     "Evaluation",
+    "EvaluationCreationParams",
     "EvaluationStatusDto",
     "Event",
     "EventInspectionResult",
