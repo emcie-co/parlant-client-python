@@ -2,17 +2,19 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .invoice import Invoice
+from .guideline_with_connections_and_tool_associations import (
+    GuidelineWithConnectionsAndToolAssociations,
+)
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class LegacyGuidelineCreationParams(UniversalBaseModel):
+class GuidelineCreationResult(UniversalBaseModel):
     """
-    Evaluation invoices to generate Guidelines from.
+    Result wrapper for Guidelines creation.
     """
 
-    invoices: typing.List[Invoice]
+    items: typing.List[GuidelineWithConnectionsAndToolAssociations]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

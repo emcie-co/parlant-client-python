@@ -2,33 +2,23 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
-import typing
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
+import typing
 
 
-class PreparationIterationTerm(UniversalBaseModel):
+class GuidelineConnectionAddition(UniversalBaseModel):
     """
-    A term participating in the preparation for an iteration.
-    """
-
-    id: str = pydantic.Field()
-    """
-    Unique identifier for the term
+    Used to add connections between Guidelines.
     """
 
-    name: str = pydantic.Field()
+    source: str = pydantic.Field()
     """
-    The name of the term, e.g., 'Gas' in blockchain.
-    """
-
-    description: str = pydantic.Field()
-    """
-    A detailed description of the term
+    `id` of guideline that is source of this connection.
     """
 
-    synonyms: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    target: str = pydantic.Field()
     """
-    A list of synonyms for the term, including alternate contexts if applicable.
+    `id` of guideline that is target of this connection.
     """
 
     if IS_PYDANTIC_V2:

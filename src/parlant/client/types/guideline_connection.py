@@ -3,29 +3,26 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 from .guideline import Guideline
-from .guideline_relationship_kind_dto import GuidelineRelationshipKindDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
 
-class GuidelineRelationship(UniversalBaseModel):
+class GuidelineConnection(UniversalBaseModel):
     """
-    Represents a guideline relationship addition.
+    Represents a connection between two guidelines.
     """
 
     id: str = pydantic.Field()
     """
-    Unique identifier for the guideline relationship
+    Unique identifier for the `GuildelineConnection`
     """
 
     source: Guideline
     target: Guideline
     indirect: bool = pydantic.Field()
     """
-    `True` if there is a path from `source` to `target` but no direct relationship
+    `True` if there is a path from `source` to `target` but no direct connection
     """
-
-    kind: GuidelineRelationshipKindDto
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

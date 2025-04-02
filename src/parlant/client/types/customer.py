@@ -22,7 +22,7 @@ class Customer(UniversalBaseModel):
 
     creation_utc: dt.datetime = pydantic.Field()
     """
-    UTC timestamp of when the customer was created
+    UTC timestamp of when the agent was created
     """
 
     name: str = pydantic.Field()

@@ -4,7 +4,6 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
 import datetime as dt
-from .composition_mode_dto import CompositionModeDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -38,15 +37,9 @@ class Agent(UniversalBaseModel):
     UTC timestamp of when the agent was created
     """
 
-    max_engine_iterations: typing.Optional[int] = pydantic.Field(default=None)
+    max_engine_iterations: int = pydantic.Field()
     """
     Maximum number of processing iterations the agent can perform per request
-    """
-
-    composition_mode: CompositionModeDto
-    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
-    """
-    List of tag IDs associated with the agent
     """
 
     if IS_PYDANTIC_V2:

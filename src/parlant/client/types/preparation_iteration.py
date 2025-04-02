@@ -3,10 +3,10 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 from .preparation_iteration_generations import PreparationIterationGenerations
 import typing
-from .guideline_match import GuidelineMatch
+from .guideline_proposition import GuidelineProposition
 import pydantic
 from .tool_call import ToolCall
-from .preparation_iteration_term import PreparationIterationTerm
+from .term import Term
 from .context_variable_and_value import ContextVariableAndValue
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -17,9 +17,9 @@ class PreparationIteration(UniversalBaseModel):
     """
 
     generations: PreparationIterationGenerations
-    guideline_matches: typing.List[GuidelineMatch] = pydantic.Field()
+    guideline_propositions: typing.List[GuidelineProposition] = pydantic.Field()
     """
-    List of guideline matches used in preparation for this iteration
+    List of guideline propositions used in preparation for this iteration
     """
 
     tool_calls: typing.List[ToolCall] = pydantic.Field()
@@ -27,7 +27,7 @@ class PreparationIteration(UniversalBaseModel):
     List of tool calls made in preparation for this iteration
     """
 
-    terms: typing.List[PreparationIterationTerm] = pydantic.Field()
+    terms: typing.List[Term] = pydantic.Field()
     """
     List of terms participating in the preparation for this iteration
     """
