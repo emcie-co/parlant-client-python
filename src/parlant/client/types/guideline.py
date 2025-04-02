@@ -2,13 +2,13 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
-import typing
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
+import typing
 
 
 class Guideline(UniversalBaseModel):
     """
-    Represents a guideline.
+    Assigns an id to the condition-action pair
     """
 
     id: str = pydantic.Field()
@@ -24,16 +24,6 @@ class Guideline(UniversalBaseModel):
     action: str = pydantic.Field()
     """
     This action will be performed if the condition is satisfied
-    """
-
-    enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether the guideline is enabled
-    """
-
-    tags: typing.List[str] = pydantic.Field()
-    """
-    The tags associated with the guideline
     """
 
     if IS_PYDANTIC_V2:

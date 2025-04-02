@@ -4,23 +4,22 @@ import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
 from ..types.guideline import Guideline
+from ..core.jsonable_encoder import jsonable_encoder
 from ..core.pydantic_utilities import parse_obj_as
+from ..errors.not_found_error import NotFoundError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.guideline_with_relationships_and_tool_associations import (
-    GuidelineWithRelationshipsAndToolAssociations,
+from ..types.invoice import Invoice
+from ..types.guideline_creation_result import GuidelineCreationResult
+from ..core.serialization import convert_and_respect_annotation_metadata
+from ..types.guideline_with_connections_and_tool_associations import (
+    GuidelineWithConnectionsAndToolAssociations,
 )
-from ..core.jsonable_encoder import jsonable_encoder
-from ..errors.not_found_error import NotFoundError
-from ..types.guideline_relationship_update_params import (
-    GuidelineRelationshipUpdateParams,
-)
+from ..types.guideline_connection_update_params import GuidelineConnectionUpdateParams
 from ..types.guideline_tool_association_update_params import (
     GuidelineToolAssociationUpdateParams,
 )
-from ..types.guideline_tags_update_params import GuidelineTagsUpdateParams
-from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -32,22 +31,19 @@ class GuidelinesClient:
         self._client_wrapper = client_wrapper
 
     def list(
-        self,
-        *,
-        tag_id: typing.Optional[str] = None,
-        request_options: typing.Optional[RequestOptions] = None,
+        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Guideline]:
         """
-        Lists all guidelines for the specified tag or all guidelines if no tag is provided.
+        Lists all guidelines for the specified agent.
 
         Returns an empty list if no guidelines exist.
         Guidelines are returned in no guaranteed order.
-        Does not include relationships or tool associations.
+        Does not include connections or tool associations.
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter guidelines by
+        agent_id : str
+            Unique identifier for the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -55,7 +51,7 @@ class GuidelinesClient:
         Returns
         -------
         typing.List[Guideline]
-            List of all guidelines for the specified tag or all guidelines if no tag is provided
+            List of all guidelines for the specified agent
 
         Examples
         --------
@@ -64,14 +60,13 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.list()
+        client.guidelines.list(
+            agent_id="agent_id",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "guidelines",
+            f"agents/{jsonable_encoder(agent_id)}/guidelines",
             method="GET",
-            params={
-                "tag_id": tag_id,
-            },
             request_options=request_options,
         )
         try:
@@ -82,6 +77,16 @@ class GuidelinesClient:
                         type_=typing.List[Guideline],  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
@@ -100,61 +105,115 @@ class GuidelinesClient:
 
     def create(
         self,
+        agent_id: str,
         *,
-        condition: str,
-        action: str,
-        enabled: typing.Optional[bool] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        invoices: typing.Sequence[Invoice],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Guideline:
+    ) -> GuidelineCreationResult:
         """
-        Creates a new guideline.
+        Creates new guidelines from the provided invoices.
 
+        Invoices are obtained by calling the `create_evaluation` method of the client.
+        (Equivalent to making a POST request to `/index/evaluations`)
         See the [documentation](https://parlant.io/docs/concepts/customization/guidelines) for more information.
+
+        The guidelines are created in the specified agent's guideline set.
+        Tool associations and connections are automatically handled.
 
         Parameters
         ----------
-        condition : str
-            If this condition is satisfied, the action will be performed
+        agent_id : str
+            Unique identifier for the agent
 
-        action : str
-            This action will be performed if the condition is satisfied
-
-        enabled : typing.Optional[bool]
-            Whether the guideline is enabled
-
-        tags : typing.Optional[typing.Sequence[str]]
-            The tags associated with the guideline
+        invoices : typing.Sequence[Invoice]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Guideline
-            Guideline successfully created. Returns the created guideline.
+        GuidelineCreationResult
+            Guidelines successfully created. Returns the created guidelines with their connections and tool associations.
 
         Examples
         --------
-        from parlant.client import ParlantClient
+        from parlant.client import (
+            CoherenceCheck,
+            ConnectionProposition,
+            GuidelineContent,
+            GuidelineInvoiceData,
+            GuidelinePayload,
+            Invoice,
+            InvoiceData,
+            ParlantClient,
+            Payload,
+        )
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
         client.guidelines.create(
-            condition="when the customer asks about pricing",
-            action="provide current pricing information and mention any ongoing promotions",
-            enabled=False,
+            agent_id="agent_id",
+            invoices=[
+                Invoice(
+                    payload=Payload(
+                        guideline=GuidelinePayload(
+                            content=GuidelineContent(
+                                condition="when the customer asks about pricing",
+                                action="provide current pricing information",
+                            ),
+                            operation="add",
+                            coherence_check=True,
+                            connection_proposition=True,
+                        ),
+                    ),
+                    checksum="abc123",
+                    approved=True,
+                    data=InvoiceData(
+                        guideline=GuidelineInvoiceData(
+                            coherence_checks=[
+                                CoherenceCheck(
+                                    kind="contradiction_with_existing_guideline",
+                                    first=GuidelineContent(
+                                        condition="User is frustrated",
+                                        action="Respond with technical details",
+                                    ),
+                                    second=GuidelineContent(
+                                        condition="User is frustrated",
+                                        action="Focus on emotional support first",
+                                    ),
+                                    issue="Conflicting approaches to handling user frustration",
+                                    severity=7,
+                                )
+                            ],
+                            connection_propositions=[
+                                ConnectionProposition(
+                                    check_kind="connection_with_existing_guideline",
+                                    source=GuidelineContent(
+                                        condition="User mentions technical problem",
+                                        action="Request system logs",
+                                    ),
+                                    target=GuidelineContent(
+                                        condition="System logs are available",
+                                        action="Analyze logs for error patterns",
+                                    ),
+                                )
+                            ],
+                        ),
+                    ),
+                )
+            ],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "guidelines",
+            f"agents/{jsonable_encoder(agent_id)}/guidelines",
             method="POST",
             json={
-                "condition": condition,
-                "action": action,
-                "enabled": enabled,
-                "tags": tags,
+                "invoices": convert_and_respect_annotation_metadata(
+                    object_=invoices,
+                    annotation=typing.Sequence[Invoice],
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -162,11 +221,21 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Guideline,
+                    GuidelineCreationResult,
                     parse_obj_as(
-                        type_=Guideline,  # type: ignore
+                        type_=GuidelineCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
@@ -185,18 +254,22 @@ class GuidelinesClient:
 
     def retrieve(
         self,
+        agent_id: str,
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithRelationshipsAndToolAssociations:
+    ) -> GuidelineWithConnectionsAndToolAssociations:
         """
-        Retrieves a specific guideline with all its relationships and tool associations.
+        Retrieves a specific guideline with all its connections and tool associations.
 
-        Returns both direct and indirect relationships between guidelines.
+        Returns both direct and indirect connections between guidelines.
         Tool associations indicate which tools the guideline can use.
 
         Parameters
         ----------
+        agent_id : str
+            Unique identifier for the agent
+
         guideline_id : str
             Unique identifier for the guideline
 
@@ -205,8 +278,8 @@ class GuidelinesClient:
 
         Returns
         -------
-        GuidelineWithRelationshipsAndToolAssociations
-            Guideline details successfully retrieved. Returns the complete guideline with its relationships and tool associations.
+        GuidelineWithConnectionsAndToolAssociations
+            Guideline details successfully retrieved. Returns the complete guideline with its connections and tool associations.
 
         Examples
         --------
@@ -216,20 +289,21 @@ class GuidelinesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.guidelines.retrieve(
-            guideline_id="IUCGT-l4pS",
+            agent_id="agent_id",
+            guideline_id="guideline_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithRelationshipsAndToolAssociations,
+                    GuidelineWithConnectionsAndToolAssociations,
                     parse_obj_as(
-                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
+                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -260,13 +334,23 @@ class GuidelinesClient:
 
     def delete(
         self,
+        agent_id: str,
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a guideline from the agent.
+
+        Also removes all associated connections and tool associations.
+        Deleting a non-existent guideline will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
+        agent_id : str
+            Unique identifier for the agent
+
         guideline_id : str
             Unique identifier for the guideline
 
@@ -285,11 +369,12 @@ class GuidelinesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.guidelines.delete(
-            guideline_id="IUCGT-l4pS",
+            agent_id="agent_id",
+            guideline_id="guideline_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -323,62 +408,53 @@ class GuidelinesClient:
 
     def update(
         self,
+        agent_id: str,
         guideline_id: str,
         *,
-        condition: typing.Optional[str] = OMIT,
-        action: typing.Optional[str] = OMIT,
-        relationships: typing.Optional[GuidelineRelationshipUpdateParams] = OMIT,
+        connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
-        enabled: typing.Optional[bool] = OMIT,
-        tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithRelationshipsAndToolAssociations:
+    ) -> GuidelineWithConnectionsAndToolAssociations:
         """
-        Updates a guideline's relationships and tool associations.
+        Updates a guideline's connections and tool associations.
 
         Only provided attributes will be updated; others remain unchanged.
 
-        Relationship rules:
-        - A guideline cannot relate to itself
-        - Only direct relationships can be removed
-        - The relationship must specify this guideline as source or target
+        Connection rules:
+
+        - A guideline cannot connect to itself
+        - Only direct connections can be removed
+        - The connection must specify this guideline as source or target
 
         Tool Association rules:
+
         - Tool services and tools must exist before creating associations
 
         Parameters
         ----------
+        agent_id : str
+            Unique identifier for the agent
+
         guideline_id : str
             Unique identifier for the guideline
 
-        condition : typing.Optional[str]
-            If this condition is satisfied, the action will be performed
-
-        action : typing.Optional[str]
-            This action will be performed if the condition is satisfied
-
-        relationships : typing.Optional[GuidelineRelationshipUpdateParams]
+        connections : typing.Optional[GuidelineConnectionUpdateParams]
 
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
-
-        enabled : typing.Optional[bool]
-            Whether the guideline is enabled
-
-        tags : typing.Optional[GuidelineTagsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithRelationshipsAndToolAssociations
-            Guideline successfully updated. Returns the updated guideline with its relationships and tool associations.
+        GuidelineWithConnectionsAndToolAssociations
+            Guideline successfully updated. Returns the updated guideline with its connections and tool associations.
 
         Examples
         --------
         from parlant.client import (
-            GuidelineRelationshipAddition,
-            GuidelineRelationshipUpdateParams,
+            GuidelineConnectionAddition,
+            GuidelineConnectionUpdateParams,
             GuidelineToolAssociationUpdateParams,
             ParlantClient,
             ToolId,
@@ -388,24 +464,22 @@ class GuidelinesClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.guidelines.update(
-            guideline_id="IUCGT-l4pS",
-            condition="when the customer asks about pricing",
-            action="provide current pricing information",
-            relationships=GuidelineRelationshipUpdateParams(
+            agent_id="agent_id",
+            guideline_id="guideline_id",
+            connections=GuidelineConnectionUpdateParams(
                 add=[
-                    GuidelineRelationshipAddition(
-                        source="guid_123xz",
-                        target="guid_456yz",
-                        kind="entailment",
+                    GuidelineConnectionAddition(
+                        source="guide_123xyz",
+                        target="guide_789xyz",
                     )
                 ],
-                remove=["guideline_relationship_id_789yz"],
+                remove=["guide_456xyz"],
             ),
             tool_associations=GuidelineToolAssociationUpdateParams(
                 add=[
                     ToolId(
-                        service_name="new_service",
-                        tool_name="new_tool",
+                        service_name="pricing_service",
+                        tool_name="get_prices",
                     )
                 ],
                 remove=[
@@ -415,29 +489,20 @@ class GuidelinesClient:
                     )
                 ],
             ),
-            enabled=True,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
             method="PATCH",
             json={
-                "condition": condition,
-                "action": action,
-                "relationships": convert_and_respect_annotation_metadata(
-                    object_=relationships,
-                    annotation=GuidelineRelationshipUpdateParams,
+                "connections": convert_and_respect_annotation_metadata(
+                    object_=connections,
+                    annotation=GuidelineConnectionUpdateParams,
                     direction="write",
                 ),
                 "tool_associations": convert_and_respect_annotation_metadata(
                     object_=tool_associations,
                     annotation=GuidelineToolAssociationUpdateParams,
-                    direction="write",
-                ),
-                "enabled": enabled,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags,
-                    annotation=GuidelineTagsUpdateParams,
                     direction="write",
                 ),
             },
@@ -447,9 +512,9 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithRelationshipsAndToolAssociations,
+                    GuidelineWithConnectionsAndToolAssociations,
                     parse_obj_as(
-                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
+                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -484,22 +549,19 @@ class AsyncGuidelinesClient:
         self._client_wrapper = client_wrapper
 
     async def list(
-        self,
-        *,
-        tag_id: typing.Optional[str] = None,
-        request_options: typing.Optional[RequestOptions] = None,
+        self, agent_id: str, *, request_options: typing.Optional[RequestOptions] = None
     ) -> typing.List[Guideline]:
         """
-        Lists all guidelines for the specified tag or all guidelines if no tag is provided.
+        Lists all guidelines for the specified agent.
 
         Returns an empty list if no guidelines exist.
         Guidelines are returned in no guaranteed order.
-        Does not include relationships or tool associations.
+        Does not include connections or tool associations.
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter guidelines by
+        agent_id : str
+            Unique identifier for the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -507,7 +569,7 @@ class AsyncGuidelinesClient:
         Returns
         -------
         typing.List[Guideline]
-            List of all guidelines for the specified tag or all guidelines if no tag is provided
+            List of all guidelines for the specified agent
 
         Examples
         --------
@@ -521,17 +583,16 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.list()
+            await client.guidelines.list(
+                agent_id="agent_id",
+            )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "guidelines",
+            f"agents/{jsonable_encoder(agent_id)}/guidelines",
             method="GET",
-            params={
-                "tag_id": tag_id,
-            },
             request_options=request_options,
         )
         try:
@@ -542,6 +603,16 @@ class AsyncGuidelinesClient:
                         type_=typing.List[Guideline],  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
@@ -560,45 +631,51 @@ class AsyncGuidelinesClient:
 
     async def create(
         self,
+        agent_id: str,
         *,
-        condition: str,
-        action: str,
-        enabled: typing.Optional[bool] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        invoices: typing.Sequence[Invoice],
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Guideline:
+    ) -> GuidelineCreationResult:
         """
-        Creates a new guideline.
+        Creates new guidelines from the provided invoices.
 
+        Invoices are obtained by calling the `create_evaluation` method of the client.
+        (Equivalent to making a POST request to `/index/evaluations`)
         See the [documentation](https://parlant.io/docs/concepts/customization/guidelines) for more information.
+
+        The guidelines are created in the specified agent's guideline set.
+        Tool associations and connections are automatically handled.
 
         Parameters
         ----------
-        condition : str
-            If this condition is satisfied, the action will be performed
+        agent_id : str
+            Unique identifier for the agent
 
-        action : str
-            This action will be performed if the condition is satisfied
-
-        enabled : typing.Optional[bool]
-            Whether the guideline is enabled
-
-        tags : typing.Optional[typing.Sequence[str]]
-            The tags associated with the guideline
+        invoices : typing.Sequence[Invoice]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Guideline
-            Guideline successfully created. Returns the created guideline.
+        GuidelineCreationResult
+            Guidelines successfully created. Returns the created guidelines with their connections and tool associations.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient
+        from parlant.client import (
+            AsyncParlantClient,
+            CoherenceCheck,
+            ConnectionProposition,
+            GuidelineContent,
+            GuidelineInvoiceData,
+            GuidelinePayload,
+            Invoice,
+            InvoiceData,
+            Payload,
+        )
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -607,22 +684,70 @@ class AsyncGuidelinesClient:
 
         async def main() -> None:
             await client.guidelines.create(
-                condition="when the customer asks about pricing",
-                action="provide current pricing information and mention any ongoing promotions",
-                enabled=False,
+                agent_id="agent_id",
+                invoices=[
+                    Invoice(
+                        payload=Payload(
+                            guideline=GuidelinePayload(
+                                content=GuidelineContent(
+                                    condition="when the customer asks about pricing",
+                                    action="provide current pricing information",
+                                ),
+                                operation="add",
+                                coherence_check=True,
+                                connection_proposition=True,
+                            ),
+                        ),
+                        checksum="abc123",
+                        approved=True,
+                        data=InvoiceData(
+                            guideline=GuidelineInvoiceData(
+                                coherence_checks=[
+                                    CoherenceCheck(
+                                        kind="contradiction_with_existing_guideline",
+                                        first=GuidelineContent(
+                                            condition="User is frustrated",
+                                            action="Respond with technical details",
+                                        ),
+                                        second=GuidelineContent(
+                                            condition="User is frustrated",
+                                            action="Focus on emotional support first",
+                                        ),
+                                        issue="Conflicting approaches to handling user frustration",
+                                        severity=7,
+                                    )
+                                ],
+                                connection_propositions=[
+                                    ConnectionProposition(
+                                        check_kind="connection_with_existing_guideline",
+                                        source=GuidelineContent(
+                                            condition="User mentions technical problem",
+                                            action="Request system logs",
+                                        ),
+                                        target=GuidelineContent(
+                                            condition="System logs are available",
+                                            action="Analyze logs for error patterns",
+                                        ),
+                                    )
+                                ],
+                            ),
+                        ),
+                    )
+                ],
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "guidelines",
+            f"agents/{jsonable_encoder(agent_id)}/guidelines",
             method="POST",
             json={
-                "condition": condition,
-                "action": action,
-                "enabled": enabled,
-                "tags": tags,
+                "invoices": convert_and_respect_annotation_metadata(
+                    object_=invoices,
+                    annotation=typing.Sequence[Invoice],
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -630,11 +755,21 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Guideline,
+                    GuidelineCreationResult,
                     parse_obj_as(
-                        type_=Guideline,  # type: ignore
+                        type_=GuidelineCreationResult,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
@@ -653,18 +788,22 @@ class AsyncGuidelinesClient:
 
     async def retrieve(
         self,
+        agent_id: str,
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithRelationshipsAndToolAssociations:
+    ) -> GuidelineWithConnectionsAndToolAssociations:
         """
-        Retrieves a specific guideline with all its relationships and tool associations.
+        Retrieves a specific guideline with all its connections and tool associations.
 
-        Returns both direct and indirect relationships between guidelines.
+        Returns both direct and indirect connections between guidelines.
         Tool associations indicate which tools the guideline can use.
 
         Parameters
         ----------
+        agent_id : str
+            Unique identifier for the agent
+
         guideline_id : str
             Unique identifier for the guideline
 
@@ -673,8 +812,8 @@ class AsyncGuidelinesClient:
 
         Returns
         -------
-        GuidelineWithRelationshipsAndToolAssociations
-            Guideline details successfully retrieved. Returns the complete guideline with its relationships and tool associations.
+        GuidelineWithConnectionsAndToolAssociations
+            Guideline details successfully retrieved. Returns the complete guideline with its connections and tool associations.
 
         Examples
         --------
@@ -689,23 +828,24 @@ class AsyncGuidelinesClient:
 
         async def main() -> None:
             await client.guidelines.retrieve(
-                guideline_id="IUCGT-l4pS",
+                agent_id="agent_id",
+                guideline_id="guideline_id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithRelationshipsAndToolAssociations,
+                    GuidelineWithConnectionsAndToolAssociations,
                     parse_obj_as(
-                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
+                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -736,13 +876,23 @@ class AsyncGuidelinesClient:
 
     async def delete(
         self,
+        agent_id: str,
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a guideline from the agent.
+
+        Also removes all associated connections and tool associations.
+        Deleting a non-existent guideline will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
+        agent_id : str
+            Unique identifier for the agent
+
         guideline_id : str
             Unique identifier for the guideline
 
@@ -766,14 +916,15 @@ class AsyncGuidelinesClient:
 
         async def main() -> None:
             await client.guidelines.delete(
-                guideline_id="IUCGT-l4pS",
+                agent_id="agent_id",
+                guideline_id="guideline_id",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -807,56 +958,47 @@ class AsyncGuidelinesClient:
 
     async def update(
         self,
+        agent_id: str,
         guideline_id: str,
         *,
-        condition: typing.Optional[str] = OMIT,
-        action: typing.Optional[str] = OMIT,
-        relationships: typing.Optional[GuidelineRelationshipUpdateParams] = OMIT,
+        connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
-        enabled: typing.Optional[bool] = OMIT,
-        tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithRelationshipsAndToolAssociations:
+    ) -> GuidelineWithConnectionsAndToolAssociations:
         """
-        Updates a guideline's relationships and tool associations.
+        Updates a guideline's connections and tool associations.
 
         Only provided attributes will be updated; others remain unchanged.
 
-        Relationship rules:
-        - A guideline cannot relate to itself
-        - Only direct relationships can be removed
-        - The relationship must specify this guideline as source or target
+        Connection rules:
+
+        - A guideline cannot connect to itself
+        - Only direct connections can be removed
+        - The connection must specify this guideline as source or target
 
         Tool Association rules:
+
         - Tool services and tools must exist before creating associations
 
         Parameters
         ----------
+        agent_id : str
+            Unique identifier for the agent
+
         guideline_id : str
             Unique identifier for the guideline
 
-        condition : typing.Optional[str]
-            If this condition is satisfied, the action will be performed
-
-        action : typing.Optional[str]
-            This action will be performed if the condition is satisfied
-
-        relationships : typing.Optional[GuidelineRelationshipUpdateParams]
+        connections : typing.Optional[GuidelineConnectionUpdateParams]
 
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
-
-        enabled : typing.Optional[bool]
-            Whether the guideline is enabled
-
-        tags : typing.Optional[GuidelineTagsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithRelationshipsAndToolAssociations
-            Guideline successfully updated. Returns the updated guideline with its relationships and tool associations.
+        GuidelineWithConnectionsAndToolAssociations
+            Guideline successfully updated. Returns the updated guideline with its connections and tool associations.
 
         Examples
         --------
@@ -864,8 +1006,8 @@ class AsyncGuidelinesClient:
 
         from parlant.client import (
             AsyncParlantClient,
-            GuidelineRelationshipAddition,
-            GuidelineRelationshipUpdateParams,
+            GuidelineConnectionAddition,
+            GuidelineConnectionUpdateParams,
             GuidelineToolAssociationUpdateParams,
             ToolId,
         )
@@ -877,24 +1019,22 @@ class AsyncGuidelinesClient:
 
         async def main() -> None:
             await client.guidelines.update(
-                guideline_id="IUCGT-l4pS",
-                condition="when the customer asks about pricing",
-                action="provide current pricing information",
-                relationships=GuidelineRelationshipUpdateParams(
+                agent_id="agent_id",
+                guideline_id="guideline_id",
+                connections=GuidelineConnectionUpdateParams(
                     add=[
-                        GuidelineRelationshipAddition(
-                            source="guid_123xz",
-                            target="guid_456yz",
-                            kind="entailment",
+                        GuidelineConnectionAddition(
+                            source="guide_123xyz",
+                            target="guide_789xyz",
                         )
                     ],
-                    remove=["guideline_relationship_id_789yz"],
+                    remove=["guide_456xyz"],
                 ),
                 tool_associations=GuidelineToolAssociationUpdateParams(
                     add=[
                         ToolId(
-                            service_name="new_service",
-                            tool_name="new_tool",
+                            service_name="pricing_service",
+                            tool_name="get_prices",
                         )
                     ],
                     remove=[
@@ -904,32 +1044,23 @@ class AsyncGuidelinesClient:
                         )
                     ],
                 ),
-                enabled=True,
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"agents/{jsonable_encoder(agent_id)}/guidelines/{jsonable_encoder(guideline_id)}",
             method="PATCH",
             json={
-                "condition": condition,
-                "action": action,
-                "relationships": convert_and_respect_annotation_metadata(
-                    object_=relationships,
-                    annotation=GuidelineRelationshipUpdateParams,
+                "connections": convert_and_respect_annotation_metadata(
+                    object_=connections,
+                    annotation=GuidelineConnectionUpdateParams,
                     direction="write",
                 ),
                 "tool_associations": convert_and_respect_annotation_metadata(
                     object_=tool_associations,
                     annotation=GuidelineToolAssociationUpdateParams,
-                    direction="write",
-                ),
-                "enabled": enabled,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags,
-                    annotation=GuidelineTagsUpdateParams,
                     direction="write",
                 ),
             },
@@ -939,9 +1070,9 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithRelationshipsAndToolAssociations,
+                    GuidelineWithConnectionsAndToolAssociations,
                     parse_obj_as(
-                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
+                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

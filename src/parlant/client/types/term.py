@@ -33,11 +33,6 @@ class Term(UniversalBaseModel):
     A list of synonyms for the term, including alternate contexts if applicable.
     """
 
-    tags: typing.List[str] = pydantic.Field()
-    """
-    List of tag IDs associated with the term
-    """
-
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
             extra="allow", frozen=True
