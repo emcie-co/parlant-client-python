@@ -42,7 +42,7 @@ class GuidelinesClient:
 
         Returns an empty list if no guidelines exist.
         Guidelines are returned in no guaranteed order.
-        Does not include connections or tool associations.
+        Does not include relationships or tool associations.
 
         Parameters
         ----------
@@ -190,9 +190,9 @@ class GuidelinesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
-        Retrieves a specific guideline with all its connections and tool associations.
+        Retrieves a specific guideline with all its relationships and tool associations.
 
-        Returns both direct and indirect connections between guidelines.
+        Returns both direct and indirect relationships between guidelines.
         Tool associations indicate which tools the guideline can use.
 
         Parameters
@@ -206,7 +206,7 @@ class GuidelinesClient:
         Returns
         -------
         GuidelineWithRelationshipsAndToolAssociations
-            Guideline details successfully retrieved. Returns the complete guideline with its connections and tool associations.
+            Guideline details successfully retrieved. Returns the complete guideline with its relationships and tool associations.
 
         Examples
         --------
@@ -372,7 +372,7 @@ class GuidelinesClient:
         Returns
         -------
         GuidelineWithRelationshipsAndToolAssociations
-            Guideline successfully updated. Returns the updated guideline with its connections and tool associations.
+            Guideline successfully updated. Returns the updated guideline with its relationships and tool associations.
 
         Examples
         --------
@@ -494,7 +494,7 @@ class AsyncGuidelinesClient:
 
         Returns an empty list if no guidelines exist.
         Guidelines are returned in no guaranteed order.
-        Does not include connections or tool associations.
+        Does not include relationships or tool associations.
 
         Parameters
         ----------
@@ -658,9 +658,9 @@ class AsyncGuidelinesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
-        Retrieves a specific guideline with all its connections and tool associations.
+        Retrieves a specific guideline with all its relationships and tool associations.
 
-        Returns both direct and indirect connections between guidelines.
+        Returns both direct and indirect relationships between guidelines.
         Tool associations indicate which tools the guideline can use.
 
         Parameters
@@ -674,7 +674,7 @@ class AsyncGuidelinesClient:
         Returns
         -------
         GuidelineWithRelationshipsAndToolAssociations
-            Guideline details successfully retrieved. Returns the complete guideline with its connections and tool associations.
+            Guideline details successfully retrieved. Returns the complete guideline with its relationships and tool associations.
 
         Examples
         --------
@@ -856,7 +856,7 @@ class AsyncGuidelinesClient:
         Returns
         -------
         GuidelineWithRelationshipsAndToolAssociations
-            Guideline successfully updated. Returns the updated guideline with its connections and tool associations.
+            Guideline successfully updated. Returns the updated guideline with its relationships and tool associations.
 
         Examples
         --------

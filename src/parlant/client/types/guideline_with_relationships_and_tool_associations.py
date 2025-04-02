@@ -11,7 +11,7 @@ import pydantic
 
 class GuidelineWithRelationshipsAndToolAssociations(UniversalBaseModel):
     """
-    A Guideline with its connections and tool associations.
+    A Guideline with its relationships and tool associations.
     """
 
     guideline: Guideline

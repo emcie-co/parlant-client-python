@@ -14,7 +14,7 @@ class LegacyGuidelineConnection(UniversalBaseModel):
 
     id: str = pydantic.Field()
     """
-    Unique identifier for the `GuidelineRelationship`
+    Unique identifier for the guideline connection
     """
 
     source: LegacyGuideline

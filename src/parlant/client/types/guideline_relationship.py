@@ -15,14 +15,14 @@ class GuidelineRelationship(UniversalBaseModel):
 
     id: str = pydantic.Field()
     """
-    Unique identifier for the `GuidelineRelationship`
+    Unique identifier for the guideline relationship
     """
 
     source: Guideline
     target: Guideline
     indirect: bool = pydantic.Field()
     """
-    `True` if there is a path from `source` to `target` but no direct connection
+    `True` if there is a path from `source` to `target` but no direct relationship
     """
 
     kind: GuidelineRelationshipKindDto
