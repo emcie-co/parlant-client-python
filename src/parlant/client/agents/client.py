@@ -7,9 +7,12 @@ from ..types.agent import Agent
 from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.composition_mode_dto import CompositionModeDto
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
+from ..types.agent_tag_update_params import AgentTagUpdateParams
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -73,6 +76,8 @@ class AgentsClient:
         name: str,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
@@ -82,7 +87,6 @@ class AgentsClient:
         A unique identifier will be automatically generated.
 
         Default behaviors:
-
         - `name` defaults to `"Unnamed Agent"` if not provided
         - `description` defaults to `None`
         - `max_engine_iterations` defaults to `None` (uses system default)
@@ -97,6 +101,11 @@ class AgentsClient:
 
         max_engine_iterations : typing.Optional[int]
             Maximum number of processing iterations the agent can perform per request
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tag IDs associated with the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -117,6 +126,8 @@ class AgentsClient:
             name="Haxon",
             description="Technical Support Assistant",
             max_engine_iterations=3,
+            composition_mode="fluid",
+            tags=["tag1", "tag2"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -126,6 +137,8 @@ class AgentsClient:
                 "name": name,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
+                "composition_mode": composition_mode,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -181,7 +194,7 @@ class AgentsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.agents.retrieve(
-            agent_id="agent_id",
+            agent_id="IUCGT-lvpS",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -252,7 +265,7 @@ class AgentsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.agents.delete(
-            agent_id="agent_id",
+            agent_id="IUCGT-lvpS",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -295,6 +308,8 @@ class AgentsClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        tags: typing.Optional[AgentTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
@@ -317,6 +332,10 @@ class AgentsClient:
         max_engine_iterations : typing.Optional[int]
             Maximum number of processing iterations the agent can perform per request
 
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        tags : typing.Optional[AgentTagUpdateParams]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -333,10 +352,11 @@ class AgentsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.agents.update(
-            agent_id="agent_id",
+            agent_id="IUCGT-lvpS",
             name="Haxon",
             description="Technical Support Assistant",
             max_engine_iterations=3,
+            composition_mode="fluid",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -346,6 +366,10 @@ class AgentsClient:
                 "name": name,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
+                "composition_mode": composition_mode,
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=AgentTagUpdateParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -450,6 +474,8 @@ class AsyncAgentsClient:
         name: str,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
@@ -459,7 +485,6 @@ class AsyncAgentsClient:
         A unique identifier will be automatically generated.
 
         Default behaviors:
-
         - `name` defaults to `"Unnamed Agent"` if not provided
         - `description` defaults to `None`
         - `max_engine_iterations` defaults to `None` (uses system default)
@@ -474,6 +499,11 @@ class AsyncAgentsClient:
 
         max_engine_iterations : typing.Optional[int]
             Maximum number of processing iterations the agent can perform per request
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tag IDs associated with the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -499,6 +529,8 @@ class AsyncAgentsClient:
                 name="Haxon",
                 description="Technical Support Assistant",
                 max_engine_iterations=3,
+                composition_mode="fluid",
+                tags=["tag1", "tag2"],
             )
 
 
@@ -511,6 +543,8 @@ class AsyncAgentsClient:
                 "name": name,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
+                "composition_mode": composition_mode,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -571,7 +605,7 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.retrieve(
-                agent_id="agent_id",
+                agent_id="IUCGT-lvpS",
             )
 
 
@@ -650,7 +684,7 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.delete(
-                agent_id="agent_id",
+                agent_id="IUCGT-lvpS",
             )
 
 
@@ -696,6 +730,8 @@ class AsyncAgentsClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        tags: typing.Optional[AgentTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
@@ -718,6 +754,10 @@ class AsyncAgentsClient:
         max_engine_iterations : typing.Optional[int]
             Maximum number of processing iterations the agent can perform per request
 
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        tags : typing.Optional[AgentTagUpdateParams]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -739,10 +779,11 @@ class AsyncAgentsClient:
 
         async def main() -> None:
             await client.agents.update(
-                agent_id="agent_id",
+                agent_id="IUCGT-lvpS",
                 name="Haxon",
                 description="Technical Support Assistant",
                 max_engine_iterations=3,
+                composition_mode="fluid",
             )
 
 
@@ -755,6 +796,10 @@ class AsyncAgentsClient:
                 "name": name,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
+                "composition_mode": composition_mode,
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=AgentTagUpdateParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,

@@ -22,8 +22,8 @@ class OpenApiServiceParams(UniversalBaseModel):
     source: str = pydantic.Field()
     """
     URL or filesystem path to the OpenAPI specification.
-    For URLs, must be publicly accessible.
-    For filesystem paths, the server must have read permissions.
+            For URLs, must be publicly accessible.
+            For filesystem paths, the server must have read permissions.
     """
 
     if IS_PYDANTIC_V2:

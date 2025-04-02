@@ -2,38 +2,36 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
+import datetime as dt
 import typing
+from .utterance_field import UtteranceField
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class Guideline(UniversalBaseModel):
-    """
-    Represents a guideline.
-    """
-
+class Utterance(UniversalBaseModel):
     id: str = pydantic.Field()
     """
-    Unique identifier for the guideline
+    Unique identifier for the tag
     """
 
-    condition: str = pydantic.Field()
+    creation_utc: dt.datetime = pydantic.Field()
     """
-    If this condition is satisfied, the action will be performed
-    """
-
-    action: str = pydantic.Field()
-    """
-    This action will be performed if the condition is satisfied
+    UTC timestamp of when the utterance was created
     """
 
-    enabled: typing.Optional[bool] = pydantic.Field(default=None)
+    value: str = pydantic.Field()
     """
-    Whether the guideline is enabled
+    The textual content of the utterance.
+    """
+
+    fields: typing.List[UtteranceField] = pydantic.Field()
+    """
+    A sequence of utterance fields associated with the utterance.
     """
 
     tags: typing.List[str] = pydantic.Field()
     """
-    The tags associated with the guideline
+    Collection of tag IDs associated with the utterance.
     """
 
     if IS_PYDANTIC_V2:

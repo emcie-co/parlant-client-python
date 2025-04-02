@@ -2,19 +2,21 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .guideline_with_connections_and_tool_associations import (
-    GuidelineWithConnectionsAndToolAssociations,
-)
+from .legacy_guideline_connection_addition import LegacyGuidelineConnectionAddition
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class GuidelineCreationResult(UniversalBaseModel):
+class LegacyGuidelineConnectionUpdateParams(UniversalBaseModel):
     """
-    Result wrapper for Guidelines creation.
+    Parameters for updating a guideline connection.
+
+    `add` is expected to be a collection of addition objects.
+    `remove` should contain the `id`s of the guidelines to remove.
     """
 
-    items: typing.List[GuidelineWithConnectionsAndToolAssociations]
+    add: typing.Optional[typing.List[LegacyGuidelineConnectionAddition]] = None
+    remove: typing.Optional[typing.List[str]] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

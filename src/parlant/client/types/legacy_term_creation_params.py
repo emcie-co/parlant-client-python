@@ -6,34 +6,26 @@ import typing
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class Guideline(UniversalBaseModel):
+class LegacyTermCreationParams(UniversalBaseModel):
     """
-    Represents a guideline.
+    Parameters for creating a new glossary term.
+
+    Use this model when adding new terms to an agent's glossary.
     """
 
-    id: str = pydantic.Field()
+    name: str = pydantic.Field()
     """
-    Unique identifier for the guideline
-    """
-
-    condition: str = pydantic.Field()
-    """
-    If this condition is satisfied, the action will be performed
+    The name of the term, e.g., 'Gas' in blockchain.
     """
 
-    action: str = pydantic.Field()
+    description: str = pydantic.Field()
     """
-    This action will be performed if the condition is satisfied
-    """
-
-    enabled: typing.Optional[bool] = pydantic.Field(default=None)
-    """
-    Whether the guideline is enabled
+    A detailed description of the term
     """
 
-    tags: typing.List[str] = pydantic.Field()
+    synonyms: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    The tags associated with the guideline
+    A list of synonyms for the term, including alternate contexts if applicable.
     """
 
     if IS_PYDANTIC_V2:

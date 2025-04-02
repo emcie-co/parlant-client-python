@@ -3,49 +3,45 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.term import Term
+from ..types.utterance import Utterance
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.utterance_field import UtteranceField
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.term_tags_update_params import TermTagsUpdateParams
-from ..core.serialization import convert_and_respect_annotation_metadata
+from ..types.utterance_tag_update_params import UtteranceTagUpdateParams
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
 
-class GlossaryClient:
+class UtterancesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    def list_terms(
+    def list(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        tags: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Term]:
+    ) -> typing.List[Utterance]:
         """
-        Retrieves a list of all terms in the glossary.
-
-        Returns an empty list if no terms exist.
-        Terms are returned in no guaranteed order.
-
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            Filter terms by tag ID
+        tags : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            Filter utterances by tags
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Term]
-            List of all terms in the glossary.
+        typing.List[Utterance]
+            List of all utterances in the system
 
         Examples
         --------
@@ -54,22 +50,22 @@ class GlossaryClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.glossary.list_terms()
+        client.utterances.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "terms",
+            "utterances",
             method="GET",
             params={
-                "tag_id": tag_id,
+                "tags": tags,
             },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Term],
+                    typing.List[Utterance],
                     parse_obj_as(
-                        type_=typing.List[Term],  # type: ignore
+                        type_=typing.List[Utterance],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -88,66 +84,62 @@ class GlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def create_term(
+    def create(
         self,
         *,
-        name: str,
-        description: str,
-        synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
+        value: str,
+        fields: typing.Sequence[UtteranceField],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Term:
+    ) -> Utterance:
         """
-        Creates a new term in the glossary.
-
-        The term will be initialized with the provided name and description, and optional synonyms.
-        A unique identifier will be automatically generated.
-
-        Default behaviors:
-        - `synonyms` defaults to an empty list if not provided
-
         Parameters
         ----------
-        name : str
-            The name of the term, e.g., 'Gas' in blockchain.
+        value : str
+            The textual content of the utterance.
 
-        description : str
-            A detailed description of the term
-
-        synonyms : typing.Optional[typing.Sequence[str]]
-            A list of synonyms for the term, including alternate contexts if applicable.
+        fields : typing.Sequence[UtteranceField]
+            A sequence of utterance fields associated with the utterance.
 
         tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the term
+            Collection of tag IDs associated with the utterance.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Term
-            Term successfully created. Returns the complete term object including generated ID
+        Utterance
+            Utterance successfully created.
 
         Examples
         --------
-        from parlant.client import ParlantClient
+        from parlant.client import ParlantClient, UtteranceField
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.glossary.create_term(
-            name="Gas",
-            description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
-            synonyms=["Transaction Fee", "Blockchain Fuel"],
+        client.utterances.create(
+            value="Your account balance is {balance}",
+            fields=[
+                UtteranceField(
+                    name="balance",
+                    description="Account's balance",
+                    examples=["9000"],
+                )
+            ],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "terms",
+            "utterances",
             method="POST",
             json={
-                "name": name,
-                "description": description,
-                "synonyms": synonyms,
+                "value": value,
+                "fields": convert_and_respect_annotation_metadata(
+                    object_=fields,
+                    annotation=typing.Sequence[UtteranceField],
+                    direction="write",
+                ),
                 "tags": tags,
             },
             request_options=request_options,
@@ -156,9 +148,9 @@ class GlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Term,
+                    Utterance,
                     parse_obj_as(
-                        type_=Term,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -177,24 +169,26 @@ class GlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def retrieve_term(
-        self, term_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> Term:
+    def retrieve(
+        self,
+        utterance_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Utterance:
         """
-        Retrieves details of a specific term by ID.
+        Retrieves details of a specific utterance by ID.
 
         Parameters
         ----------
-        term_id : str
-            Unique identifier for the term
+        utterance_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Term
-            Term details successfully retrieved. Returns the complete term object
+        Utterance
+            Utterance details successfully retrieved. Returns the Utterance object.
 
         Examples
         --------
@@ -203,21 +197,21 @@ class GlossaryClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.glossary.retrieve_term(
-            term_id="term-eth01",
+        client.utterances.retrieve(
+            utterance_id="t9a8g703f4",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"terms/{jsonable_encoder(term_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Term,
+                    Utterance,
                     parse_obj_as(
-                        type_=Term,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -246,19 +240,16 @@ class GlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def delete_term(
-        self, term_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    def delete(
+        self,
+        utterance_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes a term from the glossary.
-
-        Deleting a non-existent term will return 404.
-        No content will be returned from a successful deletion.
-
         Parameters
         ----------
-        term_id : str
-            Unique identifier for the term
+        utterance_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -274,12 +265,12 @@ class GlossaryClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.glossary.delete_term(
-            term_id="term-eth01",
+        client.utterances.delete(
+            utterance_id="t9a8g703f4",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"terms/{jsonable_encoder(term_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -311,73 +302,73 @@ class GlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    def update_term(
+    def update(
         self,
-        term_id: str,
+        utterance_id: str,
         *,
-        name: typing.Optional[str] = OMIT,
-        description: typing.Optional[str] = OMIT,
-        synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
-        tags: typing.Optional[TermTagsUpdateParams] = OMIT,
+        value: typing.Optional[str] = OMIT,
+        fields: typing.Optional[typing.Sequence[UtteranceField]] = OMIT,
+        tags: typing.Optional[UtteranceTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Term:
+    ) -> Utterance:
         """
-        Updates an existing term's attributes in the glossary.
+        Updates an existing utterance's attributes.
 
-        Only the provided attributes will be updated; others will remain unchanged.
-        The term's ID and creation timestamp cannot be modified.
+        Only provided attributes will be updated; others remain unchanged.
+        The utterance's ID and creation timestamp cannot be modified.
+        Extra metadata and tags can be added or removed independently.
 
         Parameters
         ----------
-        term_id : str
-            Unique identifier for the term
+        utterance_id : str
 
-        name : typing.Optional[str]
-            The name of the term, e.g., 'Gas' in blockchain.
+        value : typing.Optional[str]
+            The textual content of the utterance.
 
-        description : typing.Optional[str]
-            A detailed description of the term
+        fields : typing.Optional[typing.Sequence[UtteranceField]]
+            A sequence of utterance fields associated with the utterance.
 
-        synonyms : typing.Optional[typing.Sequence[str]]
-            A list of synonyms for the term, including alternate contexts if applicable.
-
-        tags : typing.Optional[TermTagsUpdateParams]
+        tags : typing.Optional[UtteranceTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Term
-            Term successfully updated. Returns the updated term object
+        Utterance
+            Utterance successfully updated. Returns the updated Utterance object.
 
         Examples
         --------
-        from parlant.client import ParlantClient, TermTagsUpdateParams
+        from parlant.client import ParlantClient, UtteranceField
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.glossary.update_term(
-            term_id="term-eth01",
-            name="Gas",
-            description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
-            synonyms=["Transaction Fee", "Blockchain Fuel"],
-            tags=TermTagsUpdateParams(
-                add=["tag1", "tag2"],
-                remove=["tag3", "tag4"],
-            ),
+        client.utterances.update(
+            utterance_id="t9a8g703f4",
+            value="Your updated balance is {balance}",
+            fields=[
+                UtteranceField(
+                    name="balance",
+                    description="Updated account balance",
+                    examples=["10000"],
+                )
+            ],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"terms/{jsonable_encoder(term_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="PATCH",
             json={
-                "name": name,
-                "description": description,
-                "synonyms": synonyms,
+                "value": value,
+                "fields": convert_and_respect_annotation_metadata(
+                    object_=fields,
+                    annotation=typing.Sequence[UtteranceField],
+                    direction="write",
+                ),
                 "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=TermTagsUpdateParams, direction="write"
+                    object_=tags, annotation=UtteranceTagUpdateParams, direction="write"
                 ),
             },
             request_options=request_options,
@@ -386,9 +377,9 @@ class GlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Term,
+                    Utterance,
                     parse_obj_as(
-                        type_=Term,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -418,34 +409,29 @@ class GlossaryClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncGlossaryClient:
+class AsyncUtterancesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
-    async def list_terms(
+    async def list(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        tags: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Term]:
+    ) -> typing.List[Utterance]:
         """
-        Retrieves a list of all terms in the glossary.
-
-        Returns an empty list if no terms exist.
-        Terms are returned in no guaranteed order.
-
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            Filter terms by tag ID
+        tags : typing.Optional[typing.Union[str, typing.Sequence[str]]]
+            Filter utterances by tags
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Term]
-            List of all terms in the glossary.
+        typing.List[Utterance]
+            List of all utterances in the system
 
         Examples
         --------
@@ -459,25 +445,25 @@ class AsyncGlossaryClient:
 
 
         async def main() -> None:
-            await client.glossary.list_terms()
+            await client.utterances.list()
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "terms",
+            "utterances",
             method="GET",
             params={
-                "tag_id": tag_id,
+                "tags": tags,
             },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Term],
+                    typing.List[Utterance],
                     parse_obj_as(
-                        type_=typing.List[Term],  # type: ignore
+                        type_=typing.List[Utterance],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -496,51 +482,39 @@ class AsyncGlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def create_term(
+    async def create(
         self,
         *,
-        name: str,
-        description: str,
-        synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
+        value: str,
+        fields: typing.Sequence[UtteranceField],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Term:
+    ) -> Utterance:
         """
-        Creates a new term in the glossary.
-
-        The term will be initialized with the provided name and description, and optional synonyms.
-        A unique identifier will be automatically generated.
-
-        Default behaviors:
-        - `synonyms` defaults to an empty list if not provided
-
         Parameters
         ----------
-        name : str
-            The name of the term, e.g., 'Gas' in blockchain.
+        value : str
+            The textual content of the utterance.
 
-        description : str
-            A detailed description of the term
-
-        synonyms : typing.Optional[typing.Sequence[str]]
-            A list of synonyms for the term, including alternate contexts if applicable.
+        fields : typing.Sequence[UtteranceField]
+            A sequence of utterance fields associated with the utterance.
 
         tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the term
+            Collection of tag IDs associated with the utterance.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Term
-            Term successfully created. Returns the complete term object including generated ID
+        Utterance
+            Utterance successfully created.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient
+        from parlant.client import AsyncParlantClient, UtteranceField
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -548,22 +522,30 @@ class AsyncGlossaryClient:
 
 
         async def main() -> None:
-            await client.glossary.create_term(
-                name="Gas",
-                description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
-                synonyms=["Transaction Fee", "Blockchain Fuel"],
+            await client.utterances.create(
+                value="Your account balance is {balance}",
+                fields=[
+                    UtteranceField(
+                        name="balance",
+                        description="Account's balance",
+                        examples=["9000"],
+                    )
+                ],
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "terms",
+            "utterances",
             method="POST",
             json={
-                "name": name,
-                "description": description,
-                "synonyms": synonyms,
+                "value": value,
+                "fields": convert_and_respect_annotation_metadata(
+                    object_=fields,
+                    annotation=typing.Sequence[UtteranceField],
+                    direction="write",
+                ),
                 "tags": tags,
             },
             request_options=request_options,
@@ -572,9 +554,9 @@ class AsyncGlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Term,
+                    Utterance,
                     parse_obj_as(
-                        type_=Term,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -593,24 +575,26 @@ class AsyncGlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def retrieve_term(
-        self, term_id: str, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> Term:
+    async def retrieve(
+        self,
+        utterance_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Utterance:
         """
-        Retrieves details of a specific term by ID.
+        Retrieves details of a specific utterance by ID.
 
         Parameters
         ----------
-        term_id : str
-            Unique identifier for the term
+        utterance_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Term
-            Term details successfully retrieved. Returns the complete term object
+        Utterance
+            Utterance details successfully retrieved. Returns the Utterance object.
 
         Examples
         --------
@@ -624,24 +608,24 @@ class AsyncGlossaryClient:
 
 
         async def main() -> None:
-            await client.glossary.retrieve_term(
-                term_id="term-eth01",
+            await client.utterances.retrieve(
+                utterance_id="t9a8g703f4",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"terms/{jsonable_encoder(term_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Term,
+                    Utterance,
                     parse_obj_as(
-                        type_=Term,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -670,19 +654,16 @@ class AsyncGlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def delete_term(
-        self, term_id: str, *, request_options: typing.Optional[RequestOptions] = None
+    async def delete(
+        self,
+        utterance_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes a term from the glossary.
-
-        Deleting a non-existent term will return 404.
-        No content will be returned from a successful deletion.
-
         Parameters
         ----------
-        term_id : str
-            Unique identifier for the term
+        utterance_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -703,15 +684,15 @@ class AsyncGlossaryClient:
 
 
         async def main() -> None:
-            await client.glossary.delete_term(
-                term_id="term-eth01",
+            await client.utterances.delete(
+                utterance_id="t9a8g703f4",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"terms/{jsonable_encoder(term_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -743,51 +724,47 @@ class AsyncGlossaryClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-    async def update_term(
+    async def update(
         self,
-        term_id: str,
+        utterance_id: str,
         *,
-        name: typing.Optional[str] = OMIT,
-        description: typing.Optional[str] = OMIT,
-        synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
-        tags: typing.Optional[TermTagsUpdateParams] = OMIT,
+        value: typing.Optional[str] = OMIT,
+        fields: typing.Optional[typing.Sequence[UtteranceField]] = OMIT,
+        tags: typing.Optional[UtteranceTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Term:
+    ) -> Utterance:
         """
-        Updates an existing term's attributes in the glossary.
+        Updates an existing utterance's attributes.
 
-        Only the provided attributes will be updated; others will remain unchanged.
-        The term's ID and creation timestamp cannot be modified.
+        Only provided attributes will be updated; others remain unchanged.
+        The utterance's ID and creation timestamp cannot be modified.
+        Extra metadata and tags can be added or removed independently.
 
         Parameters
         ----------
-        term_id : str
-            Unique identifier for the term
+        utterance_id : str
 
-        name : typing.Optional[str]
-            The name of the term, e.g., 'Gas' in blockchain.
+        value : typing.Optional[str]
+            The textual content of the utterance.
 
-        description : typing.Optional[str]
-            A detailed description of the term
+        fields : typing.Optional[typing.Sequence[UtteranceField]]
+            A sequence of utterance fields associated with the utterance.
 
-        synonyms : typing.Optional[typing.Sequence[str]]
-            A list of synonyms for the term, including alternate contexts if applicable.
-
-        tags : typing.Optional[TermTagsUpdateParams]
+        tags : typing.Optional[UtteranceTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Term
-            Term successfully updated. Returns the updated term object
+        Utterance
+            Utterance successfully updated. Returns the updated Utterance object.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, TermTagsUpdateParams
+        from parlant.client import AsyncParlantClient, UtteranceField
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -795,29 +772,33 @@ class AsyncGlossaryClient:
 
 
         async def main() -> None:
-            await client.glossary.update_term(
-                term_id="term-eth01",
-                name="Gas",
-                description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
-                synonyms=["Transaction Fee", "Blockchain Fuel"],
-                tags=TermTagsUpdateParams(
-                    add=["tag1", "tag2"],
-                    remove=["tag3", "tag4"],
-                ),
+            await client.utterances.update(
+                utterance_id="t9a8g703f4",
+                value="Your updated balance is {balance}",
+                fields=[
+                    UtteranceField(
+                        name="balance",
+                        description="Updated account balance",
+                        examples=["10000"],
+                    )
+                ],
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"terms/{jsonable_encoder(term_id)}",
+            f"utterances/{jsonable_encoder(utterance_id)}",
             method="PATCH",
             json={
-                "name": name,
-                "description": description,
-                "synonyms": synonyms,
+                "value": value,
+                "fields": convert_and_respect_annotation_metadata(
+                    object_=fields,
+                    annotation=typing.Sequence[UtteranceField],
+                    direction="write",
+                ),
                 "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=TermTagsUpdateParams, direction="write"
+                    object_=tags, annotation=UtteranceTagUpdateParams, direction="write"
                 ),
             },
             request_options=request_options,
@@ -826,9 +807,9 @@ class AsyncGlossaryClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Term,
+                    Utterance,
                     parse_obj_as(
-                        type_=Term,  # type: ignore
+                        type_=Utterance,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

@@ -63,7 +63,10 @@ class SessionsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.sessions.list()
+        client.sessions.list(
+            agent_id="ag_123xyz",
+            customer_id="cust_123xy",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "sessions",
@@ -219,7 +222,10 @@ class SessionsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.sessions.delete_many()
+        client.sessions.delete_many(
+            agent_id="ag_123xyz",
+            customer_id="cust_123xy",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "sessions",
@@ -278,7 +284,7 @@ class SessionsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.sessions.retrieve(
-            session_id="session_id",
+            session_id="sess_123yz",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -351,7 +357,7 @@ class SessionsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.sessions.delete(
-            session_id="session_id",
+            session_id="sess_123yz",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -426,7 +432,7 @@ class SessionsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.sessions.update(
-            session_id="session_id",
+            session_id="sess_123yz",
             consumption_offsets=ConsumptionOffsetsUpdateParams(
                 client=42,
             ),
@@ -496,14 +502,18 @@ class SessionsClient:
         Lists events from a session with optional filtering and waiting capabilities.
 
         This endpoint retrieves events from a specified session and can:
-
         1. Filter events by their offset, source, type, and correlation ID
         2. Wait for new events to arrive if requested
         3. Return events in chronological order based on their offset
 
         Notes:
-        Long Polling Behavior: - When wait_for_data = 0:
-        Returns immediately with any existing events that match the criteria - When wait_for_data > 0: - If new matching events arrive within the timeout period, returns with those events - If no new events arrive before timeout, raises 504 Gateway Timeout - If matching events already exist, returns immediately with those events
+            Long Polling Behavior:
+            - When wait_for_data = 0:
+                Returns immediately with any existing events that match the criteria
+            - When wait_for_data > 0:
+                - If new matching events arrive within the timeout period, returns with those events
+                - If no new events arrive before timeout, raises 504 Gateway Timeout
+                - If matching events already exist, returns immediately with those events
 
         Parameters
         ----------
@@ -536,7 +546,10 @@ class SessionsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.sessions.list_events(
-            session_id="session_id",
+            session_id="sess_123yz",
+            min_offset=0,
+            correlation_id="corr_13xyz",
+            kinds="message,tool",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -644,7 +657,7 @@ class SessionsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.sessions.create_event(
-            session_id="session_id",
+            session_id="sess_123yz",
             kind="message",
             source="customer",
             message="Hello, I need help with my order",
@@ -738,8 +751,8 @@ class SessionsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.sessions.delete_events(
-            session_id="session_id",
-            min_offset=1,
+            session_id="sess_123yz",
+            min_offset=0,
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -815,8 +828,8 @@ class SessionsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.sessions.inspect_event(
-            session_id="session_id",
-            event_id="event_id",
+            session_id="sess_123yz",
+            event_id="evt_123xyz",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -902,7 +915,10 @@ class AsyncSessionsClient:
 
 
         async def main() -> None:
-            await client.sessions.list()
+            await client.sessions.list(
+                agent_id="ag_123xyz",
+                customer_id="cust_123xy",
+            )
 
 
         asyncio.run(main())
@@ -1074,7 +1090,10 @@ class AsyncSessionsClient:
 
 
         async def main() -> None:
-            await client.sessions.delete_many()
+            await client.sessions.delete_many(
+                agent_id="ag_123xyz",
+                customer_id="cust_123xy",
+            )
 
 
         asyncio.run(main())
@@ -1141,7 +1160,7 @@ class AsyncSessionsClient:
 
         async def main() -> None:
             await client.sessions.retrieve(
-                session_id="session_id",
+                session_id="sess_123yz",
             )
 
 
@@ -1222,7 +1241,7 @@ class AsyncSessionsClient:
 
         async def main() -> None:
             await client.sessions.delete(
-                session_id="session_id",
+                session_id="sess_123yz",
             )
 
 
@@ -1305,7 +1324,7 @@ class AsyncSessionsClient:
 
         async def main() -> None:
             await client.sessions.update(
-                session_id="session_id",
+                session_id="sess_123yz",
                 consumption_offsets=ConsumptionOffsetsUpdateParams(
                     client=42,
                 ),
@@ -1378,14 +1397,18 @@ class AsyncSessionsClient:
         Lists events from a session with optional filtering and waiting capabilities.
 
         This endpoint retrieves events from a specified session and can:
-
         1. Filter events by their offset, source, type, and correlation ID
         2. Wait for new events to arrive if requested
         3. Return events in chronological order based on their offset
 
         Notes:
-        Long Polling Behavior: - When wait_for_data = 0:
-        Returns immediately with any existing events that match the criteria - When wait_for_data > 0: - If new matching events arrive within the timeout period, returns with those events - If no new events arrive before timeout, raises 504 Gateway Timeout - If matching events already exist, returns immediately with those events
+            Long Polling Behavior:
+            - When wait_for_data = 0:
+                Returns immediately with any existing events that match the criteria
+            - When wait_for_data > 0:
+                - If new matching events arrive within the timeout period, returns with those events
+                - If no new events arrive before timeout, raises 504 Gateway Timeout
+                - If matching events already exist, returns immediately with those events
 
         Parameters
         ----------
@@ -1423,7 +1446,10 @@ class AsyncSessionsClient:
 
         async def main() -> None:
             await client.sessions.list_events(
-                session_id="session_id",
+                session_id="sess_123yz",
+                min_offset=0,
+                correlation_id="corr_13xyz",
+                kinds="message,tool",
             )
 
 
@@ -1539,7 +1565,7 @@ class AsyncSessionsClient:
 
         async def main() -> None:
             await client.sessions.create_event(
-                session_id="session_id",
+                session_id="sess_123yz",
                 kind="message",
                 source="customer",
                 message="Hello, I need help with my order",
@@ -1641,8 +1667,8 @@ class AsyncSessionsClient:
 
         async def main() -> None:
             await client.sessions.delete_events(
-                session_id="session_id",
-                min_offset=1,
+                session_id="sess_123yz",
+                min_offset=0,
             )
 
 
@@ -1726,8 +1752,8 @@ class AsyncSessionsClient:
 
         async def main() -> None:
             await client.sessions.inspect_event(
-                session_id="session_id",
-                event_id="event_id",
+                session_id="sess_123yz",
+                event_id="evt_123xyz",
             )
 
 

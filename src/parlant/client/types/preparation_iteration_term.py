@@ -3,23 +3,32 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
-from .generation_info import GenerationInfo
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class GuidelinePropositionInspection(UniversalBaseModel):
+class PreparationIterationTerm(UniversalBaseModel):
     """
-    Inspection data for guideline proposition.
-    """
-
-    total_duration: float = pydantic.Field()
-    """
-    Amount of time spent proposing guidelines
+    A term participating in the preparation for an iteration.
     """
 
-    batches: typing.List[GenerationInfo] = pydantic.Field()
+    id: str = pydantic.Field()
     """
-    A list of `GenerationInfoDTO` describing the batches of generation executed
+    Unique identifier for the term
+    """
+
+    name: str = pydantic.Field()
+    """
+    The name of the term, e.g., 'Gas' in blockchain.
+    """
+
+    description: str = pydantic.Field()
+    """
+    A detailed description of the term
+    """
+
+    synonyms: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    A list of synonyms for the term, including alternate contexts if applicable.
     """
 
     if IS_PYDANTIC_V2:

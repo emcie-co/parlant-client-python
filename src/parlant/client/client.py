@@ -4,24 +4,24 @@ import typing
 import httpx
 from .core.client_wrapper import SyncClientWrapper
 from .agents.client import AgentsClient
-from .guidelines.client import GuidelinesClient
-from .glossary.client import GlossaryClient
-from .context_variables.client import ContextVariablesClient
 from .sessions.client import SessionsClient
-from .evaluations.client import EvaluationsClient
 from .services.client import ServicesClient
 from .tags.client import TagsClient
+from .glossary.client import GlossaryClient
 from .customers.client import CustomersClient
+from .utterances.client import UtterancesClient
+from .context_variables.client import ContextVariablesClient
+from .guidelines.client import GuidelinesClient
 from .core.client_wrapper import AsyncClientWrapper
 from .agents.client import AsyncAgentsClient
-from .guidelines.client import AsyncGuidelinesClient
-from .glossary.client import AsyncGlossaryClient
-from .context_variables.client import AsyncContextVariablesClient
 from .sessions.client import AsyncSessionsClient
-from .evaluations.client import AsyncEvaluationsClient
 from .services.client import AsyncServicesClient
 from .tags.client import AsyncTagsClient
+from .glossary.client import AsyncGlossaryClient
 from .customers.client import AsyncCustomersClient
+from .utterances.client import AsyncUtterancesClient
+from .context_variables.client import AsyncContextVariablesClient
+from .guidelines.client import AsyncGuidelinesClient
 
 
 class ParlantClient:
@@ -74,16 +74,16 @@ class ParlantClient:
             timeout=_defaulted_timeout,
         )
         self.agents = AgentsClient(client_wrapper=self._client_wrapper)
-        self.guidelines = GuidelinesClient(client_wrapper=self._client_wrapper)
+        self.sessions = SessionsClient(client_wrapper=self._client_wrapper)
+        self.services = ServicesClient(client_wrapper=self._client_wrapper)
+        self.tags = TagsClient(client_wrapper=self._client_wrapper)
         self.glossary = GlossaryClient(client_wrapper=self._client_wrapper)
+        self.customers = CustomersClient(client_wrapper=self._client_wrapper)
+        self.utterances = UtterancesClient(client_wrapper=self._client_wrapper)
         self.context_variables = ContextVariablesClient(
             client_wrapper=self._client_wrapper
         )
-        self.sessions = SessionsClient(client_wrapper=self._client_wrapper)
-        self.evaluations = EvaluationsClient(client_wrapper=self._client_wrapper)
-        self.services = ServicesClient(client_wrapper=self._client_wrapper)
-        self.tags = TagsClient(client_wrapper=self._client_wrapper)
-        self.customers = CustomersClient(client_wrapper=self._client_wrapper)
+        self.guidelines = GuidelinesClient(client_wrapper=self._client_wrapper)
 
 
 class AsyncParlantClient:
@@ -136,13 +136,13 @@ class AsyncParlantClient:
             timeout=_defaulted_timeout,
         )
         self.agents = AsyncAgentsClient(client_wrapper=self._client_wrapper)
-        self.guidelines = AsyncGuidelinesClient(client_wrapper=self._client_wrapper)
+        self.sessions = AsyncSessionsClient(client_wrapper=self._client_wrapper)
+        self.services = AsyncServicesClient(client_wrapper=self._client_wrapper)
+        self.tags = AsyncTagsClient(client_wrapper=self._client_wrapper)
         self.glossary = AsyncGlossaryClient(client_wrapper=self._client_wrapper)
+        self.customers = AsyncCustomersClient(client_wrapper=self._client_wrapper)
+        self.utterances = AsyncUtterancesClient(client_wrapper=self._client_wrapper)
         self.context_variables = AsyncContextVariablesClient(
             client_wrapper=self._client_wrapper
         )
-        self.sessions = AsyncSessionsClient(client_wrapper=self._client_wrapper)
-        self.evaluations = AsyncEvaluationsClient(client_wrapper=self._client_wrapper)
-        self.services = AsyncServicesClient(client_wrapper=self._client_wrapper)
-        self.tags = AsyncTagsClient(client_wrapper=self._client_wrapper)
-        self.customers = AsyncCustomersClient(client_wrapper=self._client_wrapper)
+        self.guidelines = AsyncGuidelinesClient(client_wrapper=self._client_wrapper)

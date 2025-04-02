@@ -7,14 +7,9 @@ from .tool_id import ToolId
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class ContextVariable(UniversalBaseModel):
+class LegacyContextVariableCreationParams(UniversalBaseModel):
     """
-    Represents a context variable type.
-    """
-
-    id: str = pydantic.Field()
-    """
-    Unique identifier for the context variable
+    Parameters for creating a new context variable.
     """
 
     name: str = pydantic.Field()
@@ -31,11 +26,6 @@ class ContextVariable(UniversalBaseModel):
     freshness_rules: typing.Optional[str] = pydantic.Field(default=None)
     """
     Cron expression defining the freshness rules
-    """
-
-    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
-    """
-    List of tags associated with the context variable
     """
 
     if IS_PYDANTIC_V2:

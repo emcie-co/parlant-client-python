@@ -75,6 +75,7 @@ class CustomersClient:
         *,
         name: str,
         extra: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
@@ -90,6 +91,9 @@ class CustomersClient:
 
         extra : typing.Optional[typing.Dict[str, typing.Optional[str]]]
             Key-value pairs (`str: str`) to describe the customer
+
+        tags : typing.Optional[typing.Sequence[str]]
+            Collection of ids of tags that describe the customer
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -117,6 +121,7 @@ class CustomersClient:
             json={
                 "name": name,
                 "extra": extra,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -178,7 +183,7 @@ class CustomersClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.customers.retrieve(
-            customer_id="customer_id",
+            customer_id="ck_IdAXUtp",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -252,7 +257,7 @@ class CustomersClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.customers.delete(
-            customer_id="customer_id",
+            customer_id="ck_IdAXUtp",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -336,7 +341,7 @@ class CustomersClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.customers.update(
-            customer_id="customer_id",
+            customer_id="ck_IdAXUtp",
             name="Scooby",
             extra=CustomerExtraUpdateParams(
                 add={"VIP": "Yes", "email": "scooby@dooby.do"},
@@ -464,6 +469,7 @@ class AsyncCustomersClient:
         *,
         name: str,
         extra: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
@@ -479,6 +485,9 @@ class AsyncCustomersClient:
 
         extra : typing.Optional[typing.Dict[str, typing.Optional[str]]]
             Key-value pairs (`str: str`) to describe the customer
+
+        tags : typing.Optional[typing.Sequence[str]]
+            Collection of ids of tags that describe the customer
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -514,6 +523,7 @@ class AsyncCustomersClient:
             json={
                 "name": name,
                 "extra": extra,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -580,7 +590,7 @@ class AsyncCustomersClient:
 
         async def main() -> None:
             await client.customers.retrieve(
-                customer_id="customer_id",
+                customer_id="ck_IdAXUtp",
             )
 
 
@@ -662,7 +672,7 @@ class AsyncCustomersClient:
 
         async def main() -> None:
             await client.customers.delete(
-                customer_id="customer_id",
+                customer_id="ck_IdAXUtp",
             )
 
 
@@ -754,7 +764,7 @@ class AsyncCustomersClient:
 
         async def main() -> None:
             await client.customers.update(
-                customer_id="customer_id",
+                customer_id="ck_IdAXUtp",
                 name="Scooby",
                 extra=CustomerExtraUpdateParams(
                     add={"VIP": "Yes", "email": "scooby@dooby.do"},
