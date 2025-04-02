@@ -2,26 +2,23 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
-from .guideline import Guideline
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
 
-class GuidelineConnection(UniversalBaseModel):
+class LegacyGuidelineConnectionAddition(UniversalBaseModel):
     """
-    Represents a connection between two guidelines.
-    """
-
-    id: str = pydantic.Field()
-    """
-    Unique identifier for the `GuildelineConnection`
+    Used to add connections between Guidelines.
     """
 
-    source: Guideline
-    target: Guideline
-    indirect: bool = pydantic.Field()
+    source: str = pydantic.Field()
     """
-    `True` if there is a path from `source` to `target` but no direct connection
+    `id` of guideline that is source of this connection.
+    """
+
+    target: str = pydantic.Field()
+    """
+    `id` of guideline that is target of this connection.
     """
 
     if IS_PYDANTIC_V2:

@@ -8,12 +8,14 @@ from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.guideline_with_connections_and_tool_associations import (
-    GuidelineWithConnectionsAndToolAssociations,
+from ..types.guideline_with_relationships_and_tool_associations import (
+    GuidelineWithRelationshipsAndToolAssociations,
 )
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.guideline_connection_update_params import GuidelineConnectionUpdateParams
+from ..types.guideline_relationship_update_params import (
+    GuidelineRelationshipUpdateParams,
+)
 from ..types.guideline_tool_association_update_params import (
     GuidelineToolAssociationUpdateParams,
 )
@@ -40,7 +42,7 @@ class GuidelinesClient:
 
         Returns an empty list if no guidelines exist.
         Guidelines are returned in no guaranteed order.
-        Does not include connections or tool associations.
+        Does not include relationships or tool associations.
 
         Parameters
         ----------
@@ -186,11 +188,11 @@ class GuidelinesClient:
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
-        Retrieves a specific guideline with all its connections and tool associations.
+        Retrieves a specific guideline with all its relationships and tool associations.
 
-        Returns both direct and indirect connections between guidelines.
+        Returns both direct and indirect relationships between guidelines.
         Tool associations indicate which tools the guideline can use.
 
         Parameters
@@ -203,8 +205,8 @@ class GuidelinesClient:
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
-            Guideline details successfully retrieved. Returns the complete guideline with its connections and tool associations.
+        GuidelineWithRelationshipsAndToolAssociations
+            Guideline details successfully retrieved. Returns the complete guideline with its relationships and tool associations.
 
         Examples
         --------
@@ -225,9 +227,9 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
+                    GuidelineWithRelationshipsAndToolAssociations,
                     parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
+                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -325,21 +327,21 @@ class GuidelinesClient:
         *,
         condition: typing.Optional[str] = OMIT,
         action: typing.Optional[str] = OMIT,
-        connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
+        relationships: typing.Optional[GuidelineRelationshipUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
-        Updates a guideline's connections and tool associations.
+        Updates a guideline's relationships and tool associations.
 
         Only provided attributes will be updated; others remain unchanged.
 
-        Connection rules:
-        - A guideline cannot connect to itself
-        - Only direct connections can be removed
-        - The connection must specify this guideline as source or target
+        Relationship rules:
+        - A guideline cannot relate to itself
+        - Only direct relationships can be removed
+        - The relationship must specify this guideline as source or target
 
         Tool Association rules:
         - Tool services and tools must exist before creating associations
@@ -355,7 +357,7 @@ class GuidelinesClient:
         action : typing.Optional[str]
             This action will be performed if the condition is satisfied
 
-        connections : typing.Optional[GuidelineConnectionUpdateParams]
+        relationships : typing.Optional[GuidelineRelationshipUpdateParams]
 
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
 
@@ -369,14 +371,14 @@ class GuidelinesClient:
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
-            Guideline successfully updated. Returns the updated guideline with its connections and tool associations.
+        GuidelineWithRelationshipsAndToolAssociations
+            Guideline successfully updated. Returns the updated guideline with its relationships and tool associations.
 
         Examples
         --------
         from parlant.client import (
-            GuidelineConnectionAddition,
-            GuidelineConnectionUpdateParams,
+            GuidelineRelationshipAddition,
+            GuidelineRelationshipUpdateParams,
             GuidelineToolAssociationUpdateParams,
             ParlantClient,
             ToolId,
@@ -387,20 +389,23 @@ class GuidelinesClient:
         )
         client.guidelines.update(
             guideline_id="IUCGT-l4pS",
-            connections=GuidelineConnectionUpdateParams(
+            condition="when the customer asks about pricing",
+            action="provide current pricing information",
+            relationships=GuidelineRelationshipUpdateParams(
                 add=[
-                    GuidelineConnectionAddition(
-                        source="guide_123xyz",
-                        target="guide_789xyz",
+                    GuidelineRelationshipAddition(
+                        source="guid_123xz",
+                        target="guid_456yz",
+                        kind="entailment",
                     )
                 ],
-                remove=["guide_456xyz"],
+                remove=["guideline_relationship_id_789yz"],
             ),
             tool_associations=GuidelineToolAssociationUpdateParams(
                 add=[
                     ToolId(
-                        service_name="pricing_service",
-                        tool_name="get_prices",
+                        service_name="new_service",
+                        tool_name="new_tool",
                     )
                 ],
                 remove=[
@@ -419,9 +424,9 @@ class GuidelinesClient:
             json={
                 "condition": condition,
                 "action": action,
-                "connections": convert_and_respect_annotation_metadata(
-                    object_=connections,
-                    annotation=GuidelineConnectionUpdateParams,
+                "relationships": convert_and_respect_annotation_metadata(
+                    object_=relationships,
+                    annotation=GuidelineRelationshipUpdateParams,
                     direction="write",
                 ),
                 "tool_associations": convert_and_respect_annotation_metadata(
@@ -442,9 +447,9 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
+                    GuidelineWithRelationshipsAndToolAssociations,
                     parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
+                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -489,7 +494,7 @@ class AsyncGuidelinesClient:
 
         Returns an empty list if no guidelines exist.
         Guidelines are returned in no guaranteed order.
-        Does not include connections or tool associations.
+        Does not include relationships or tool associations.
 
         Parameters
         ----------
@@ -651,11 +656,11 @@ class AsyncGuidelinesClient:
         guideline_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
-        Retrieves a specific guideline with all its connections and tool associations.
+        Retrieves a specific guideline with all its relationships and tool associations.
 
-        Returns both direct and indirect connections between guidelines.
+        Returns both direct and indirect relationships between guidelines.
         Tool associations indicate which tools the guideline can use.
 
         Parameters
@@ -668,8 +673,8 @@ class AsyncGuidelinesClient:
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
-            Guideline details successfully retrieved. Returns the complete guideline with its connections and tool associations.
+        GuidelineWithRelationshipsAndToolAssociations
+            Guideline details successfully retrieved. Returns the complete guideline with its relationships and tool associations.
 
         Examples
         --------
@@ -698,9 +703,9 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
+                    GuidelineWithRelationshipsAndToolAssociations,
                     parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
+                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -806,21 +811,21 @@ class AsyncGuidelinesClient:
         *,
         condition: typing.Optional[str] = OMIT,
         action: typing.Optional[str] = OMIT,
-        connections: typing.Optional[GuidelineConnectionUpdateParams] = OMIT,
+        relationships: typing.Optional[GuidelineRelationshipUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithConnectionsAndToolAssociations:
+    ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
-        Updates a guideline's connections and tool associations.
+        Updates a guideline's relationships and tool associations.
 
         Only provided attributes will be updated; others remain unchanged.
 
-        Connection rules:
-        - A guideline cannot connect to itself
-        - Only direct connections can be removed
-        - The connection must specify this guideline as source or target
+        Relationship rules:
+        - A guideline cannot relate to itself
+        - Only direct relationships can be removed
+        - The relationship must specify this guideline as source or target
 
         Tool Association rules:
         - Tool services and tools must exist before creating associations
@@ -836,7 +841,7 @@ class AsyncGuidelinesClient:
         action : typing.Optional[str]
             This action will be performed if the condition is satisfied
 
-        connections : typing.Optional[GuidelineConnectionUpdateParams]
+        relationships : typing.Optional[GuidelineRelationshipUpdateParams]
 
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
 
@@ -850,8 +855,8 @@ class AsyncGuidelinesClient:
 
         Returns
         -------
-        GuidelineWithConnectionsAndToolAssociations
-            Guideline successfully updated. Returns the updated guideline with its connections and tool associations.
+        GuidelineWithRelationshipsAndToolAssociations
+            Guideline successfully updated. Returns the updated guideline with its relationships and tool associations.
 
         Examples
         --------
@@ -859,8 +864,8 @@ class AsyncGuidelinesClient:
 
         from parlant.client import (
             AsyncParlantClient,
-            GuidelineConnectionAddition,
-            GuidelineConnectionUpdateParams,
+            GuidelineRelationshipAddition,
+            GuidelineRelationshipUpdateParams,
             GuidelineToolAssociationUpdateParams,
             ToolId,
         )
@@ -873,20 +878,23 @@ class AsyncGuidelinesClient:
         async def main() -> None:
             await client.guidelines.update(
                 guideline_id="IUCGT-l4pS",
-                connections=GuidelineConnectionUpdateParams(
+                condition="when the customer asks about pricing",
+                action="provide current pricing information",
+                relationships=GuidelineRelationshipUpdateParams(
                     add=[
-                        GuidelineConnectionAddition(
-                            source="guide_123xyz",
-                            target="guide_789xyz",
+                        GuidelineRelationshipAddition(
+                            source="guid_123xz",
+                            target="guid_456yz",
+                            kind="entailment",
                         )
                     ],
-                    remove=["guide_456xyz"],
+                    remove=["guideline_relationship_id_789yz"],
                 ),
                 tool_associations=GuidelineToolAssociationUpdateParams(
                     add=[
                         ToolId(
-                            service_name="pricing_service",
-                            tool_name="get_prices",
+                            service_name="new_service",
+                            tool_name="new_tool",
                         )
                     ],
                     remove=[
@@ -908,9 +916,9 @@ class AsyncGuidelinesClient:
             json={
                 "condition": condition,
                 "action": action,
-                "connections": convert_and_respect_annotation_metadata(
-                    object_=connections,
-                    annotation=GuidelineConnectionUpdateParams,
+                "relationships": convert_and_respect_annotation_metadata(
+                    object_=relationships,
+                    annotation=GuidelineRelationshipUpdateParams,
                     direction="write",
                 ),
                 "tool_associations": convert_and_respect_annotation_metadata(
@@ -931,9 +939,9 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithConnectionsAndToolAssociations,
+                    GuidelineWithRelationshipsAndToolAssociations,
                     parse_obj_as(
-                        type_=GuidelineWithConnectionsAndToolAssociations,  # type: ignore
+                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

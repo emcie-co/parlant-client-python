@@ -2,24 +2,21 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .legacy_guideline_connection_update_params import (
-    LegacyGuidelineConnectionUpdateParams,
-)
-from .guideline_tool_association_update_params import (
-    GuidelineToolAssociationUpdateParams,
-)
+from .guideline_relationship_addition import GuidelineRelationshipAddition
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class LegacyGuidelineUpdateParams(UniversalBaseModel):
+class GuidelineRelationshipUpdateParams(UniversalBaseModel):
     """
-    Parameters for updating Guideline objects.
+    Parameters for updating a guideline relationship.
+
+    `add` is expected to be a collection of addition objects.
+    `remove` should contain the `id`s of the relationships to remove.
     """
 
-    connections: typing.Optional[LegacyGuidelineConnectionUpdateParams] = None
-    tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = None
-    enabled: typing.Optional[bool] = None
+    add: typing.Optional[typing.List[GuidelineRelationshipAddition]] = None
+    remove: typing.Optional[typing.List[str]] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

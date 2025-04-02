@@ -2,27 +2,22 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
-from .legacy_guideline import LegacyGuideline
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
+from .payload import Payload
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class LegacyGuidelineConnection(UniversalBaseModel):
+class EvaluationCreationParams(UniversalBaseModel):
     """
-    Represents a connection between two guidelines.
-    """
-
-    id: str = pydantic.Field()
-    """
-    Unique identifier for the guideline connection
+    Parameters for creating a new evaluation task
     """
 
-    source: LegacyGuideline
-    target: LegacyGuideline
-    indirect: bool = pydantic.Field()
+    agent_id: str = pydantic.Field()
     """
-    `True` if there is a path from `source` to `target` but no direct connection
+    Unique identifier for the agent
     """
+
+    payloads: typing.List[Payload]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

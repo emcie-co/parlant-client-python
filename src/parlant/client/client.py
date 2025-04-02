@@ -5,7 +5,6 @@ import httpx
 from .core.client_wrapper import SyncClientWrapper
 from .agents.client import AgentsClient
 from .sessions.client import SessionsClient
-from .evaluations.client import EvaluationsClient
 from .services.client import ServicesClient
 from .tags.client import TagsClient
 from .glossary.client import GlossaryClient
@@ -16,7 +15,6 @@ from .guidelines.client import GuidelinesClient
 from .core.client_wrapper import AsyncClientWrapper
 from .agents.client import AsyncAgentsClient
 from .sessions.client import AsyncSessionsClient
-from .evaluations.client import AsyncEvaluationsClient
 from .services.client import AsyncServicesClient
 from .tags.client import AsyncTagsClient
 from .glossary.client import AsyncGlossaryClient
@@ -77,7 +75,6 @@ class ParlantClient:
         )
         self.agents = AgentsClient(client_wrapper=self._client_wrapper)
         self.sessions = SessionsClient(client_wrapper=self._client_wrapper)
-        self.evaluations = EvaluationsClient(client_wrapper=self._client_wrapper)
         self.services = ServicesClient(client_wrapper=self._client_wrapper)
         self.tags = TagsClient(client_wrapper=self._client_wrapper)
         self.glossary = GlossaryClient(client_wrapper=self._client_wrapper)
@@ -140,7 +137,6 @@ class AsyncParlantClient:
         )
         self.agents = AsyncAgentsClient(client_wrapper=self._client_wrapper)
         self.sessions = AsyncSessionsClient(client_wrapper=self._client_wrapper)
-        self.evaluations = AsyncEvaluationsClient(client_wrapper=self._client_wrapper)
         self.services = AsyncServicesClient(client_wrapper=self._client_wrapper)
         self.tags = AsyncTagsClient(client_wrapper=self._client_wrapper)
         self.glossary = AsyncGlossaryClient(client_wrapper=self._client_wrapper)
