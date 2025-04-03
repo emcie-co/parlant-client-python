@@ -31,6 +31,7 @@ from .guideline_content import GuidelineContent
 from .guideline_invoice_data import GuidelineInvoiceData
 from .guideline_match import GuidelineMatch
 from .guideline_matching_inspection import GuidelineMatchingInspection
+from .guideline_metadata_update_params import GuidelineMetadataUpdateParams
 from .guideline_payload import GuidelinePayload
 from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
 from .guideline_relationship import GuidelineRelationship
@@ -130,6 +131,7 @@ __all__ = [
     "GuidelineInvoiceData",
     "GuidelineMatch",
     "GuidelineMatchingInspection",
+    "GuidelineMetadataUpdateParams",
     "GuidelinePayload",
     "GuidelinePayloadOperationDto",
     "GuidelineRelationship",

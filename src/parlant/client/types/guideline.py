@@ -36,6 +36,11 @@ class Guideline(UniversalBaseModel):
     The tags associated with the guideline
     """
 
+    metadata: typing.Dict[str, typing.Optional[typing.Any]] = pydantic.Field()
+    """
+    Metadata for the guideline
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
             extra="allow", frozen=True
