@@ -17,6 +17,7 @@ from .context_variable_value import ContextVariableValue
 from .customer import Customer
 from .customer_extra_update_params import CustomerExtraUpdateParams
 from .customer_tag_update_params import CustomerTagUpdateParams
+from .entity_type_dto import EntityTypeDto
 from .evaluation import Evaluation
 from .evaluation_creation_params import EvaluationCreationParams
 from .evaluation_status_dto import EvaluationStatusDto
@@ -79,7 +80,9 @@ from .preparation_iteration_term import PreparationIterationTerm
 from .sdk_service_params import SdkServiceParams
 from .service import Service
 from .session import Session
+from .source import Source
 from .tag import Tag
+from .target import Target
 from .term import Term
 from .term_tags_update_params import TermTagsUpdateParams
 from .tool import Tool
@@ -117,6 +120,7 @@ __all__ = [
     "Customer",
     "CustomerExtraUpdateParams",
     "CustomerTagUpdateParams",
+    "EntityTypeDto",
     "Evaluation",
     "EvaluationCreationParams",
     "EvaluationStatusDto",
@@ -171,7 +175,9 @@ __all__ = [
     "SdkServiceParams",
     "Service",
     "Session",
+    "Source",
     "Tag",
+    "Target",
     "Term",
     "TermTagsUpdateParams",
     "Tool",

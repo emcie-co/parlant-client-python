@@ -2,6 +2,7 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
+from .entity_type_dto import EntityTypeDto
 from .guideline_relationship_kind_dto import GuidelineRelationshipKindDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
@@ -14,14 +15,16 @@ class GuidelineRelationshipAddition(UniversalBaseModel):
 
     source: str = pydantic.Field()
     """
-    `id` of guideline that is source of this relationship.
+    `id` of guideline or tag that is source or target of this relationship.
     """
 
+    source_type: EntityTypeDto
     target: str = pydantic.Field()
     """
-    `id` of guideline that is target of this relationship.
+    `id` of guideline or tag that is source or target of this relationship.
     """
 
+    target_type: EntityTypeDto
     kind: GuidelineRelationshipKindDto
 
     if IS_PYDANTIC_V2:

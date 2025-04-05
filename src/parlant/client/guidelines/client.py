@@ -406,7 +406,9 @@ class GuidelinesClient:
                 add=[
                     GuidelineRelationshipAddition(
                         source="guid_123xz",
+                        source_type="guideline",
                         target="guid_456yz",
+                        target_type="guideline",
                         kind="entailment",
                     )
                 ],
@@ -914,7 +916,9 @@ class AsyncGuidelinesClient:
                     add=[
                         GuidelineRelationshipAddition(
                             source="guid_123xz",
+                            source_type="guideline",
                             target="guid_456yz",
+                            target_type="guideline",
                             kind="entailment",
                         )
                     ],

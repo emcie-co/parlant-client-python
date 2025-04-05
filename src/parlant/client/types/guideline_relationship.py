@@ -2,7 +2,9 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
-from .guideline import Guideline
+from .source import Source
+from .entity_type_dto import EntityTypeDto
+from .target import Target
 from .guideline_relationship_kind_dto import GuidelineRelationshipKindDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
@@ -18,8 +20,10 @@ class GuidelineRelationship(UniversalBaseModel):
     Unique identifier for the guideline relationship
     """
 
-    source: Guideline
-    target: Guideline
+    source: Source
+    source_type: EntityTypeDto
+    target: Target
+    target_type: EntityTypeDto
     indirect: bool = pydantic.Field()
     """
     `True` if there is a path from `source` to `target` but no direct relationship
