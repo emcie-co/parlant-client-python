@@ -13,9 +13,6 @@ from ..types.guideline_with_relationships_and_tool_associations import (
 )
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.guideline_relationship_update_params import (
-    GuidelineRelationshipUpdateParams,
-)
 from ..types.guideline_tool_association_update_params import (
     GuidelineToolAssociationUpdateParams,
 )
@@ -334,7 +331,6 @@ class GuidelinesClient:
         *,
         condition: typing.Optional[str] = OMIT,
         action: typing.Optional[str] = OMIT,
-        relationships: typing.Optional[GuidelineRelationshipUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
@@ -365,8 +361,6 @@ class GuidelinesClient:
         action : typing.Optional[str]
             This action will be performed if the condition is satisfied
 
-        relationships : typing.Optional[GuidelineRelationshipUpdateParams]
-
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
 
         enabled : typing.Optional[bool]
@@ -388,8 +382,6 @@ class GuidelinesClient:
         --------
         from parlant.client import (
             GuidelineMetadataUpdateParams,
-            GuidelineRelationshipAddition,
-            GuidelineRelationshipUpdateParams,
             GuidelineToolAssociationUpdateParams,
             ParlantClient,
             ToolId,
@@ -402,14 +394,6 @@ class GuidelinesClient:
             guideline_id="IUCGT-l4pS",
             condition="when the customer asks about pricing",
             action="provide current pricing information",
-            relationships=GuidelineRelationshipUpdateParams(
-                add=[
-                    GuidelineRelationshipAddition(
-                        kind="entailment",
-                    )
-                ],
-                remove=["guideline_relationship_id_789yz"],
-            ),
             tool_associations=GuidelineToolAssociationUpdateParams(
                 add=[
                     ToolId(
@@ -437,11 +421,6 @@ class GuidelinesClient:
             json={
                 "condition": condition,
                 "action": action,
-                "relationships": convert_and_respect_annotation_metadata(
-                    object_=relationships,
-                    annotation=GuidelineRelationshipUpdateParams,
-                    direction="write",
-                ),
                 "tool_associations": convert_and_respect_annotation_metadata(
                     object_=tool_associations,
                     annotation=GuidelineToolAssociationUpdateParams,
@@ -835,7 +814,6 @@ class AsyncGuidelinesClient:
         *,
         condition: typing.Optional[str] = OMIT,
         action: typing.Optional[str] = OMIT,
-        relationships: typing.Optional[GuidelineRelationshipUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
@@ -866,8 +844,6 @@ class AsyncGuidelinesClient:
         action : typing.Optional[str]
             This action will be performed if the condition is satisfied
 
-        relationships : typing.Optional[GuidelineRelationshipUpdateParams]
-
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
 
         enabled : typing.Optional[bool]
@@ -892,8 +868,6 @@ class AsyncGuidelinesClient:
         from parlant.client import (
             AsyncParlantClient,
             GuidelineMetadataUpdateParams,
-            GuidelineRelationshipAddition,
-            GuidelineRelationshipUpdateParams,
             GuidelineToolAssociationUpdateParams,
             ToolId,
         )
@@ -908,14 +882,6 @@ class AsyncGuidelinesClient:
                 guideline_id="IUCGT-l4pS",
                 condition="when the customer asks about pricing",
                 action="provide current pricing information",
-                relationships=GuidelineRelationshipUpdateParams(
-                    add=[
-                        GuidelineRelationshipAddition(
-                            kind="entailment",
-                        )
-                    ],
-                    remove=["guideline_relationship_id_789yz"],
-                ),
                 tool_associations=GuidelineToolAssociationUpdateParams(
                     add=[
                         ToolId(
@@ -946,11 +912,6 @@ class AsyncGuidelinesClient:
             json={
                 "condition": condition,
                 "action": action,
-                "relationships": convert_and_respect_annotation_metadata(
-                    object_=relationships,
-                    annotation=GuidelineRelationshipUpdateParams,
-                    direction="write",
-                ),
                 "tool_associations": convert_and_respect_annotation_metadata(
                     object_=tool_associations,
                     annotation=GuidelineToolAssociationUpdateParams,

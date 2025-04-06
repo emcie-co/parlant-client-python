@@ -4,7 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
 from .guideline import Guideline
-from .guideline_relationship_tag import GuidelineRelationshipTag
+from .tag import Tag
 from .guideline_relationship_kind_dto import GuidelineRelationshipKindDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -23,9 +23,9 @@ class GuidelineRelationship(UniversalBaseModel):
     """
 
     source_guideline: typing.Optional[Guideline] = None
-    source_tag: typing.Optional[GuidelineRelationshipTag] = None
+    source_tag: typing.Optional[Tag] = None
     target_guideline: typing.Optional[Guideline] = None
-    target_tag: typing.Optional[GuidelineRelationshipTag] = None
+    target_tag: typing.Optional[Tag] = None
     indirect: bool = pydantic.Field()
     """
     `True` if there is a path from `source` to `target` but no direct relationship

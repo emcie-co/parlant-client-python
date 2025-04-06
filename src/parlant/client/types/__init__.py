@@ -35,10 +35,7 @@ from .guideline_metadata_update_params import GuidelineMetadataUpdateParams
 from .guideline_payload import GuidelinePayload
 from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
 from .guideline_relationship import GuidelineRelationship
-from .guideline_relationship_addition import GuidelineRelationshipAddition
 from .guideline_relationship_kind_dto import GuidelineRelationshipKindDto
-from .guideline_relationship_tag import GuidelineRelationshipTag
-from .guideline_relationship_update_params import GuidelineRelationshipUpdateParams
 from .guideline_tags_update_params import GuidelineTagsUpdateParams
 from .guideline_tool_association import GuidelineToolAssociation
 from .guideline_tool_association_update_params import (
@@ -136,10 +133,7 @@ __all__ = [
     "GuidelinePayload",
     "GuidelinePayloadOperationDto",
     "GuidelineRelationship",
-    "GuidelineRelationshipAddition",
     "GuidelineRelationshipKindDto",
-    "GuidelineRelationshipTag",
-    "GuidelineRelationshipUpdateParams",
     "GuidelineTagsUpdateParams",
     "GuidelineToolAssociation",
     "GuidelineToolAssociationUpdateParams",

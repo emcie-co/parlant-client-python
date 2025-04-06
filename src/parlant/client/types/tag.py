@@ -2,7 +2,6 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
-import datetime as dt
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
 
@@ -18,11 +17,6 @@ class Tag(UniversalBaseModel):
     id: str = pydantic.Field()
     """
     Unique identifier for the tag
-    """
-
-    creation_utc: dt.datetime = pydantic.Field()
-    """
-    UTC timestamp of when the tag was created, in ISO 8601 format
     """
 
     name: str = pydantic.Field()
