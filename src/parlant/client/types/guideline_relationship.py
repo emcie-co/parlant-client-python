@@ -2,15 +2,19 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
+import typing
 from .guideline import Guideline
+from .tag import Tag
 from .guideline_relationship_kind_dto import GuidelineRelationshipKindDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
-import typing
 
 
 class GuidelineRelationship(UniversalBaseModel):
     """
     Represents a guideline relationship addition.
+
+    Only one of `source_guideline` and `source_tag` can have a value.
+    Only one of `target_guideline` and `target_tag` can have a value.
     """
 
     id: str = pydantic.Field()
@@ -18,8 +22,10 @@ class GuidelineRelationship(UniversalBaseModel):
     Unique identifier for the guideline relationship
     """
 
-    source: Guideline
-    target: Guideline
+    source_guideline: typing.Optional[Guideline] = None
+    source_tag: typing.Optional[Tag] = None
+    target_guideline: typing.Optional[Guideline] = None
+    target_tag: typing.Optional[Tag] = None
     indirect: bool = pydantic.Field()
     """
     `True` if there is a path from `source` to `target` but no direct relationship

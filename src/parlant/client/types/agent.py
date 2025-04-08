@@ -3,7 +3,6 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
-import datetime as dt
 from .composition_mode_dto import CompositionModeDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -31,11 +30,6 @@ class Agent(UniversalBaseModel):
     description: typing.Optional[str] = pydantic.Field(default=None)
     """
     Detailed description of the agent's purpose and capabilities
-    """
-
-    creation_utc: dt.datetime = pydantic.Field()
-    """
-    UTC timestamp of when the agent was created
     """
 
     max_engine_iterations: typing.Optional[int] = pydantic.Field(default=None)

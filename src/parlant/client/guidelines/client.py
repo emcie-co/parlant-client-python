@@ -13,13 +13,11 @@ from ..types.guideline_with_relationships_and_tool_associations import (
 )
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.guideline_relationship_update_params import (
-    GuidelineRelationshipUpdateParams,
-)
 from ..types.guideline_tool_association_update_params import (
     GuidelineToolAssociationUpdateParams,
 )
 from ..types.guideline_tags_update_params import GuidelineTagsUpdateParams
+from ..types.guideline_metadata_update_params import GuidelineMetadataUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -103,6 +101,7 @@ class GuidelinesClient:
         *,
         condition: str,
         action: str,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -119,6 +118,9 @@ class GuidelinesClient:
 
         action : str
             This action will be performed if the condition is satisfied
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Metadata for the guideline
 
         enabled : typing.Optional[bool]
             Whether the guideline is enabled
@@ -144,6 +146,7 @@ class GuidelinesClient:
         client.guidelines.create(
             condition="when the customer asks about pricing",
             action="provide current pricing information and mention any ongoing promotions",
+            metadata={"key1": "value1", "key2": "value2"},
             enabled=False,
         )
         """
@@ -153,6 +156,7 @@ class GuidelinesClient:
             json={
                 "condition": condition,
                 "action": action,
+                "metadata": metadata,
                 "enabled": enabled,
                 "tags": tags,
             },
@@ -327,10 +331,10 @@ class GuidelinesClient:
         *,
         condition: typing.Optional[str] = OMIT,
         action: typing.Optional[str] = OMIT,
-        relationships: typing.Optional[GuidelineRelationshipUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
+        metadata: typing.Optional[GuidelineMetadataUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
@@ -357,14 +361,14 @@ class GuidelinesClient:
         action : typing.Optional[str]
             This action will be performed if the condition is satisfied
 
-        relationships : typing.Optional[GuidelineRelationshipUpdateParams]
-
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
 
         enabled : typing.Optional[bool]
             Whether the guideline is enabled
 
         tags : typing.Optional[GuidelineTagsUpdateParams]
+
+        metadata : typing.Optional[GuidelineMetadataUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -377,8 +381,7 @@ class GuidelinesClient:
         Examples
         --------
         from parlant.client import (
-            GuidelineRelationshipAddition,
-            GuidelineRelationshipUpdateParams,
+            GuidelineMetadataUpdateParams,
             GuidelineToolAssociationUpdateParams,
             ParlantClient,
             ToolId,
@@ -391,16 +394,6 @@ class GuidelinesClient:
             guideline_id="IUCGT-l4pS",
             condition="when the customer asks about pricing",
             action="provide current pricing information",
-            relationships=GuidelineRelationshipUpdateParams(
-                add=[
-                    GuidelineRelationshipAddition(
-                        source="guid_123xz",
-                        target="guid_456yz",
-                        kind="entailment",
-                    )
-                ],
-                remove=["guideline_relationship_id_789yz"],
-            ),
             tool_associations=GuidelineToolAssociationUpdateParams(
                 add=[
                     ToolId(
@@ -416,6 +409,10 @@ class GuidelinesClient:
                 ],
             ),
             enabled=True,
+            metadata=GuidelineMetadataUpdateParams(
+                add={"key1": "value1", "key2": "value2"},
+                remove=["key3", "key4"],
+            ),
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -424,11 +421,6 @@ class GuidelinesClient:
             json={
                 "condition": condition,
                 "action": action,
-                "relationships": convert_and_respect_annotation_metadata(
-                    object_=relationships,
-                    annotation=GuidelineRelationshipUpdateParams,
-                    direction="write",
-                ),
                 "tool_associations": convert_and_respect_annotation_metadata(
                     object_=tool_associations,
                     annotation=GuidelineToolAssociationUpdateParams,
@@ -438,6 +430,11 @@ class GuidelinesClient:
                 "tags": convert_and_respect_annotation_metadata(
                     object_=tags,
                     annotation=GuidelineTagsUpdateParams,
+                    direction="write",
+                ),
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=GuidelineMetadataUpdateParams,
                     direction="write",
                 ),
             },
@@ -563,6 +560,7 @@ class AsyncGuidelinesClient:
         *,
         condition: str,
         action: str,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -579,6 +577,9 @@ class AsyncGuidelinesClient:
 
         action : str
             This action will be performed if the condition is satisfied
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Metadata for the guideline
 
         enabled : typing.Optional[bool]
             Whether the guideline is enabled
@@ -609,6 +610,7 @@ class AsyncGuidelinesClient:
             await client.guidelines.create(
                 condition="when the customer asks about pricing",
                 action="provide current pricing information and mention any ongoing promotions",
+                metadata={"key1": "value1", "key2": "value2"},
                 enabled=False,
             )
 
@@ -621,6 +623,7 @@ class AsyncGuidelinesClient:
             json={
                 "condition": condition,
                 "action": action,
+                "metadata": metadata,
                 "enabled": enabled,
                 "tags": tags,
             },
@@ -811,10 +814,10 @@ class AsyncGuidelinesClient:
         *,
         condition: typing.Optional[str] = OMIT,
         action: typing.Optional[str] = OMIT,
-        relationships: typing.Optional[GuidelineRelationshipUpdateParams] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
+        metadata: typing.Optional[GuidelineMetadataUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
@@ -841,14 +844,14 @@ class AsyncGuidelinesClient:
         action : typing.Optional[str]
             This action will be performed if the condition is satisfied
 
-        relationships : typing.Optional[GuidelineRelationshipUpdateParams]
-
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
 
         enabled : typing.Optional[bool]
             Whether the guideline is enabled
 
         tags : typing.Optional[GuidelineTagsUpdateParams]
+
+        metadata : typing.Optional[GuidelineMetadataUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -864,8 +867,7 @@ class AsyncGuidelinesClient:
 
         from parlant.client import (
             AsyncParlantClient,
-            GuidelineRelationshipAddition,
-            GuidelineRelationshipUpdateParams,
+            GuidelineMetadataUpdateParams,
             GuidelineToolAssociationUpdateParams,
             ToolId,
         )
@@ -880,16 +882,6 @@ class AsyncGuidelinesClient:
                 guideline_id="IUCGT-l4pS",
                 condition="when the customer asks about pricing",
                 action="provide current pricing information",
-                relationships=GuidelineRelationshipUpdateParams(
-                    add=[
-                        GuidelineRelationshipAddition(
-                            source="guid_123xz",
-                            target="guid_456yz",
-                            kind="entailment",
-                        )
-                    ],
-                    remove=["guideline_relationship_id_789yz"],
-                ),
                 tool_associations=GuidelineToolAssociationUpdateParams(
                     add=[
                         ToolId(
@@ -905,6 +897,10 @@ class AsyncGuidelinesClient:
                     ],
                 ),
                 enabled=True,
+                metadata=GuidelineMetadataUpdateParams(
+                    add={"key1": "value1", "key2": "value2"},
+                    remove=["key3", "key4"],
+                ),
             )
 
 
@@ -916,11 +912,6 @@ class AsyncGuidelinesClient:
             json={
                 "condition": condition,
                 "action": action,
-                "relationships": convert_and_respect_annotation_metadata(
-                    object_=relationships,
-                    annotation=GuidelineRelationshipUpdateParams,
-                    direction="write",
-                ),
                 "tool_associations": convert_and_respect_annotation_metadata(
                     object_=tool_associations,
                     annotation=GuidelineToolAssociationUpdateParams,
@@ -930,6 +921,11 @@ class AsyncGuidelinesClient:
                 "tags": convert_and_respect_annotation_metadata(
                     object_=tags,
                     annotation=GuidelineTagsUpdateParams,
+                    direction="write",
+                ),
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=GuidelineMetadataUpdateParams,
                     direction="write",
                 ),
             },
