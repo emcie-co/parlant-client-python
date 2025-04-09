@@ -4,7 +4,7 @@ import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..types.guideline_relationship_kind_dto import GuidelineRelationshipKindDto
 from ..core.request_options import RequestOptions
-from ..types.guideline_relationship import GuidelineRelationship
+from ..types.relationship import Relationship
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
@@ -17,7 +17,7 @@ from ..core.client_wrapper import AsyncClientWrapper
 OMIT = typing.cast(typing.Any, ...)
 
 
-class GuidelineRelationshipsClient:
+class RelationshipsClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
@@ -25,29 +25,35 @@ class GuidelineRelationshipsClient:
         self,
         *,
         kind: GuidelineRelationshipKindDto,
-        entity_id: str,
         indirect: typing.Optional[bool] = None,
+        guideline_id: typing.Optional[str] = None,
+        tag_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[GuidelineRelationship]:
+    ) -> typing.List[Relationship]:
         """
+        List relationships.
+
+        Either `guideline_id` or `tag_id` must be provided.
+
         Parameters
         ----------
         kind : GuidelineRelationshipKindDto
-            The kind of guideline relationship to list
-
-        entity_id : str
-            The ID of the entity to list relationships for
+            The kind of relationship to list
 
         indirect : typing.Optional[bool]
             Whether to include indirect relationships
+
+        guideline_id : typing.Optional[str]
+
+        tag_id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[GuidelineRelationship]
-            Guideline relationships successfully retrieved. Returns a list of all guideline relationships.
+        typing.List[Relationship]
+            Relationships successfully retrieved. Returns a list of all relationships.
 
         Examples
         --------
@@ -56,9 +62,8 @@ class GuidelineRelationshipsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guideline_relationships.list(
+        client.relationships.list(
             kind="entailment",
-            entity_id="entity_id",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -66,17 +71,18 @@ class GuidelineRelationshipsClient:
             method="GET",
             params={
                 "kind": kind,
-                "entity_id": entity_id,
                 "indirect": indirect,
+                "guideline_id": guideline_id,
+                "tag_id": tag_id,
             },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[GuidelineRelationship],
+                    typing.List[Relationship],
                     parse_obj_as(
-                        type_=typing.List[GuidelineRelationship],  # type: ignore
+                        type_=typing.List[Relationship],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -104,8 +110,13 @@ class GuidelineRelationshipsClient:
         target_guideline: typing.Optional[str] = OMIT,
         target_tag: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineRelationship:
+    ) -> Relationship:
         """
+        Create a relationship.
+
+        A relationship is a relationship between a guideline and a tag.
+        It can be created between a guideline and a tag, or between two guidelines, or between two tags.
+
         Parameters
         ----------
         kind : GuidelineRelationshipKindDto
@@ -127,8 +138,8 @@ class GuidelineRelationshipsClient:
 
         Returns
         -------
-        GuidelineRelationship
-            Guideline relationship successfully created. Returns the created guideline relationship.
+        Relationship
+            Relationship successfully created. Returns the created relationship.
 
         Examples
         --------
@@ -137,7 +148,7 @@ class GuidelineRelationshipsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guideline_relationships.create(
+        client.relationships.create(
             source_guideline="gid_123",
             target_tag="tid_456",
             kind="entailment",
@@ -159,9 +170,9 @@ class GuidelineRelationshipsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineRelationship,
+                    Relationship,
                     parse_obj_as(
-                        type_=GuidelineRelationship,  # type: ignore
+                        type_=Relationship,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -185,20 +196,22 @@ class GuidelineRelationshipsClient:
         relationship_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineRelationship:
+    ) -> Relationship:
         """
+        Read a relationship by ID.
+
         Parameters
         ----------
         relationship_id : str
-            identifier of guideline relationship
+            identifier of relationship
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineRelationship
-            Guideline relationship successfully retrieved. Returns the requested guideline relationship.
+        Relationship
+            Relationship successfully retrieved. Returns the requested relationship.
 
         Examples
         --------
@@ -207,7 +220,7 @@ class GuidelineRelationshipsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guideline_relationships.retrieve(
+        client.relationships.retrieve(
             relationship_id="gr_123",
         )
         """
@@ -219,9 +232,9 @@ class GuidelineRelationshipsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineRelationship,
+                    Relationship,
                     parse_obj_as(
-                        type_=GuidelineRelationship,  # type: ignore
+                        type_=Relationship,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -247,10 +260,12 @@ class GuidelineRelationshipsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Delete a relationship by ID.
+
         Parameters
         ----------
         relationship_id : str
-            identifier of guideline relationship
+            identifier of relationship
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -266,7 +281,7 @@ class GuidelineRelationshipsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guideline_relationships.delete(
+        client.relationships.delete(
             relationship_id="gr_123",
         )
         """
@@ -304,7 +319,7 @@ class GuidelineRelationshipsClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncGuidelineRelationshipsClient:
+class AsyncRelationshipsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
@@ -312,29 +327,35 @@ class AsyncGuidelineRelationshipsClient:
         self,
         *,
         kind: GuidelineRelationshipKindDto,
-        entity_id: str,
         indirect: typing.Optional[bool] = None,
+        guideline_id: typing.Optional[str] = None,
+        tag_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[GuidelineRelationship]:
+    ) -> typing.List[Relationship]:
         """
+        List relationships.
+
+        Either `guideline_id` or `tag_id` must be provided.
+
         Parameters
         ----------
         kind : GuidelineRelationshipKindDto
-            The kind of guideline relationship to list
-
-        entity_id : str
-            The ID of the entity to list relationships for
+            The kind of relationship to list
 
         indirect : typing.Optional[bool]
             Whether to include indirect relationships
+
+        guideline_id : typing.Optional[str]
+
+        tag_id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[GuidelineRelationship]
-            Guideline relationships successfully retrieved. Returns a list of all guideline relationships.
+        typing.List[Relationship]
+            Relationships successfully retrieved. Returns a list of all relationships.
 
         Examples
         --------
@@ -348,9 +369,8 @@ class AsyncGuidelineRelationshipsClient:
 
 
         async def main() -> None:
-            await client.guideline_relationships.list(
+            await client.relationships.list(
                 kind="entailment",
-                entity_id="entity_id",
             )
 
 
@@ -361,17 +381,18 @@ class AsyncGuidelineRelationshipsClient:
             method="GET",
             params={
                 "kind": kind,
-                "entity_id": entity_id,
                 "indirect": indirect,
+                "guideline_id": guideline_id,
+                "tag_id": tag_id,
             },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[GuidelineRelationship],
+                    typing.List[Relationship],
                     parse_obj_as(
-                        type_=typing.List[GuidelineRelationship],  # type: ignore
+                        type_=typing.List[Relationship],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -399,8 +420,13 @@ class AsyncGuidelineRelationshipsClient:
         target_guideline: typing.Optional[str] = OMIT,
         target_tag: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineRelationship:
+    ) -> Relationship:
         """
+        Create a relationship.
+
+        A relationship is a relationship between a guideline and a tag.
+        It can be created between a guideline and a tag, or between two guidelines, or between two tags.
+
         Parameters
         ----------
         kind : GuidelineRelationshipKindDto
@@ -422,8 +448,8 @@ class AsyncGuidelineRelationshipsClient:
 
         Returns
         -------
-        GuidelineRelationship
-            Guideline relationship successfully created. Returns the created guideline relationship.
+        Relationship
+            Relationship successfully created. Returns the created relationship.
 
         Examples
         --------
@@ -437,7 +463,7 @@ class AsyncGuidelineRelationshipsClient:
 
 
         async def main() -> None:
-            await client.guideline_relationships.create(
+            await client.relationships.create(
                 source_guideline="gid_123",
                 target_tag="tid_456",
                 kind="entailment",
@@ -462,9 +488,9 @@ class AsyncGuidelineRelationshipsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineRelationship,
+                    Relationship,
                     parse_obj_as(
-                        type_=GuidelineRelationship,  # type: ignore
+                        type_=Relationship,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -488,20 +514,22 @@ class AsyncGuidelineRelationshipsClient:
         relationship_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineRelationship:
+    ) -> Relationship:
         """
+        Read a relationship by ID.
+
         Parameters
         ----------
         relationship_id : str
-            identifier of guideline relationship
+            identifier of relationship
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineRelationship
-            Guideline relationship successfully retrieved. Returns the requested guideline relationship.
+        Relationship
+            Relationship successfully retrieved. Returns the requested relationship.
 
         Examples
         --------
@@ -515,7 +543,7 @@ class AsyncGuidelineRelationshipsClient:
 
 
         async def main() -> None:
-            await client.guideline_relationships.retrieve(
+            await client.relationships.retrieve(
                 relationship_id="gr_123",
             )
 
@@ -530,9 +558,9 @@ class AsyncGuidelineRelationshipsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineRelationship,
+                    Relationship,
                     parse_obj_as(
-                        type_=GuidelineRelationship,  # type: ignore
+                        type_=Relationship,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -558,10 +586,12 @@ class AsyncGuidelineRelationshipsClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Delete a relationship by ID.
+
         Parameters
         ----------
         relationship_id : str
-            identifier of guideline relationship
+            identifier of relationship
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -582,7 +612,7 @@ class AsyncGuidelineRelationshipsClient:
 
 
         async def main() -> None:
-            await client.guideline_relationships.delete(
+            await client.relationships.delete(
                 relationship_id="gr_123",
             )
 

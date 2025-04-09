@@ -9,9 +9,9 @@ from .guideline_relationship_kind_dto import GuidelineRelationshipKindDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class GuidelineRelationship(UniversalBaseModel):
+class Relationship(UniversalBaseModel):
     """
-    Represents a guideline relationship addition.
+    Represents a relationship.
 
     Only one of `source_guideline` and `source_tag` can have a value.
     Only one of `target_guideline` and `target_tag` can have a value.
@@ -19,7 +19,7 @@ class GuidelineRelationship(UniversalBaseModel):
 
     id: str = pydantic.Field()
     """
-    Unique identifier for the guideline relationship
+    Unique identifier for the relationship
     """
 
     source_guideline: typing.Optional[Guideline] = None

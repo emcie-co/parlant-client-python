@@ -3,7 +3,7 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 from .guideline import Guideline
 import typing
-from .guideline_relationship import GuidelineRelationship
+from .relationship import Relationship
 from .guideline_tool_association import GuidelineToolAssociation
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
@@ -15,7 +15,7 @@ class GuidelineWithRelationshipsAndToolAssociations(UniversalBaseModel):
     """
 
     guideline: Guideline
-    relationships: typing.List[GuidelineRelationship]
+    relationships: typing.List[Relationship]
     tool_associations: typing.List[GuidelineToolAssociation]
 
     if IS_PYDANTIC_V2:

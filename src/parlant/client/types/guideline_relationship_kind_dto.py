@@ -3,8 +3,5 @@
 import typing
 
 GuidelineRelationshipKindDto = typing.Union[
-    typing.Literal[
-        "entailment", "precedence", "requirement", "priority", "persistence"
-    ],
-    typing.Any,
+    typing.Literal["entailment", "priority"], typing.Any
 ]
