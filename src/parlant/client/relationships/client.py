@@ -2,13 +2,15 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
-from ..types.guideline_relationship_kind_dto import GuidelineRelationshipKindDto
+from ..types.relationship_kind_dto import RelationshipKindDto
 from ..core.request_options import RequestOptions
 from ..types.relationship import Relationship
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.tool_id import ToolId
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
 from ..core.client_wrapper import AsyncClientWrapper
@@ -24,7 +26,7 @@ class RelationshipsClient:
     def list(
         self,
         *,
-        kind: GuidelineRelationshipKindDto,
+        kind: RelationshipKindDto,
         indirect: typing.Optional[bool] = None,
         guideline_id: typing.Optional[str] = None,
         tag_id: typing.Optional[str] = None,
@@ -37,7 +39,7 @@ class RelationshipsClient:
 
         Parameters
         ----------
-        kind : GuidelineRelationshipKindDto
+        kind : RelationshipKindDto
             The kind of relationship to list
 
         indirect : typing.Optional[bool]
@@ -104,11 +106,13 @@ class RelationshipsClient:
     def create(
         self,
         *,
-        kind: GuidelineRelationshipKindDto,
+        kind: RelationshipKindDto,
         source_guideline: typing.Optional[str] = OMIT,
         source_tag: typing.Optional[str] = OMIT,
+        source_tool: typing.Optional[ToolId] = OMIT,
         target_guideline: typing.Optional[str] = OMIT,
         target_tag: typing.Optional[str] = OMIT,
+        target_tool: typing.Optional[ToolId] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Relationship:
         """
@@ -119,7 +123,7 @@ class RelationshipsClient:
 
         Parameters
         ----------
-        kind : GuidelineRelationshipKindDto
+        kind : RelationshipKindDto
 
         source_guideline : typing.Optional[str]
             Unique identifier for the guideline
@@ -127,11 +131,15 @@ class RelationshipsClient:
         source_tag : typing.Optional[str]
             Unique identifier for the tag
 
+        source_tool : typing.Optional[ToolId]
+
         target_guideline : typing.Optional[str]
             Unique identifier for the guideline
 
         target_tag : typing.Optional[str]
             Unique identifier for the tag
+
+        target_tool : typing.Optional[ToolId]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -160,8 +168,14 @@ class RelationshipsClient:
             json={
                 "source_guideline": source_guideline,
                 "source_tag": source_tag,
+                "source_tool": convert_and_respect_annotation_metadata(
+                    object_=source_tool, annotation=ToolId, direction="write"
+                ),
                 "target_guideline": target_guideline,
                 "target_tag": target_tag,
+                "target_tool": convert_and_respect_annotation_metadata(
+                    object_=target_tool, annotation=ToolId, direction="write"
+                ),
                 "kind": kind,
             },
             request_options=request_options,
@@ -326,7 +340,7 @@ class AsyncRelationshipsClient:
     async def list(
         self,
         *,
-        kind: GuidelineRelationshipKindDto,
+        kind: RelationshipKindDto,
         indirect: typing.Optional[bool] = None,
         guideline_id: typing.Optional[str] = None,
         tag_id: typing.Optional[str] = None,
@@ -339,7 +353,7 @@ class AsyncRelationshipsClient:
 
         Parameters
         ----------
-        kind : GuidelineRelationshipKindDto
+        kind : RelationshipKindDto
             The kind of relationship to list
 
         indirect : typing.Optional[bool]
@@ -414,11 +428,13 @@ class AsyncRelationshipsClient:
     async def create(
         self,
         *,
-        kind: GuidelineRelationshipKindDto,
+        kind: RelationshipKindDto,
         source_guideline: typing.Optional[str] = OMIT,
         source_tag: typing.Optional[str] = OMIT,
+        source_tool: typing.Optional[ToolId] = OMIT,
         target_guideline: typing.Optional[str] = OMIT,
         target_tag: typing.Optional[str] = OMIT,
+        target_tool: typing.Optional[ToolId] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Relationship:
         """
@@ -429,7 +445,7 @@ class AsyncRelationshipsClient:
 
         Parameters
         ----------
-        kind : GuidelineRelationshipKindDto
+        kind : RelationshipKindDto
 
         source_guideline : typing.Optional[str]
             Unique identifier for the guideline
@@ -437,11 +453,15 @@ class AsyncRelationshipsClient:
         source_tag : typing.Optional[str]
             Unique identifier for the tag
 
+        source_tool : typing.Optional[ToolId]
+
         target_guideline : typing.Optional[str]
             Unique identifier for the guideline
 
         target_tag : typing.Optional[str]
             Unique identifier for the tag
+
+        target_tool : typing.Optional[ToolId]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -478,8 +498,14 @@ class AsyncRelationshipsClient:
             json={
                 "source_guideline": source_guideline,
                 "source_tag": source_tag,
+                "source_tool": convert_and_respect_annotation_metadata(
+                    object_=source_tool, annotation=ToolId, direction="write"
+                ),
                 "target_guideline": target_guideline,
                 "target_tag": target_tag,
+                "target_tool": convert_and_respect_annotation_metadata(
+                    object_=target_tool, annotation=ToolId, direction="write"
+                ),
                 "kind": kind,
             },
             request_options=request_options,

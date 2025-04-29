@@ -34,7 +34,6 @@ from .guideline_matching_inspection import GuidelineMatchingInspection
 from .guideline_metadata_update_params import GuidelineMetadataUpdateParams
 from .guideline_payload import GuidelinePayload
 from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
-from .guideline_relationship_kind_dto import GuidelineRelationshipKindDto
 from .guideline_tags_update_params import GuidelineTagsUpdateParams
 from .guideline_tool_association import GuidelineToolAssociation
 from .guideline_tool_association_update_params import (
@@ -74,6 +73,7 @@ from .preparation_iteration import PreparationIteration
 from .preparation_iteration_generations import PreparationIterationGenerations
 from .preparation_iteration_term import PreparationIterationTerm
 from .relationship import Relationship
+from .relationship_kind_dto import RelationshipKindDto
 from .sdk_service_params import SdkServiceParams
 from .service import Service
 from .session import Session
@@ -132,7 +132,6 @@ __all__ = [
     "GuidelineMetadataUpdateParams",
     "GuidelinePayload",
     "GuidelinePayloadOperationDto",
-    "GuidelineRelationshipKindDto",
     "GuidelineTagsUpdateParams",
     "GuidelineToolAssociation",
     "GuidelineToolAssociationUpdateParams",
@@ -164,6 +163,7 @@ __all__ = [
     "PreparationIterationGenerations",
     "PreparationIterationTerm",
     "Relationship",
+    "RelationshipKindDto",
     "SdkServiceParams",
     "Service",
     "Session",

@@ -5,7 +5,8 @@ import pydantic
 import typing
 from .guideline import Guideline
 from .tag import Tag
-from .guideline_relationship_kind_dto import GuidelineRelationshipKindDto
+from .tool import Tool
+from .relationship_kind_dto import RelationshipKindDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -15,6 +16,7 @@ class Relationship(UniversalBaseModel):
 
     Only one of `source_guideline` and `source_tag` can have a value.
     Only one of `target_guideline` and `target_tag` can have a value.
+    Only one of `source_tool` and `target_tool` can have a value.
     """
 
     id: str = pydantic.Field()
@@ -26,12 +28,14 @@ class Relationship(UniversalBaseModel):
     source_tag: typing.Optional[Tag] = None
     target_guideline: typing.Optional[Guideline] = None
     target_tag: typing.Optional[Tag] = None
+    source_tool: typing.Optional[Tool] = None
+    target_tool: typing.Optional[Tool] = None
     indirect: bool = pydantic.Field()
     """
     `True` if there is a path from `source` to `target` but no direct relationship
     """
 
-    kind: GuidelineRelationshipKindDto
+    kind: RelationshipKindDto
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
