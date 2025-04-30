@@ -3,57 +3,38 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.guideline import Guideline
+from ..types.journey import Journey
 from ..core.pydantic_utilities import parse_obj_as
-from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.guideline_with_relationships_and_tool_associations import (
-    GuidelineWithRelationshipsAndToolAssociations,
-)
+from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.guideline_tool_association_update_params import (
-    GuidelineToolAssociationUpdateParams,
-)
-from ..types.guideline_tags_update_params import GuidelineTagsUpdateParams
-from ..types.guideline_metadata_update_params import GuidelineMetadataUpdateParams
-from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
 
-class GuidelinesClient:
+class JourneysClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(
-        self,
-        *,
-        tag_id: typing.Optional[str] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Guideline]:
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[Journey]:
         """
-        Lists all guidelines for the specified tag or all guidelines if no tag is provided.
-
-        Returns an empty list if no guidelines exist.
-        Guidelines are returned in no guaranteed order.
-        Does not include relationships or tool associations.
+        Retrieves a list of all journeys in the system.
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter guidelines by
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Guideline]
-            List of all guidelines for the specified tag or all guidelines if no tag is provided
+        typing.List[Journey]
+            List of all journeys in the system
 
         Examples
         --------
@@ -62,34 +43,21 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.list()
+        client.journeys.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "guidelines",
+            "journeys",
             method="GET",
-            params={
-                "tag_id": tag_id,
-            },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Guideline],
+                    typing.List[Journey],
                     parse_obj_as(
-                        type_=typing.List[Guideline],  # type: ignore
+                        type_=typing.List[Journey],  # type: ignore
                         object_=_response.json(),
                     ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -99,42 +67,38 @@ class GuidelinesClient:
     def create(
         self,
         *,
+        title: str,
+        description: str,
         condition: str,
-        action: typing.Optional[str] = OMIT,
-        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Guideline:
+    ) -> Journey:
         """
-        Creates a new guideline.
+        Creates a new journey in the system.
 
-        See the [documentation](https://parlant.io/docs/concepts/customization/guidelines) for more information.
+        The journey will be initialized with the provided title, description, and condition.
+        A unique identifier will be automatically generated.
 
         Parameters
         ----------
+        title : str
+            The title of the journey
+
+        description : str
+
         condition : str
-            If this condition is satisfied, the action will be performed
-
-        action : typing.Optional[str]
-            This action will be performed if the condition is satisfied
-
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Metadata for the guideline
-
-        enabled : typing.Optional[bool]
-            Whether the guideline is enabled
+            The condition that triggers this journey
 
         tags : typing.Optional[typing.Sequence[str]]
-            The tags associated with the guideline
+            List of tag IDs associated with the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Guideline
-            Guideline successfully created. Returns the created guideline.
+        Journey
+            Journey successfully created. Returns the complete journey object including generated ID.
 
         Examples
         --------
@@ -143,21 +107,20 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.create(
-            condition="when the customer asks about pricing",
-            action="provide current pricing information and mention any ongoing promotions",
-            metadata={"key1": "value1", "key2": "value2"},
-            enabled=False,
+        client.journeys.create(
+            title="Customer Onboarding",
+            description="A journey to guide new customers through our product features",
+            condition="when customer needs help with onboarding",
+            tags=["tag1", "tag2"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "guidelines",
+            "journeys",
             method="POST",
             json={
+                "title": title,
+                "description": description,
                 "condition": condition,
-                "action": action,
-                "metadata": metadata,
-                "enabled": enabled,
                 "tags": tags,
             },
             request_options=request_options,
@@ -166,9 +129,9 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Guideline,
+                    Journey,
                     parse_obj_as(
-                        type_=Guideline,  # type: ignore
+                        type_=Journey,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -189,28 +152,25 @@ class GuidelinesClient:
 
     def retrieve(
         self,
-        guideline_id: str,
+        journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithRelationshipsAndToolAssociations:
+    ) -> Journey:
         """
-        Retrieves a specific guideline with all its relationships and tool associations.
-
-        Returns both direct and indirect relationships between guidelines.
-        Tool associations indicate which tools the guideline can use.
+        Retrieves details of a specific journey by ID.
 
         Parameters
         ----------
-        guideline_id : str
-            Unique identifier for the guideline
+        journey_id : str
+            Unique identifier for the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithRelationshipsAndToolAssociations
-            Guideline details successfully retrieved. Returns the complete guideline with its relationships and tool associations.
+        Journey
+            Journey details successfully retrieved. Returns the complete journey object.
 
         Examples
         --------
@@ -219,21 +179,21 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.retrieve(
-            guideline_id="IUCGT-l4pS",
+        client.journeys.retrieve(
+            journey_id="IUCGT-lvpS",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"journeys/{jsonable_encoder(journey_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithRelationshipsAndToolAssociations,
+                    Journey,
                     parse_obj_as(
-                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
+                        type_=Journey,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -264,15 +224,21 @@ class GuidelinesClient:
 
     def delete(
         self,
-        guideline_id: str,
+        journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a journey from the system.
+
+        Also deletes the associated guideline.
+        Deleting a non-existent journey will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
-        guideline_id : str
-            Unique identifier for the guideline
+        journey_id : str
+            Unique identifier for the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -288,12 +254,12 @@ class GuidelinesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.delete(
-            guideline_id="IUCGT-l4pS",
+        client.journeys.delete(
+            journey_id="IUCGT-lvpS",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"journeys/{jsonable_encoder(journey_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -327,118 +293,66 @@ class GuidelinesClient:
 
     def update(
         self,
-        guideline_id: str,
+        journey_id: str,
         *,
+        title: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
         condition: typing.Optional[str] = OMIT,
-        action: typing.Optional[str] = OMIT,
-        tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
-        enabled: typing.Optional[bool] = OMIT,
-        tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
-        metadata: typing.Optional[GuidelineMetadataUpdateParams] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithRelationshipsAndToolAssociations:
+    ) -> Journey:
         """
-        Updates a guideline's relationships and tool associations.
+        Updates an existing journey's attributes.
 
-        Only provided attributes will be updated; others remain unchanged.
-
-        Relationship rules:
-        - A guideline cannot relate to itself
-        - Only direct relationships can be removed
-        - The relationship must specify this guideline as source or target
-
-        Tool Association rules:
-        - Tool services and tools must exist before creating associations
-
-        Action with text can not be updated to None.
+        Only the provided attributes will be updated; others will remain unchanged.
 
         Parameters
         ----------
-        guideline_id : str
-            Unique identifier for the guideline
+        journey_id : str
+            Unique identifier for the journey
+
+        title : typing.Optional[str]
+            The title of the journey
+
+        description : typing.Optional[str]
 
         condition : typing.Optional[str]
-            If this condition is satisfied, the action will be performed
+            The condition that triggers this journey
 
-        action : typing.Optional[str]
-            This action will be performed if the condition is satisfied
-
-        tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
-
-        enabled : typing.Optional[bool]
-            Whether the guideline is enabled
-
-        tags : typing.Optional[GuidelineTagsUpdateParams]
-
-        metadata : typing.Optional[GuidelineMetadataUpdateParams]
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tag IDs associated with the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithRelationshipsAndToolAssociations
-            Guideline successfully updated. Returns the updated guideline with its relationships and tool associations.
+        Journey
+            Journey successfully updated. Returns the updated journey.
 
         Examples
         --------
-        from parlant.client import (
-            GuidelineMetadataUpdateParams,
-            GuidelineToolAssociationUpdateParams,
-            ParlantClient,
-            ToolId,
-        )
+        from parlant.client import ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.guidelines.update(
-            guideline_id="IUCGT-l4pS",
-            condition="when the customer asks about pricing",
-            action="provide current pricing information",
-            tool_associations=GuidelineToolAssociationUpdateParams(
-                add=[
-                    ToolId(
-                        service_name="new_service",
-                        tool_name="new_tool",
-                    )
-                ],
-                remove=[
-                    ToolId(
-                        service_name="old_service",
-                        tool_name="old_tool",
-                    )
-                ],
-            ),
-            enabled=True,
-            metadata=GuidelineMetadataUpdateParams(
-                add={"key1": "value1", "key2": "value2"},
-                remove=["key3", "key4"],
-            ),
+        client.journeys.update(
+            journey_id="IUCGT-lvpS",
+            title="Customer Onboarding",
+            description="A journey to guide new customers through our product features",
+            condition="when customer needs help with onboarding",
+            tags=["tag1", "tag2"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"journeys/{jsonable_encoder(journey_id)}",
             method="PATCH",
             json={
+                "title": title,
+                "description": description,
                 "condition": condition,
-                "action": action,
-                "tool_associations": convert_and_respect_annotation_metadata(
-                    object_=tool_associations,
-                    annotation=GuidelineToolAssociationUpdateParams,
-                    direction="write",
-                ),
-                "enabled": enabled,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags,
-                    annotation=GuidelineTagsUpdateParams,
-                    direction="write",
-                ),
-                "metadata": convert_and_respect_annotation_metadata(
-                    object_=metadata,
-                    annotation=GuidelineMetadataUpdateParams,
-                    direction="write",
-                ),
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -446,9 +360,9 @@ class GuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithRelationshipsAndToolAssociations,
+                    Journey,
                     parse_obj_as(
-                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
+                        type_=Journey,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -478,35 +392,25 @@ class GuidelinesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncGuidelinesClient:
+class AsyncJourneysClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     async def list(
-        self,
-        *,
-        tag_id: typing.Optional[str] = None,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Guideline]:
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.List[Journey]:
         """
-        Lists all guidelines for the specified tag or all guidelines if no tag is provided.
-
-        Returns an empty list if no guidelines exist.
-        Guidelines are returned in no guaranteed order.
-        Does not include relationships or tool associations.
+        Retrieves a list of all journeys in the system.
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter guidelines by
-
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Guideline]
-            List of all guidelines for the specified tag or all guidelines if no tag is provided
+        typing.List[Journey]
+            List of all journeys in the system
 
         Examples
         --------
@@ -520,37 +424,24 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.list()
+            await client.journeys.list()
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "guidelines",
+            "journeys",
             method="GET",
-            params={
-                "tag_id": tag_id,
-            },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Guideline],
+                    typing.List[Journey],
                     parse_obj_as(
-                        type_=typing.List[Guideline],  # type: ignore
+                        type_=typing.List[Journey],  # type: ignore
                         object_=_response.json(),
                     ),
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -560,42 +451,38 @@ class AsyncGuidelinesClient:
     async def create(
         self,
         *,
+        title: str,
+        description: str,
         condition: str,
-        action: typing.Optional[str] = OMIT,
-        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
-        enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Guideline:
+    ) -> Journey:
         """
-        Creates a new guideline.
+        Creates a new journey in the system.
 
-        See the [documentation](https://parlant.io/docs/concepts/customization/guidelines) for more information.
+        The journey will be initialized with the provided title, description, and condition.
+        A unique identifier will be automatically generated.
 
         Parameters
         ----------
+        title : str
+            The title of the journey
+
+        description : str
+
         condition : str
-            If this condition is satisfied, the action will be performed
-
-        action : typing.Optional[str]
-            This action will be performed if the condition is satisfied
-
-        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
-            Metadata for the guideline
-
-        enabled : typing.Optional[bool]
-            Whether the guideline is enabled
+            The condition that triggers this journey
 
         tags : typing.Optional[typing.Sequence[str]]
-            The tags associated with the guideline
+            List of tag IDs associated with the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Guideline
-            Guideline successfully created. Returns the created guideline.
+        Journey
+            Journey successfully created. Returns the complete journey object including generated ID.
 
         Examples
         --------
@@ -609,24 +496,23 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.create(
-                condition="when the customer asks about pricing",
-                action="provide current pricing information and mention any ongoing promotions",
-                metadata={"key1": "value1", "key2": "value2"},
-                enabled=False,
+            await client.journeys.create(
+                title="Customer Onboarding",
+                description="A journey to guide new customers through our product features",
+                condition="when customer needs help with onboarding",
+                tags=["tag1", "tag2"],
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "guidelines",
+            "journeys",
             method="POST",
             json={
+                "title": title,
+                "description": description,
                 "condition": condition,
-                "action": action,
-                "metadata": metadata,
-                "enabled": enabled,
                 "tags": tags,
             },
             request_options=request_options,
@@ -635,9 +521,9 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Guideline,
+                    Journey,
                     parse_obj_as(
-                        type_=Guideline,  # type: ignore
+                        type_=Journey,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -658,28 +544,25 @@ class AsyncGuidelinesClient:
 
     async def retrieve(
         self,
-        guideline_id: str,
+        journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithRelationshipsAndToolAssociations:
+    ) -> Journey:
         """
-        Retrieves a specific guideline with all its relationships and tool associations.
-
-        Returns both direct and indirect relationships between guidelines.
-        Tool associations indicate which tools the guideline can use.
+        Retrieves details of a specific journey by ID.
 
         Parameters
         ----------
-        guideline_id : str
-            Unique identifier for the guideline
+        journey_id : str
+            Unique identifier for the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithRelationshipsAndToolAssociations
-            Guideline details successfully retrieved. Returns the complete guideline with its relationships and tool associations.
+        Journey
+            Journey details successfully retrieved. Returns the complete journey object.
 
         Examples
         --------
@@ -693,24 +576,24 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.retrieve(
-                guideline_id="IUCGT-l4pS",
+            await client.journeys.retrieve(
+                journey_id="IUCGT-lvpS",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"journeys/{jsonable_encoder(journey_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithRelationshipsAndToolAssociations,
+                    Journey,
                     parse_obj_as(
-                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
+                        type_=Journey,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -741,15 +624,21 @@ class AsyncGuidelinesClient:
 
     async def delete(
         self,
-        guideline_id: str,
+        journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
+        Deletes a journey from the system.
+
+        Also deletes the associated guideline.
+        Deleting a non-existent journey will return 404.
+        No content will be returned from a successful deletion.
+
         Parameters
         ----------
-        guideline_id : str
-            Unique identifier for the guideline
+        journey_id : str
+            Unique identifier for the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -770,15 +659,15 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.delete(
-                guideline_id="IUCGT-l4pS",
+            await client.journeys.delete(
+                journey_id="IUCGT-lvpS",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"journeys/{jsonable_encoder(journey_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -812,69 +701,48 @@ class AsyncGuidelinesClient:
 
     async def update(
         self,
-        guideline_id: str,
+        journey_id: str,
         *,
+        title: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
         condition: typing.Optional[str] = OMIT,
-        action: typing.Optional[str] = OMIT,
-        tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
-        enabled: typing.Optional[bool] = OMIT,
-        tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
-        metadata: typing.Optional[GuidelineMetadataUpdateParams] = OMIT,
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> GuidelineWithRelationshipsAndToolAssociations:
+    ) -> Journey:
         """
-        Updates a guideline's relationships and tool associations.
+        Updates an existing journey's attributes.
 
-        Only provided attributes will be updated; others remain unchanged.
-
-        Relationship rules:
-        - A guideline cannot relate to itself
-        - Only direct relationships can be removed
-        - The relationship must specify this guideline as source or target
-
-        Tool Association rules:
-        - Tool services and tools must exist before creating associations
-
-        Action with text can not be updated to None.
+        Only the provided attributes will be updated; others will remain unchanged.
 
         Parameters
         ----------
-        guideline_id : str
-            Unique identifier for the guideline
+        journey_id : str
+            Unique identifier for the journey
+
+        title : typing.Optional[str]
+            The title of the journey
+
+        description : typing.Optional[str]
 
         condition : typing.Optional[str]
-            If this condition is satisfied, the action will be performed
+            The condition that triggers this journey
 
-        action : typing.Optional[str]
-            This action will be performed if the condition is satisfied
-
-        tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
-
-        enabled : typing.Optional[bool]
-            Whether the guideline is enabled
-
-        tags : typing.Optional[GuidelineTagsUpdateParams]
-
-        metadata : typing.Optional[GuidelineMetadataUpdateParams]
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tag IDs associated with the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        GuidelineWithRelationshipsAndToolAssociations
-            Guideline successfully updated. Returns the updated guideline with its relationships and tool associations.
+        Journey
+            Journey successfully updated. Returns the updated journey.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import (
-            AsyncParlantClient,
-            GuidelineMetadataUpdateParams,
-            GuidelineToolAssociationUpdateParams,
-            ToolId,
-        )
+        from parlant.client import AsyncParlantClient
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -882,56 +750,25 @@ class AsyncGuidelinesClient:
 
 
         async def main() -> None:
-            await client.guidelines.update(
-                guideline_id="IUCGT-l4pS",
-                condition="when the customer asks about pricing",
-                action="provide current pricing information",
-                tool_associations=GuidelineToolAssociationUpdateParams(
-                    add=[
-                        ToolId(
-                            service_name="new_service",
-                            tool_name="new_tool",
-                        )
-                    ],
-                    remove=[
-                        ToolId(
-                            service_name="old_service",
-                            tool_name="old_tool",
-                        )
-                    ],
-                ),
-                enabled=True,
-                metadata=GuidelineMetadataUpdateParams(
-                    add={"key1": "value1", "key2": "value2"},
-                    remove=["key3", "key4"],
-                ),
+            await client.journeys.update(
+                journey_id="IUCGT-lvpS",
+                title="Customer Onboarding",
+                description="A journey to guide new customers through our product features",
+                condition="when customer needs help with onboarding",
+                tags=["tag1", "tag2"],
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"guidelines/{jsonable_encoder(guideline_id)}",
+            f"journeys/{jsonable_encoder(journey_id)}",
             method="PATCH",
             json={
+                "title": title,
+                "description": description,
                 "condition": condition,
-                "action": action,
-                "tool_associations": convert_and_respect_annotation_metadata(
-                    object_=tool_associations,
-                    annotation=GuidelineToolAssociationUpdateParams,
-                    direction="write",
-                ),
-                "enabled": enabled,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags,
-                    annotation=GuidelineTagsUpdateParams,
-                    direction="write",
-                ),
-                "metadata": convert_and_respect_annotation_metadata(
-                    object_=metadata,
-                    annotation=GuidelineMetadataUpdateParams,
-                    direction="write",
-                ),
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -939,9 +776,9 @@ class AsyncGuidelinesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    GuidelineWithRelationshipsAndToolAssociations,
+                    Journey,
                     parse_obj_as(
-                        type_=GuidelineWithRelationshipsAndToolAssociations,  # type: ignore
+                        type_=Journey,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

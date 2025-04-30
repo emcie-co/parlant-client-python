@@ -45,6 +45,7 @@ from .guideline_with_relationships_and_tool_associations import (
 from .http_validation_error import HttpValidationError
 from .invoice import Invoice
 from .invoice_data import InvoiceData
+from .journey import Journey
 from .legacy_context_variable import LegacyContextVariable
 from .legacy_context_variable_creation_params import LegacyContextVariableCreationParams
 from .legacy_context_variable_read_result import LegacyContextVariableReadResult
@@ -139,6 +140,7 @@ __all__ = [
     "HttpValidationError",
     "Invoice",
     "InvoiceData",
+    "Journey",
     "LegacyContextVariable",
     "LegacyContextVariableCreationParams",
     "LegacyContextVariableReadResult",
