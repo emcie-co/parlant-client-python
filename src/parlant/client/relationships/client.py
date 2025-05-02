@@ -26,21 +26,21 @@ class RelationshipsClient:
     def list(
         self,
         *,
-        kind: RelationshipKindDto,
+        kind: typing.Optional[RelationshipKindDto] = None,
         indirect: typing.Optional[bool] = None,
         guideline_id: typing.Optional[str] = None,
         tag_id: typing.Optional[str] = None,
+        tool_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Relationship]:
         """
         List relationships.
 
-        Either `guideline_id` or `tag_id` must be provided.
+        Either `guideline_id` or `tag_id` or `tool_id` must be provided.
 
         Parameters
         ----------
-        kind : RelationshipKindDto
-            The kind of relationship to list
+        kind : typing.Optional[RelationshipKindDto]
 
         indirect : typing.Optional[bool]
             Whether to include indirect relationships
@@ -48,6 +48,8 @@ class RelationshipsClient:
         guideline_id : typing.Optional[str]
 
         tag_id : typing.Optional[str]
+
+        tool_id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -64,9 +66,7 @@ class RelationshipsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.relationships.list(
-            kind="entailment",
-        )
+        client.relationships.list()
         """
         _response = self._client_wrapper.httpx_client.request(
             "relationships",
@@ -76,6 +76,7 @@ class RelationshipsClient:
                 "indirect": indirect,
                 "guideline_id": guideline_id,
                 "tag_id": tag_id,
+                "tool_id": tool_id,
             },
             request_options=request_options,
         )
@@ -340,21 +341,21 @@ class AsyncRelationshipsClient:
     async def list(
         self,
         *,
-        kind: RelationshipKindDto,
+        kind: typing.Optional[RelationshipKindDto] = None,
         indirect: typing.Optional[bool] = None,
         guideline_id: typing.Optional[str] = None,
         tag_id: typing.Optional[str] = None,
+        tool_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Relationship]:
         """
         List relationships.
 
-        Either `guideline_id` or `tag_id` must be provided.
+        Either `guideline_id` or `tag_id` or `tool_id` must be provided.
 
         Parameters
         ----------
-        kind : RelationshipKindDto
-            The kind of relationship to list
+        kind : typing.Optional[RelationshipKindDto]
 
         indirect : typing.Optional[bool]
             Whether to include indirect relationships
@@ -362,6 +363,8 @@ class AsyncRelationshipsClient:
         guideline_id : typing.Optional[str]
 
         tag_id : typing.Optional[str]
+
+        tool_id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -383,9 +386,7 @@ class AsyncRelationshipsClient:
 
 
         async def main() -> None:
-            await client.relationships.list(
-                kind="entailment",
-            )
+            await client.relationships.list()
 
 
         asyncio.run(main())
@@ -398,6 +399,7 @@ class AsyncRelationshipsClient:
                 "indirect": indirect,
                 "guideline_id": guideline_id,
                 "tag_id": tag_id,
+                "tool_id": tool_id,
             },
             request_options=request_options,
         )
