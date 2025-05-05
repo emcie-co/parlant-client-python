@@ -8,7 +8,7 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class GuidelinePayload(UniversalBaseModel):
+class LegacyGuidelinePayload(UniversalBaseModel):
     """
     Payload data for a Guideline operation
     """
@@ -20,14 +20,14 @@ class GuidelinePayload(UniversalBaseModel):
     Unique identifier for the guideline
     """
 
-    action_proposition: bool = pydantic.Field()
+    coherence_check: bool = pydantic.Field()
     """
-    Whether the action proposition is enabled
+    Whether to check for contradictions with other Guidelines
     """
 
-    properties_proposition: bool = pydantic.Field()
+    connection_proposition: bool = pydantic.Field()
     """
-    Properties proposition
+    Whether to propose logical connections with other Guidelines
     """
 
     if IS_PYDANTIC_V2:

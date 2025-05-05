@@ -14,6 +14,7 @@ from .context_variables.client import ContextVariablesClient
 from .guidelines.client import GuidelinesClient
 from .relationships.client import RelationshipsClient
 from .journeys.client import JourneysClient
+from .evaluations.client import EvaluationsClient
 from .core.client_wrapper import AsyncClientWrapper
 from .agents.client import AsyncAgentsClient
 from .sessions.client import AsyncSessionsClient
@@ -26,6 +27,7 @@ from .context_variables.client import AsyncContextVariablesClient
 from .guidelines.client import AsyncGuidelinesClient
 from .relationships.client import AsyncRelationshipsClient
 from .journeys.client import AsyncJourneysClient
+from .evaluations.client import AsyncEvaluationsClient
 
 
 class ParlantClient:
@@ -90,6 +92,7 @@ class ParlantClient:
         self.guidelines = GuidelinesClient(client_wrapper=self._client_wrapper)
         self.relationships = RelationshipsClient(client_wrapper=self._client_wrapper)
         self.journeys = JourneysClient(client_wrapper=self._client_wrapper)
+        self.evaluations = EvaluationsClient(client_wrapper=self._client_wrapper)
 
 
 class AsyncParlantClient:
@@ -156,3 +159,4 @@ class AsyncParlantClient:
             client_wrapper=self._client_wrapper
         )
         self.journeys = AsyncJourneysClient(client_wrapper=self._client_wrapper)
+        self.evaluations = AsyncEvaluationsClient(client_wrapper=self._client_wrapper)

@@ -2,7 +2,7 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .invoice import Invoice
+from .legacy_invoice import LegacyInvoice
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
@@ -12,7 +12,7 @@ class LegacyGuidelineCreationParams(UniversalBaseModel):
     Evaluation invoices to generate Guidelines from.
     """
 
-    invoices: typing.List[Invoice]
+    invoices: typing.List[LegacyInvoice]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
