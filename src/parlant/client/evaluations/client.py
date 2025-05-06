@@ -65,7 +65,6 @@ class EvaluationsClient:
                     guideline=GuidelinePayload(
                         content=GuidelineContent(
                             condition="when customer asks about pricing",
-                            action="Sing the user a lullaby.",
                         ),
                         tool_ids=[
                             ToolId(
@@ -267,7 +266,6 @@ class AsyncEvaluationsClient:
                         guideline=GuidelinePayload(
                             content=GuidelineContent(
                                 condition="when customer asks about pricing",
-                                action="Sing the user a lullaby.",
                             ),
                             tool_ids=[
                                 ToolId(

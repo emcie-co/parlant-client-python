@@ -2,8 +2,8 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
 class GuidelineContent(UniversalBaseModel):
@@ -19,7 +19,7 @@ class GuidelineContent(UniversalBaseModel):
     If this condition is satisfied, the action will be performed
     """
 
-    action: str = pydantic.Field()
+    action: typing.Optional[str] = pydantic.Field(default=None)
     """
     This action will be performed if the condition is satisfied
     """
