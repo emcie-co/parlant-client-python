@@ -2,8 +2,9 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 from .guideline_content import GuidelineContent
-from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
 import typing
+from .tool_id import ToolId
+from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
 import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -14,6 +15,7 @@ class GuidelinePayload(UniversalBaseModel):
     """
 
     content: GuidelineContent
+    tool_ids: typing.List[ToolId]
     operation: GuidelinePayloadOperationDto
     updated_id: typing.Optional[str] = pydantic.Field(default=None)
     """

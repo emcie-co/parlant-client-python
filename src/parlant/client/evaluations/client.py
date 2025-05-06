@@ -48,7 +48,13 @@ class EvaluationsClient:
 
         Examples
         --------
-        from parlant.client import GuidelineContent, GuidelinePayload, ParlantClient, Payload
+        from parlant.client import (
+            GuidelineContent,
+            GuidelinePayload,
+            ParlantClient,
+            Payload,
+            ToolId,
+        )
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -61,6 +67,12 @@ class EvaluationsClient:
                             condition="when customer asks about pricing",
                             action="Sing the user a lullaby.",
                         ),
+                        tool_ids=[
+                            ToolId(
+                                service_name="email_service",
+                                tool_name="send_email",
+                            )
+                        ],
                         operation="add",
                         action_proposition=True,
                         properties_proposition=True,
@@ -240,6 +252,7 @@ class AsyncEvaluationsClient:
             GuidelineContent,
             GuidelinePayload,
             Payload,
+            ToolId,
         )
 
         client = AsyncParlantClient(
@@ -256,6 +269,12 @@ class AsyncEvaluationsClient:
                                 condition="when customer asks about pricing",
                                 action="Sing the user a lullaby.",
                             ),
+                            tool_ids=[
+                                ToolId(
+                                    service_name="email_service",
+                                    tool_name="send_email",
+                                )
+                            ],
                             operation="add",
                             action_proposition=True,
                             properties_proposition=True,
