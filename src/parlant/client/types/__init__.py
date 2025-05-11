@@ -45,6 +45,8 @@ from .http_validation_error import HttpValidationError
 from .invoice import Invoice
 from .invoice_data import InvoiceData
 from .journey import Journey
+from .journey_condition_update_params import JourneyConditionUpdateParams
+from .journey_tag_update_params import JourneyTagUpdateParams
 from .legacy_context_variable import LegacyContextVariable
 from .legacy_context_variable_creation_params import LegacyContextVariableCreationParams
 from .legacy_context_variable_read_result import LegacyContextVariableReadResult
@@ -146,6 +148,8 @@ __all__ = [
     "Invoice",
     "InvoiceData",
     "Journey",
+    "JourneyConditionUpdateParams",
+    "JourneyTagUpdateParams",
     "LegacyContextVariable",
     "LegacyContextVariableCreationParams",
     "LegacyContextVariableReadResult",

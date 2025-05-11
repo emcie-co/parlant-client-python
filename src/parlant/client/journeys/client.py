@@ -5,11 +5,14 @@ from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
 from ..types.journey import Journey
 from ..core.pydantic_utilities import parse_obj_as
+from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
+from ..types.journey_condition_update_params import JourneyConditionUpdateParams
+from ..types.journey_tag_update_params import JourneyTagUpdateParams
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -21,13 +24,19 @@ class JourneysClient:
         self._client_wrapper = client_wrapper
 
     def list(
-        self, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        tag_id: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Journey]:
         """
         Retrieves a list of all journeys in the system.
 
         Parameters
         ----------
+        tag_id : typing.Optional[str]
+            The tag ID to filter journeys by
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -48,6 +57,9 @@ class JourneysClient:
         _response = self._client_wrapper.httpx_client.request(
             "journeys",
             method="GET",
+            params={
+                "tag_id": tag_id,
+            },
             request_options=request_options,
         )
         try:
@@ -59,6 +71,16 @@ class JourneysClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -69,14 +91,14 @@ class JourneysClient:
         *,
         title: str,
         description: str,
-        condition: str,
+        conditions: typing.Sequence[str],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
         Creates a new journey in the system.
 
-        The journey will be initialized with the provided title, description, and condition.
+        The journey will be initialized with the provided title, description, and conditions.
         A unique identifier will be automatically generated.
 
         Parameters
@@ -86,8 +108,7 @@ class JourneysClient:
 
         description : str
 
-        condition : str
-            The condition that triggers this journey
+        conditions : typing.Sequence[str]
 
         tags : typing.Optional[typing.Sequence[str]]
             List of tag IDs associated with the journey
@@ -109,8 +130,11 @@ class JourneysClient:
         )
         client.journeys.create(
             title="Customer Onboarding",
-            description="A journey to guide new customers through our product features",
-            condition="when customer needs help with onboarding",
+            description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
+            conditions=[
+                "customer needs unlocking their card",
+                "customer needs help with card",
+            ],
             tags=["tag1", "tag2"],
         )
         """
@@ -120,7 +144,7 @@ class JourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "condition": condition,
+                "conditions": conditions,
                 "tags": tags,
             },
             request_options=request_options,
@@ -297,8 +321,8 @@ class JourneysClient:
         *,
         title: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
-        condition: typing.Optional[str] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
+        tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -316,11 +340,9 @@ class JourneysClient:
 
         description : typing.Optional[str]
 
-        condition : typing.Optional[str]
-            The condition that triggers this journey
+        conditions : typing.Optional[JourneyConditionUpdateParams]
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the journey
+        tags : typing.Optional[JourneyTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -340,9 +362,7 @@ class JourneysClient:
         client.journeys.update(
             journey_id="IUCGT-lvpS",
             title="Customer Onboarding",
-            description="A journey to guide new customers through our product features",
-            condition="when customer needs help with onboarding",
-            tags=["tag1", "tag2"],
+            description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -351,8 +371,14 @@ class JourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "condition": condition,
-                "tags": tags,
+                "conditions": convert_and_respect_annotation_metadata(
+                    object_=conditions,
+                    annotation=JourneyConditionUpdateParams,
+                    direction="write",
+                ),
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=JourneyTagUpdateParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -397,13 +423,19 @@ class AsyncJourneysClient:
         self._client_wrapper = client_wrapper
 
     async def list(
-        self, *, request_options: typing.Optional[RequestOptions] = None
+        self,
+        *,
+        tag_id: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Journey]:
         """
         Retrieves a list of all journeys in the system.
 
         Parameters
         ----------
+        tag_id : typing.Optional[str]
+            The tag ID to filter journeys by
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -432,6 +464,9 @@ class AsyncJourneysClient:
         _response = await self._client_wrapper.httpx_client.request(
             "journeys",
             method="GET",
+            params={
+                "tag_id": tag_id,
+            },
             request_options=request_options,
         )
         try:
@@ -443,6 +478,16 @@ class AsyncJourneysClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
             _response_json = _response.json()
         except JSONDecodeError:
             raise ApiError(status_code=_response.status_code, body=_response.text)
@@ -453,14 +498,14 @@ class AsyncJourneysClient:
         *,
         title: str,
         description: str,
-        condition: str,
+        conditions: typing.Sequence[str],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
         Creates a new journey in the system.
 
-        The journey will be initialized with the provided title, description, and condition.
+        The journey will be initialized with the provided title, description, and conditions.
         A unique identifier will be automatically generated.
 
         Parameters
@@ -470,8 +515,7 @@ class AsyncJourneysClient:
 
         description : str
 
-        condition : str
-            The condition that triggers this journey
+        conditions : typing.Sequence[str]
 
         tags : typing.Optional[typing.Sequence[str]]
             List of tag IDs associated with the journey
@@ -498,8 +542,11 @@ class AsyncJourneysClient:
         async def main() -> None:
             await client.journeys.create(
                 title="Customer Onboarding",
-                description="A journey to guide new customers through our product features",
-                condition="when customer needs help with onboarding",
+                description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
+                conditions=[
+                    "customer needs unlocking their card",
+                    "customer needs help with card",
+                ],
                 tags=["tag1", "tag2"],
             )
 
@@ -512,7 +559,7 @@ class AsyncJourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "condition": condition,
+                "conditions": conditions,
                 "tags": tags,
             },
             request_options=request_options,
@@ -705,8 +752,8 @@ class AsyncJourneysClient:
         *,
         title: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
-        condition: typing.Optional[str] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
+        tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -724,11 +771,9 @@ class AsyncJourneysClient:
 
         description : typing.Optional[str]
 
-        condition : typing.Optional[str]
-            The condition that triggers this journey
+        conditions : typing.Optional[JourneyConditionUpdateParams]
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the journey
+        tags : typing.Optional[JourneyTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -753,9 +798,7 @@ class AsyncJourneysClient:
             await client.journeys.update(
                 journey_id="IUCGT-lvpS",
                 title="Customer Onboarding",
-                description="A journey to guide new customers through our product features",
-                condition="when customer needs help with onboarding",
-                tags=["tag1", "tag2"],
+                description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
             )
 
 
@@ -767,8 +810,14 @@ class AsyncJourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "condition": condition,
-                "tags": tags,
+                "conditions": convert_and_respect_annotation_metadata(
+                    object_=conditions,
+                    annotation=JourneyConditionUpdateParams,
+                    direction="write",
+                ),
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=JourneyTagUpdateParams, direction="write"
+                ),
             },
             request_options=request_options,
             omit=OMIT,
