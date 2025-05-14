@@ -13,12 +13,12 @@ class JourneyConditionUpdateParams(UniversalBaseModel):
 
     add: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    List of condition IDs to add to the journey
+    List of guideline IDs to add to the journey
     """
 
     remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    List of condition IDs to remove from the journey
+    List of guideline IDs to remove from the journey
     """
 
     if IS_PYDANTIC_V2:
