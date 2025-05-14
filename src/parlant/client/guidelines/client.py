@@ -100,7 +100,7 @@ class GuidelinesClient:
         self,
         *,
         condition: str,
-        action: str,
+        action: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
@@ -116,7 +116,7 @@ class GuidelinesClient:
         condition : str
             If this condition is satisfied, the action will be performed
 
-        action : str
+        action : typing.Optional[str]
             This action will be performed if the condition is satisfied
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
@@ -350,6 +350,8 @@ class GuidelinesClient:
         Tool Association rules:
         - Tool services and tools must exist before creating associations
 
+        Action with text can not be updated to None.
+
         Parameters
         ----------
         guideline_id : str
@@ -559,7 +561,7 @@ class AsyncGuidelinesClient:
         self,
         *,
         condition: str,
-        action: str,
+        action: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
@@ -575,7 +577,7 @@ class AsyncGuidelinesClient:
         condition : str
             If this condition is satisfied, the action will be performed
 
-        action : str
+        action : typing.Optional[str]
             This action will be performed if the condition is satisfied
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
@@ -832,6 +834,8 @@ class AsyncGuidelinesClient:
 
         Tool Association rules:
         - Tool services and tools must exist before creating associations
+
+        Action with text can not be updated to None.
 
         Parameters
         ----------

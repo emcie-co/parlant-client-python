@@ -6,22 +6,28 @@ import typing
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class GuidelineContent(UniversalBaseModel):
+class Journey(UniversalBaseModel):
     """
-    Represention of a guideline with a condition-action pair.
+    A journey represents a guided interaction path for specific user scenarios.
 
-    This model defines a structure for guidelines where specific actions should be taken
-    when certain conditions are met. It follows a simple "if condition then action" pattern.
-    """
-
-    condition: str = pydantic.Field()
-    """
-    If this condition is satisfied, the action will be performed
+    Each journey is triggered by a condition and contains steps to guide the interaction.
     """
 
-    action: typing.Optional[str] = pydantic.Field(default=None)
+    id: str = pydantic.Field()
     """
-    This action will be performed if the condition is satisfied
+    Unique identifier for the journey
+    """
+
+    title: str = pydantic.Field()
+    """
+    The title of the journey
+    """
+
+    description: str
+    conditions: typing.List[str]
+    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    List of tag IDs associated with the journey
     """
 
     if IS_PYDANTIC_V2:

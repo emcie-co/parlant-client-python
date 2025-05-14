@@ -2,62 +2,48 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
-from ..types.relationship_kind_dto import RelationshipKindDto
 from ..core.request_options import RequestOptions
-from ..types.relationship import Relationship
+from ..types.journey import Journey
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.tool_id import ToolId
-from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
+from ..types.journey_condition_update_params import JourneyConditionUpdateParams
+from ..types.journey_tag_update_params import JourneyTagUpdateParams
+from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
 
-class RelationshipsClient:
+class JourneysClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
     def list(
         self,
         *,
-        kind: typing.Optional[RelationshipKindDto] = None,
-        indirect: typing.Optional[bool] = None,
-        guideline_id: typing.Optional[str] = None,
         tag_id: typing.Optional[str] = None,
-        tool_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Relationship]:
+    ) -> typing.List[Journey]:
         """
-        List relationships.
-
-        Either `guideline_id` or `tag_id` or `tool_id` must be provided.
+        Retrieves a list of all journeys in the system.
 
         Parameters
         ----------
-        kind : typing.Optional[RelationshipKindDto]
-
-        indirect : typing.Optional[bool]
-            Whether to include indirect relationships
-
-        guideline_id : typing.Optional[str]
-
         tag_id : typing.Optional[str]
-
-        tool_id : typing.Optional[str]
+            The tag ID to filter journeys by
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Relationship]
-            Relationships successfully retrieved. Returns a list of all relationships.
+        typing.List[Journey]
+            List of all journeys in the system
 
         Examples
         --------
@@ -66,26 +52,22 @@ class RelationshipsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.relationships.list()
+        client.journeys.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "relationships",
+            "journeys",
             method="GET",
             params={
-                "kind": kind,
-                "indirect": indirect,
-                "guideline_id": guideline_id,
                 "tag_id": tag_id,
-                "tool_id": tool_id,
             },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Relationship],
+                    typing.List[Journey],
                     parse_obj_as(
-                        type_=typing.List[Relationship],  # type: ignore
+                        type_=typing.List[Journey],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -107,48 +89,37 @@ class RelationshipsClient:
     def create(
         self,
         *,
-        kind: RelationshipKindDto,
-        source_guideline: typing.Optional[str] = OMIT,
-        source_tag: typing.Optional[str] = OMIT,
-        source_tool: typing.Optional[ToolId] = OMIT,
-        target_guideline: typing.Optional[str] = OMIT,
-        target_tag: typing.Optional[str] = OMIT,
-        target_tool: typing.Optional[ToolId] = OMIT,
+        title: str,
+        description: str,
+        conditions: typing.Sequence[str],
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Relationship:
+    ) -> Journey:
         """
-        Create a relationship.
+        Creates a new journey in the system.
 
-        A relationship is a relationship between a guideline and a tag.
-        It can be created between a guideline and a tag, or between two guidelines, or between two tags.
+        The journey will be initialized with the provided title, description, and conditions.
+        A unique identifier will be automatically generated.
 
         Parameters
         ----------
-        kind : RelationshipKindDto
+        title : str
+            The title of the journey
 
-        source_guideline : typing.Optional[str]
-            Unique identifier for the guideline
+        description : str
 
-        source_tag : typing.Optional[str]
-            Unique identifier for the tag
+        conditions : typing.Sequence[str]
 
-        source_tool : typing.Optional[ToolId]
-
-        target_guideline : typing.Optional[str]
-            Unique identifier for the guideline
-
-        target_tag : typing.Optional[str]
-            Unique identifier for the tag
-
-        target_tool : typing.Optional[ToolId]
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tag IDs associated with the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Relationship
-            Relationship successfully created. Returns the created relationship.
+        Journey
+            Journey successfully created. Returns the complete journey object including generated ID.
 
         Examples
         --------
@@ -157,27 +128,24 @@ class RelationshipsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.relationships.create(
-            source_guideline="gid_123",
-            target_tag="tid_456",
-            kind="entailment",
+        client.journeys.create(
+            title="Customer Onboarding",
+            description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
+            conditions=[
+                "customer needs unlocking their card",
+                "customer needs help with card",
+            ],
+            tags=["tag1", "tag2"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "relationships",
+            "journeys",
             method="POST",
             json={
-                "source_guideline": source_guideline,
-                "source_tag": source_tag,
-                "source_tool": convert_and_respect_annotation_metadata(
-                    object_=source_tool, annotation=ToolId, direction="write"
-                ),
-                "target_guideline": target_guideline,
-                "target_tag": target_tag,
-                "target_tool": convert_and_respect_annotation_metadata(
-                    object_=target_tool, annotation=ToolId, direction="write"
-                ),
-                "kind": kind,
+                "title": title,
+                "description": description,
+                "conditions": conditions,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -185,9 +153,9 @@ class RelationshipsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Relationship,
+                    Journey,
                     parse_obj_as(
-                        type_=Relationship,  # type: ignore
+                        type_=Journey,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -208,25 +176,25 @@ class RelationshipsClient:
 
     def retrieve(
         self,
-        relationship_id: str,
+        journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Relationship:
+    ) -> Journey:
         """
-        Read a relationship by ID.
+        Retrieves details of a specific journey by ID.
 
         Parameters
         ----------
-        relationship_id : str
-            identifier of relationship
+        journey_id : str
+            Unique identifier for the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Relationship
-            Relationship successfully retrieved. Returns the requested relationship.
+        Journey
+            Journey details successfully retrieved. Returns the complete journey object.
 
         Examples
         --------
@@ -235,23 +203,33 @@ class RelationshipsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.relationships.retrieve(
-            relationship_id="gr_123",
+        client.journeys.retrieve(
+            journey_id="IUCGT-lvpS",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"relationships/{jsonable_encoder(relationship_id)}",
+            f"journeys/{jsonable_encoder(journey_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Relationship,
+                    Journey,
                     parse_obj_as(
-                        type_=Relationship,  # type: ignore
+                        type_=Journey,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
@@ -270,17 +248,21 @@ class RelationshipsClient:
 
     def delete(
         self,
-        relationship_id: str,
+        journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Delete a relationship by ID.
+        Deletes a journey from the system.
+
+        Also deletes the associated guideline.
+        Deleting a non-existent journey will return 404.
+        No content will be returned from a successful deletion.
 
         Parameters
         ----------
-        relationship_id : str
-            identifier of relationship
+        journey_id : str
+            Unique identifier for the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -296,12 +278,12 @@ class RelationshipsClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.relationships.delete(
-            relationship_id="gr_123",
+        client.journeys.delete(
+            journey_id="IUCGT-lvpS",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"relationships/{jsonable_encoder(relationship_id)}",
+            f"journeys/{jsonable_encoder(journey_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -333,46 +315,134 @@ class RelationshipsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
-
-class AsyncRelationshipsClient:
-    def __init__(self, *, client_wrapper: AsyncClientWrapper):
-        self._client_wrapper = client_wrapper
-
-    async def list(
+    def update(
         self,
+        journey_id: str,
         *,
-        kind: typing.Optional[RelationshipKindDto] = None,
-        indirect: typing.Optional[bool] = None,
-        guideline_id: typing.Optional[str] = None,
-        tag_id: typing.Optional[str] = None,
-        tool_id: typing.Optional[str] = None,
+        title: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
+        tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Relationship]:
+    ) -> Journey:
         """
-        List relationships.
+        Updates an existing journey's attributes.
 
-        Either `guideline_id` or `tag_id` or `tool_id` must be provided.
+        Only the provided attributes will be updated; others will remain unchanged.
 
         Parameters
         ----------
-        kind : typing.Optional[RelationshipKindDto]
+        journey_id : str
+            Unique identifier for the journey
 
-        indirect : typing.Optional[bool]
-            Whether to include indirect relationships
+        title : typing.Optional[str]
+            The title of the journey
 
-        guideline_id : typing.Optional[str]
+        description : typing.Optional[str]
 
-        tag_id : typing.Optional[str]
+        conditions : typing.Optional[JourneyConditionUpdateParams]
 
-        tool_id : typing.Optional[str]
+        tags : typing.Optional[JourneyTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Relationship]
-            Relationships successfully retrieved. Returns a list of all relationships.
+        Journey
+            Journey successfully updated. Returns the updated journey.
+
+        Examples
+        --------
+        from parlant.client import ParlantClient
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.journeys.update(
+            journey_id="IUCGT-lvpS",
+            title="Customer Onboarding",
+            description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"journeys/{jsonable_encoder(journey_id)}",
+            method="PATCH",
+            json={
+                "title": title,
+                "description": description,
+                "conditions": convert_and_respect_annotation_metadata(
+                    object_=conditions,
+                    annotation=JourneyConditionUpdateParams,
+                    direction="write",
+                ),
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=JourneyTagUpdateParams, direction="write"
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Journey,
+                    parse_obj_as(
+                        type_=Journey,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+
+class AsyncJourneysClient:
+    def __init__(self, *, client_wrapper: AsyncClientWrapper):
+        self._client_wrapper = client_wrapper
+
+    async def list(
+        self,
+        *,
+        tag_id: typing.Optional[str] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> typing.List[Journey]:
+        """
+        Retrieves a list of all journeys in the system.
+
+        Parameters
+        ----------
+        tag_id : typing.Optional[str]
+            The tag ID to filter journeys by
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.List[Journey]
+            List of all journeys in the system
 
         Examples
         --------
@@ -386,29 +456,25 @@ class AsyncRelationshipsClient:
 
 
         async def main() -> None:
-            await client.relationships.list()
+            await client.journeys.list()
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "relationships",
+            "journeys",
             method="GET",
             params={
-                "kind": kind,
-                "indirect": indirect,
-                "guideline_id": guideline_id,
                 "tag_id": tag_id,
-                "tool_id": tool_id,
             },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Relationship],
+                    typing.List[Journey],
                     parse_obj_as(
-                        type_=typing.List[Relationship],  # type: ignore
+                        type_=typing.List[Journey],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -430,48 +496,37 @@ class AsyncRelationshipsClient:
     async def create(
         self,
         *,
-        kind: RelationshipKindDto,
-        source_guideline: typing.Optional[str] = OMIT,
-        source_tag: typing.Optional[str] = OMIT,
-        source_tool: typing.Optional[ToolId] = OMIT,
-        target_guideline: typing.Optional[str] = OMIT,
-        target_tag: typing.Optional[str] = OMIT,
-        target_tool: typing.Optional[ToolId] = OMIT,
+        title: str,
+        description: str,
+        conditions: typing.Sequence[str],
+        tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Relationship:
+    ) -> Journey:
         """
-        Create a relationship.
+        Creates a new journey in the system.
 
-        A relationship is a relationship between a guideline and a tag.
-        It can be created between a guideline and a tag, or between two guidelines, or between two tags.
+        The journey will be initialized with the provided title, description, and conditions.
+        A unique identifier will be automatically generated.
 
         Parameters
         ----------
-        kind : RelationshipKindDto
+        title : str
+            The title of the journey
 
-        source_guideline : typing.Optional[str]
-            Unique identifier for the guideline
+        description : str
 
-        source_tag : typing.Optional[str]
-            Unique identifier for the tag
+        conditions : typing.Sequence[str]
 
-        source_tool : typing.Optional[ToolId]
-
-        target_guideline : typing.Optional[str]
-            Unique identifier for the guideline
-
-        target_tag : typing.Optional[str]
-            Unique identifier for the tag
-
-        target_tool : typing.Optional[ToolId]
+        tags : typing.Optional[typing.Sequence[str]]
+            List of tag IDs associated with the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Relationship
-            Relationship successfully created. Returns the created relationship.
+        Journey
+            Journey successfully created. Returns the complete journey object including generated ID.
 
         Examples
         --------
@@ -485,30 +540,27 @@ class AsyncRelationshipsClient:
 
 
         async def main() -> None:
-            await client.relationships.create(
-                source_guideline="gid_123",
-                target_tag="tid_456",
-                kind="entailment",
+            await client.journeys.create(
+                title="Customer Onboarding",
+                description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
+                conditions=[
+                    "customer needs unlocking their card",
+                    "customer needs help with card",
+                ],
+                tags=["tag1", "tag2"],
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "relationships",
+            "journeys",
             method="POST",
             json={
-                "source_guideline": source_guideline,
-                "source_tag": source_tag,
-                "source_tool": convert_and_respect_annotation_metadata(
-                    object_=source_tool, annotation=ToolId, direction="write"
-                ),
-                "target_guideline": target_guideline,
-                "target_tag": target_tag,
-                "target_tool": convert_and_respect_annotation_metadata(
-                    object_=target_tool, annotation=ToolId, direction="write"
-                ),
-                "kind": kind,
+                "title": title,
+                "description": description,
+                "conditions": conditions,
+                "tags": tags,
             },
             request_options=request_options,
             omit=OMIT,
@@ -516,9 +568,9 @@ class AsyncRelationshipsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Relationship,
+                    Journey,
                     parse_obj_as(
-                        type_=Relationship,  # type: ignore
+                        type_=Journey,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -539,25 +591,25 @@ class AsyncRelationshipsClient:
 
     async def retrieve(
         self,
-        relationship_id: str,
+        journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Relationship:
+    ) -> Journey:
         """
-        Read a relationship by ID.
+        Retrieves details of a specific journey by ID.
 
         Parameters
         ----------
-        relationship_id : str
-            identifier of relationship
+        journey_id : str
+            Unique identifier for the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Relationship
-            Relationship successfully retrieved. Returns the requested relationship.
+        Journey
+            Journey details successfully retrieved. Returns the complete journey object.
 
         Examples
         --------
@@ -571,26 +623,36 @@ class AsyncRelationshipsClient:
 
 
         async def main() -> None:
-            await client.relationships.retrieve(
-                relationship_id="gr_123",
+            await client.journeys.retrieve(
+                journey_id="IUCGT-lvpS",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"relationships/{jsonable_encoder(relationship_id)}",
+            f"journeys/{jsonable_encoder(journey_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Relationship,
+                    Journey,
                     parse_obj_as(
-                        type_=Relationship,  # type: ignore
+                        type_=Journey,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             if _response.status_code == 422:
                 raise UnprocessableEntityError(
@@ -609,17 +671,21 @@ class AsyncRelationshipsClient:
 
     async def delete(
         self,
-        relationship_id: str,
+        journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Delete a relationship by ID.
+        Deletes a journey from the system.
+
+        Also deletes the associated guideline.
+        Deleting a non-existent journey will return 404.
+        No content will be returned from a successful deletion.
 
         Parameters
         ----------
-        relationship_id : str
-            identifier of relationship
+        journey_id : str
+            Unique identifier for the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -640,21 +706,131 @@ class AsyncRelationshipsClient:
 
 
         async def main() -> None:
-            await client.relationships.delete(
-                relationship_id="gr_123",
+            await client.journeys.delete(
+                journey_id="IUCGT-lvpS",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"relationships/{jsonable_encoder(relationship_id)}",
+            f"journeys/{jsonable_encoder(journey_id)}",
             method="DELETE",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update(
+        self,
+        journey_id: str,
+        *,
+        title: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
+        tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Journey:
+        """
+        Updates an existing journey's attributes.
+
+        Only the provided attributes will be updated; others will remain unchanged.
+
+        Parameters
+        ----------
+        journey_id : str
+            Unique identifier for the journey
+
+        title : typing.Optional[str]
+            The title of the journey
+
+        description : typing.Optional[str]
+
+        conditions : typing.Optional[JourneyConditionUpdateParams]
+
+        tags : typing.Optional[JourneyTagUpdateParams]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        Journey
+            Journey successfully updated. Returns the updated journey.
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.journeys.update(
+                journey_id="IUCGT-lvpS",
+                title="Customer Onboarding",
+                description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"journeys/{jsonable_encoder(journey_id)}",
+            method="PATCH",
+            json={
+                "title": title,
+                "description": description,
+                "conditions": convert_and_respect_annotation_metadata(
+                    object_=conditions,
+                    annotation=JourneyConditionUpdateParams,
+                    direction="write",
+                ),
+                "tags": convert_and_respect_annotation_metadata(
+                    object_=tags, annotation=JourneyTagUpdateParams, direction="write"
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Journey,
+                    parse_obj_as(
+                        type_=Journey,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(

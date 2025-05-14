@@ -3,11 +3,11 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
-from .payload import Payload
+from .legacy_payload import LegacyPayload
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class EvaluationCreationParams(UniversalBaseModel):
+class LegacyEvaluationCreationParams(UniversalBaseModel):
     """
     Parameters for creating a new evaluation task
     """
@@ -17,7 +17,7 @@ class EvaluationCreationParams(UniversalBaseModel):
     Unique identifier for the agent
     """
 
-    payloads: typing.List[Payload]
+    payloads: typing.List[LegacyPayload]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

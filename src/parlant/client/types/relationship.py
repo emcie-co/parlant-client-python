@@ -30,11 +30,6 @@ class Relationship(UniversalBaseModel):
     target_tag: typing.Optional[Tag] = None
     source_tool: typing.Optional[Tool] = None
     target_tool: typing.Optional[Tool] = None
-    indirect: bool = pydantic.Field()
-    """
-    `True` if there is a path from `source` to `target` but no direct relationship
-    """
-
     kind: RelationshipKindDto
 
     if IS_PYDANTIC_V2:

@@ -21,7 +21,7 @@ class Guideline(UniversalBaseModel):
     If this condition is satisfied, the action will be performed
     """
 
-    action: str = pydantic.Field()
+    action: typing.Optional[str] = pydantic.Field(default=None)
     """
     This action will be performed if the condition is satisfied
     """
