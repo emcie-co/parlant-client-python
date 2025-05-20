@@ -3,5 +3,5 @@
 import typing
 
 ToolParameterTypeDto = typing.Union[
-    typing.Literal["string", "number", "integer", "boolean"], typing.Any
+    typing.Literal["string", "number", "integer", "boolean", "array"], typing.Any
 ]
