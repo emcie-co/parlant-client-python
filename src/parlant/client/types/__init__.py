@@ -86,6 +86,7 @@ from .relationship_kind_dto import RelationshipKindDto
 from .sdk_service_params import SdkServiceParams
 from .service import Service
 from .session import Session
+from .session_mode_dto import SessionModeDto
 from .tag import Tag
 from .term import Term
 from .term_tags_update_params import TermTagsUpdateParams
@@ -185,6 +186,7 @@ __all__ = [
     "SdkServiceParams",
     "Service",
     "Session",
+    "SessionModeDto",
     "Tag",
     "Term",
     "TermTagsUpdateParams",

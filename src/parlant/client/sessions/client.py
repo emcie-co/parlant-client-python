@@ -11,6 +11,7 @@ from ..core.api_error import ApiError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
 from ..types.consumption_offsets_update_params import ConsumptionOffsetsUpdateParams
+from ..types.session_mode_dto import SessionModeDto
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.event_source_dto import EventSourceDto
 from ..types.event import Event
@@ -399,6 +400,7 @@ class SessionsClient:
         *,
         consumption_offsets: typing.Optional[ConsumptionOffsetsUpdateParams] = OMIT,
         title: typing.Optional[str] = OMIT,
+        mode: typing.Optional[SessionModeDto] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
@@ -415,6 +417,9 @@ class SessionsClient:
 
         title : typing.Optional[str]
             Descriptive title for the session
+
+        mode : typing.Optional[SessionModeDto]
+            The mode of the session, either 'auto' or 'manual'. In manual mode, events added to a session will not be responded to automatically by the agent.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -449,6 +454,7 @@ class SessionsClient:
                     direction="write",
                 ),
                 "title": title,
+                "mode": mode,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1286,6 +1292,7 @@ class AsyncSessionsClient:
         *,
         consumption_offsets: typing.Optional[ConsumptionOffsetsUpdateParams] = OMIT,
         title: typing.Optional[str] = OMIT,
+        mode: typing.Optional[SessionModeDto] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
@@ -1302,6 +1309,9 @@ class AsyncSessionsClient:
 
         title : typing.Optional[str]
             Descriptive title for the session
+
+        mode : typing.Optional[SessionModeDto]
+            The mode of the session, either 'auto' or 'manual'. In manual mode, events added to a session will not be responded to automatically by the agent.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1344,6 +1354,7 @@ class AsyncSessionsClient:
                     direction="write",
                 ),
                 "title": title,
+                "mode": mode,
             },
             request_options=request_options,
             omit=OMIT,

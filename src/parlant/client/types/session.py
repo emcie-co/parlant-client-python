@@ -4,6 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import datetime as dt
 import typing
+from .session_mode_dto import SessionModeDto
 from .consumption_offsets import ConsumptionOffsets
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -36,6 +37,11 @@ class Session(UniversalBaseModel):
     title: typing.Optional[str] = pydantic.Field(default=None)
     """
     Descriptive title for the session
+    """
+
+    mode: SessionModeDto = pydantic.Field()
+    """
+    The mode of the session, either 'auto' or 'manual'. In manual mode, events added to a session will not be responded to automatically by the agent.
     """
 
     consumption_offsets: ConsumptionOffsets
