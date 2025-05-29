@@ -14,6 +14,7 @@ from ..core.api_error import ApiError
 from ..types.tool_service_kind_dto import ToolServiceKindDto
 from ..types.sdk_service_params import SdkServiceParams
 from ..types.open_api_service_params import OpenApiServiceParams
+from ..types.mcp_service_params import McpServiceParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -121,6 +122,7 @@ class ServicesClient:
         kind: ToolServiceKindDto,
         sdk: typing.Optional[SdkServiceParams] = OMIT,
         openapi: typing.Optional[OpenApiServiceParams] = OMIT,
+        mcp: typing.Optional[McpServiceParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Service:
         """
@@ -151,6 +153,9 @@ class ServicesClient:
 
         openapi : typing.Optional[OpenApiServiceParams]
             OpenAPI service configuration parameters. Required when kind is 'openapi'.
+
+        mcp : typing.Optional[McpServiceParams]
+            MCP service configuration parameters. Required when kind is 'mcp'.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -186,6 +191,9 @@ class ServicesClient:
                 ),
                 "openapi": convert_and_respect_annotation_metadata(
                     object_=openapi, annotation=OpenApiServiceParams, direction="write"
+                ),
+                "mcp": convert_and_respect_annotation_metadata(
+                    object_=mcp, annotation=McpServiceParams, direction="write"
                 ),
             },
             request_options=request_options,
@@ -452,6 +460,7 @@ class AsyncServicesClient:
         kind: ToolServiceKindDto,
         sdk: typing.Optional[SdkServiceParams] = OMIT,
         openapi: typing.Optional[OpenApiServiceParams] = OMIT,
+        mcp: typing.Optional[McpServiceParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Service:
         """
@@ -482,6 +491,9 @@ class AsyncServicesClient:
 
         openapi : typing.Optional[OpenApiServiceParams]
             OpenAPI service configuration parameters. Required when kind is 'openapi'.
+
+        mcp : typing.Optional[McpServiceParams]
+            MCP service configuration parameters. Required when kind is 'mcp'.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -525,6 +537,9 @@ class AsyncServicesClient:
                 ),
                 "openapi": convert_and_respect_annotation_metadata(
                     object_=openapi, annotation=OpenApiServiceParams, direction="write"
+                ),
+                "mcp": convert_and_respect_annotation_metadata(
+                    object_=mcp, annotation=McpServiceParams, direction="write"
                 ),
             },
             request_options=request_options,

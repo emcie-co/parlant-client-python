@@ -2,4 +2,4 @@
 
 import typing
 
-ToolServiceKindDto = typing.Union[typing.Literal["sdk", "openapi"], typing.Any]
+ToolServiceKindDto = typing.Union[typing.Literal["sdk", "openapi", "mcp"], typing.Any]
