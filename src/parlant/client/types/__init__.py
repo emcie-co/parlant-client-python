@@ -73,6 +73,7 @@ from .legacy_payload import LegacyPayload
 from .legacy_term import LegacyTerm
 from .legacy_term_creation_params import LegacyTermCreationParams
 from .legacy_term_update_params import LegacyTermUpdateParams
+from .mcp_service_params import McpServiceParams
 from .message_generation_inspection import MessageGenerationInspection
 from .moderation import Moderation
 from .open_api_service_params import OpenApiServiceParams
@@ -173,6 +174,7 @@ __all__ = [
     "LegacyTerm",
     "LegacyTermCreationParams",
     "LegacyTermUpdateParams",
+    "McpServiceParams",
     "MessageGenerationInspection",
     "Moderation",
     "OpenApiServiceParams",
