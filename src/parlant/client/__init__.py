@@ -3,6 +3,8 @@
 from .types import (
     Agent,
     AgentTagUpdateParams,
+    Capability,
+    CapabilityTagUpdateParams,
     CoherenceCheck,
     CoherenceCheckKindDto,
     CompositionModeDto,
@@ -109,6 +111,7 @@ from .errors import (
 )
 from . import (
     agents,
+    capabilities,
     context_variables,
     customers,
     evaluations,
@@ -127,6 +130,8 @@ __all__ = [
     "Agent",
     "AgentTagUpdateParams",
     "AsyncParlantClient",
+    "Capability",
+    "CapabilityTagUpdateParams",
     "CoherenceCheck",
     "CoherenceCheckKindDto",
     "CompositionModeDto",
@@ -230,6 +235,7 @@ __all__ = [
     "ValidationError",
     "ValidationErrorLocItem",
     "agents",
+    "capabilities",
     "context_variables",
     "customers",
     "evaluations",
