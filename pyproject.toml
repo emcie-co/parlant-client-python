@@ -11,7 +11,7 @@ packages = [{ include = "parlant", from = "src" }]
 httpx = "^0.28.1"
 mypy = "^1.11.1"
 pydantic = "^2.9.2"
-python = "^3.10"
+python = ">=3.10"
 nanoid = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
