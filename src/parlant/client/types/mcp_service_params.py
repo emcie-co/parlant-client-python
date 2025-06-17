@@ -9,6 +9,9 @@ import typing
 class McpServiceParams(UniversalBaseModel):
     """
     Configuration parameters for MCP-based service integration.
+
+    MCP services use the MCP protocol, which enables advanced features
+    and supports a wide variety of variable types. It is widely adopted by third parties worldwide.
     """
 
     url: str = pydantic.Field()
