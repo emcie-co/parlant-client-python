@@ -11,7 +11,7 @@ class InvoiceData(UniversalBaseModel):
     """
     Contains the relevant invoice data.
 
-    At this point only `guideline` is suppoerted.
+    At this point only `guideline` is supported.
     """
 
     guideline: typing.Optional[GuidelineInvoiceData] = None

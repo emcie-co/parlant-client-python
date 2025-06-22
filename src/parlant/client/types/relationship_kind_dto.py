@@ -3,5 +3,6 @@
 import typing
 
 RelationshipKindDto = typing.Union[
-    typing.Literal["entailment", "priority", "dependency", "overlap"], typing.Any
+    typing.Literal["entailment", "priority", "dependency", "disambiguation", "overlap"],
+    typing.Any,
 ]

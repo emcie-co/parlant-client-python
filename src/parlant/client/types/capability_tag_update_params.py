@@ -2,19 +2,24 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .legacy_guideline_invoice_data import LegacyGuidelineInvoiceData
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class LegacyInvoiceData(UniversalBaseModel):
+class CapabilityTagUpdateParams(UniversalBaseModel):
     """
-    Contains the relevant invoice data.
-
-    At this point only `guideline` is supported.
+    Parameters for updating an existing capability's tags.
     """
 
-    guideline: typing.Optional[LegacyGuidelineInvoiceData] = None
+    add: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    List of tag IDs to add to the capability
+    """
+
+    remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    List of tag IDs to remove from the capability
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

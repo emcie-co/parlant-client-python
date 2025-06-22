@@ -2,6 +2,8 @@
 
 from .agent import Agent
 from .agent_tag_update_params import AgentTagUpdateParams
+from .capability import Capability
+from .capability_tag_update_params import CapabilityTagUpdateParams
 from .coherence_check import CoherenceCheck
 from .coherence_check_kind_dto import CoherenceCheckKindDto
 from .composition_mode_dto import CompositionModeDto
@@ -111,6 +113,8 @@ from .validation_error_loc_item import ValidationErrorLocItem
 __all__ = [
     "Agent",
     "AgentTagUpdateParams",
+    "Capability",
+    "CapabilityTagUpdateParams",
     "CoherenceCheck",
     "CoherenceCheckKindDto",
     "CompositionModeDto",

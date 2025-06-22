@@ -15,6 +15,7 @@ from .guidelines.client import GuidelinesClient
 from .relationships.client import RelationshipsClient
 from .journeys.client import JourneysClient
 from .evaluations.client import EvaluationsClient
+from .capabilities.client import CapabilitiesClient
 from .core.client_wrapper import AsyncClientWrapper
 from .agents.client import AsyncAgentsClient
 from .sessions.client import AsyncSessionsClient
@@ -28,6 +29,7 @@ from .guidelines.client import AsyncGuidelinesClient
 from .relationships.client import AsyncRelationshipsClient
 from .journeys.client import AsyncJourneysClient
 from .evaluations.client import AsyncEvaluationsClient
+from .capabilities.client import AsyncCapabilitiesClient
 
 
 class ParlantClient:
@@ -93,6 +95,7 @@ class ParlantClient:
         self.relationships = RelationshipsClient(client_wrapper=self._client_wrapper)
         self.journeys = JourneysClient(client_wrapper=self._client_wrapper)
         self.evaluations = EvaluationsClient(client_wrapper=self._client_wrapper)
+        self.capabilities = CapabilitiesClient(client_wrapper=self._client_wrapper)
 
 
 class AsyncParlantClient:
@@ -160,3 +163,4 @@ class AsyncParlantClient:
         )
         self.journeys = AsyncJourneysClient(client_wrapper=self._client_wrapper)
         self.evaluations = AsyncEvaluationsClient(client_wrapper=self._client_wrapper)
+        self.capabilities = AsyncCapabilitiesClient(client_wrapper=self._client_wrapper)
