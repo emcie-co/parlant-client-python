@@ -34,6 +34,11 @@ class Utterance(UniversalBaseModel):
     Collection of tag IDs associated with the utterance.
     """
 
+    queries: typing.List[str] = pydantic.Field()
+    """
+    A sequence of queries associated with the utterance, to help with filtering and matching.
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
             extra="allow", frozen=True

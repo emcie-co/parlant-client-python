@@ -90,6 +90,7 @@ class UtterancesClient:
         value: str,
         fields: typing.Sequence[UtteranceField],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        queries: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Utterance:
         """
@@ -103,6 +104,9 @@ class UtterancesClient:
 
         tags : typing.Optional[typing.Sequence[str]]
             Collection of tag IDs associated with the utterance.
+
+        queries : typing.Optional[typing.Sequence[str]]
+            A sequence of queries associated with the utterance, to help with filtering and matching.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -141,6 +145,7 @@ class UtterancesClient:
                     direction="write",
                 ),
                 "tags": tags,
+                "queries": queries,
             },
             request_options=request_options,
             omit=OMIT,
@@ -488,6 +493,7 @@ class AsyncUtterancesClient:
         value: str,
         fields: typing.Sequence[UtteranceField],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        queries: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Utterance:
         """
@@ -501,6 +507,9 @@ class AsyncUtterancesClient:
 
         tags : typing.Optional[typing.Sequence[str]]
             Collection of tag IDs associated with the utterance.
+
+        queries : typing.Optional[typing.Sequence[str]]
+            A sequence of queries associated with the utterance, to help with filtering and matching.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -547,6 +556,7 @@ class AsyncUtterancesClient:
                     direction="write",
                 ),
                 "tags": tags,
+                "queries": queries,
             },
             request_options=request_options,
             omit=OMIT,
