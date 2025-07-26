@@ -93,18 +93,18 @@ class CapabilitiesClient:
         *,
         title: str,
         description: str,
-        queries: typing.Sequence[str],
+        signals: typing.Sequence[str],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Capability:
         """
         Creates a new capability in the system.
 
-        The capability will be initialized with the provided title, description, queries, and optional tags.
+        The capability will be initialized with the provided title, description, signals, and optional tags.
         A unique identifier will be automatically generated.
 
         Default behaviors:
-        - `queries` defaults to an empty list if not provided
+        - `signals` defaults to an empty list if not provided
 
         Parameters
         ----------
@@ -114,8 +114,8 @@ class CapabilitiesClient:
         description : str
             Detailed description of the capability's purpose
 
-        queries : typing.Sequence[str]
-            Example queries that this capability can handle
+        signals : typing.Sequence[str]
+            Example signals that this capability can handle
 
         tags : typing.Optional[typing.Sequence[str]]
             List of tag IDs associated with the capability
@@ -138,7 +138,7 @@ class CapabilitiesClient:
         client.capabilities.create(
             title="Provide Replacement Phone",
             description="Provide a replacement phone when a customer needs repair for their phone.",
-            queries=[
+            signals=[
                 "My phone is broken",
                 "I need a replacement while my phone is being repaired",
             ],
@@ -151,7 +151,7 @@ class CapabilitiesClient:
             json={
                 "title": title,
                 "description": description,
-                "queries": queries,
+                "signals": signals,
                 "tags": tags,
             },
             request_options=request_options,
@@ -329,7 +329,7 @@ class CapabilitiesClient:
         *,
         title: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
-        queries: typing.Optional[typing.Sequence[str]] = OMIT,
+        signals: typing.Optional[typing.Sequence[str]] = OMIT,
         tags: typing.Optional[CapabilityTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Capability:
@@ -350,8 +350,8 @@ class CapabilitiesClient:
         description : typing.Optional[str]
             Detailed description of the capability's purpose
 
-        queries : typing.Optional[typing.Sequence[str]]
-            Example queries that this capability can handle
+        signals : typing.Optional[typing.Sequence[str]]
+            Example signals that this capability can handle
 
         tags : typing.Optional[CapabilityTagUpdateParams]
 
@@ -374,7 +374,7 @@ class CapabilitiesClient:
             capability_id="cap_123abc",
             title="Provide Replacement Phone",
             description="Provide a replacement phone when a customer needs repair for their phone.",
-            queries=[
+            signals=[
                 "My phone is broken",
                 "I need a replacement while my phone is being repaired",
             ],
@@ -386,7 +386,7 @@ class CapabilitiesClient:
             json={
                 "title": title,
                 "description": description,
-                "queries": queries,
+                "signals": signals,
                 "tags": convert_and_respect_annotation_metadata(
                     object_=tags,
                     annotation=CapabilityTagUpdateParams,
@@ -514,18 +514,18 @@ class AsyncCapabilitiesClient:
         *,
         title: str,
         description: str,
-        queries: typing.Sequence[str],
+        signals: typing.Sequence[str],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Capability:
         """
         Creates a new capability in the system.
 
-        The capability will be initialized with the provided title, description, queries, and optional tags.
+        The capability will be initialized with the provided title, description, signals, and optional tags.
         A unique identifier will be automatically generated.
 
         Default behaviors:
-        - `queries` defaults to an empty list if not provided
+        - `signals` defaults to an empty list if not provided
 
         Parameters
         ----------
@@ -535,8 +535,8 @@ class AsyncCapabilitiesClient:
         description : str
             Detailed description of the capability's purpose
 
-        queries : typing.Sequence[str]
-            Example queries that this capability can handle
+        signals : typing.Sequence[str]
+            Example signals that this capability can handle
 
         tags : typing.Optional[typing.Sequence[str]]
             List of tag IDs associated with the capability
@@ -564,7 +564,7 @@ class AsyncCapabilitiesClient:
             await client.capabilities.create(
                 title="Provide Replacement Phone",
                 description="Provide a replacement phone when a customer needs repair for their phone.",
-                queries=[
+                signals=[
                     "My phone is broken",
                     "I need a replacement while my phone is being repaired",
                 ],
@@ -580,7 +580,7 @@ class AsyncCapabilitiesClient:
             json={
                 "title": title,
                 "description": description,
-                "queries": queries,
+                "signals": signals,
                 "tags": tags,
             },
             request_options=request_options,
@@ -774,7 +774,7 @@ class AsyncCapabilitiesClient:
         *,
         title: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
-        queries: typing.Optional[typing.Sequence[str]] = OMIT,
+        signals: typing.Optional[typing.Sequence[str]] = OMIT,
         tags: typing.Optional[CapabilityTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Capability:
@@ -795,8 +795,8 @@ class AsyncCapabilitiesClient:
         description : typing.Optional[str]
             Detailed description of the capability's purpose
 
-        queries : typing.Optional[typing.Sequence[str]]
-            Example queries that this capability can handle
+        signals : typing.Optional[typing.Sequence[str]]
+            Example signals that this capability can handle
 
         tags : typing.Optional[CapabilityTagUpdateParams]
 
@@ -824,7 +824,7 @@ class AsyncCapabilitiesClient:
                 capability_id="cap_123abc",
                 title="Provide Replacement Phone",
                 description="Provide a replacement phone when a customer needs repair for their phone.",
-                queries=[
+                signals=[
                     "My phone is broken",
                     "I need a replacement while my phone is being repaired",
                 ],
@@ -839,7 +839,7 @@ class AsyncCapabilitiesClient:
             json={
                 "title": title,
                 "description": description,
-                "queries": queries,
+                "signals": signals,
                 "tags": convert_and_respect_annotation_metadata(
                     object_=tags,
                     annotation=CapabilityTagUpdateParams,

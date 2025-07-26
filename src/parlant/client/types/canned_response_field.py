@@ -2,18 +2,22 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
-from .utterance_reason_dto import UtteranceReasonDto
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import typing
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class UtteranceRequest(UniversalBaseModel):
-    action: str = pydantic.Field()
+class CannedResponseField(UniversalBaseModel):
+    name: str = pydantic.Field()
     """
-    A single action that explains what to say; i.e. "Tell the customer that you are thinking and will be right back with an answer."
+    The name of the canned response field.
     """
 
-    reason: UtteranceReasonDto
+    description: str = pydantic.Field()
+    """
+    A description of the canned response field.
+    """
+
+    examples: typing.List[str]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

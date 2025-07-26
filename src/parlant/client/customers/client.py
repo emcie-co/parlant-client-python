@@ -10,7 +10,7 @@ from ..core.api_error import ApiError
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.customer_extra_update_params import CustomerExtraUpdateParams
+from ..types.customer_metadata_update_params import CustomerMetadataUpdateParams
 from ..types.customer_tag_update_params import CustomerTagUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
@@ -74,7 +74,7 @@ class CustomersClient:
         self,
         *,
         name: str,
-        extra: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
@@ -82,14 +82,14 @@ class CustomersClient:
         Creates a new customer in the system.
 
         A customer may be created with as little as a `name`.
-        `extra` key-value pairs and additional `tags` may be attached to a customer.
+        `metadata` key-value pairs and additional `tags` may be attached to a customer.
 
         Parameters
         ----------
         name : str
-            An arbitrary string that indentifies and/or describes the customer
+            An arbitrary string that identifies and/or describes the customer
 
-        extra : typing.Optional[typing.Dict[str, typing.Optional[str]]]
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[str]]]
             Key-value pairs (`str: str`) to describe the customer
 
         tags : typing.Optional[typing.Sequence[str]]
@@ -112,7 +112,7 @@ class CustomersClient:
         )
         client.customers.create(
             name="Scooby",
-            extra={"VIP": "Yes", "email": "scooby@dooby.do"},
+            metadata={"VIP": "Yes", "email": "scooby@dooby.do"},
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -120,7 +120,7 @@ class CustomersClient:
             method="POST",
             json={
                 "name": name,
-                "extra": extra,
+                "metadata": metadata,
                 "tags": tags,
             },
             request_options=request_options,
@@ -298,7 +298,7 @@ class CustomersClient:
         customer_id: str,
         *,
         name: typing.Optional[str] = OMIT,
-        extra: typing.Optional[CustomerExtraUpdateParams] = OMIT,
+        metadata: typing.Optional[CustomerMetadataUpdateParams] = OMIT,
         tags: typing.Optional[CustomerTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
@@ -315,9 +315,9 @@ class CustomersClient:
             Unique identifier for the customer
 
         name : typing.Optional[str]
-            An arbitrary string that indentifies and/or describes the customer
+            An arbitrary string that identifies and/or describes the customer
 
-        extra : typing.Optional[CustomerExtraUpdateParams]
+        metadata : typing.Optional[CustomerMetadataUpdateParams]
 
         tags : typing.Optional[CustomerTagUpdateParams]
 
@@ -332,7 +332,7 @@ class CustomersClient:
         Examples
         --------
         from parlant.client import (
-            CustomerExtraUpdateParams,
+            CustomerMetadataUpdateParams,
             CustomerTagUpdateParams,
             ParlantClient,
         )
@@ -343,7 +343,7 @@ class CustomersClient:
         client.customers.update(
             customer_id="ck_IdAXUtp",
             name="Scooby",
-            extra=CustomerExtraUpdateParams(
+            metadata=CustomerMetadataUpdateParams(
                 add={"VIP": "Yes", "email": "scooby@dooby.do"},
                 remove=["old_email", "old_title"],
             ),
@@ -358,9 +358,9 @@ class CustomersClient:
             method="PATCH",
             json={
                 "name": name,
-                "extra": convert_and_respect_annotation_metadata(
-                    object_=extra,
-                    annotation=CustomerExtraUpdateParams,
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=CustomerMetadataUpdateParams,
                     direction="write",
                 ),
                 "tags": convert_and_respect_annotation_metadata(
@@ -468,7 +468,7 @@ class AsyncCustomersClient:
         self,
         *,
         name: str,
-        extra: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
@@ -476,14 +476,14 @@ class AsyncCustomersClient:
         Creates a new customer in the system.
 
         A customer may be created with as little as a `name`.
-        `extra` key-value pairs and additional `tags` may be attached to a customer.
+        `metadata` key-value pairs and additional `tags` may be attached to a customer.
 
         Parameters
         ----------
         name : str
-            An arbitrary string that indentifies and/or describes the customer
+            An arbitrary string that identifies and/or describes the customer
 
-        extra : typing.Optional[typing.Dict[str, typing.Optional[str]]]
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[str]]]
             Key-value pairs (`str: str`) to describe the customer
 
         tags : typing.Optional[typing.Sequence[str]]
@@ -511,7 +511,7 @@ class AsyncCustomersClient:
         async def main() -> None:
             await client.customers.create(
                 name="Scooby",
-                extra={"VIP": "Yes", "email": "scooby@dooby.do"},
+                metadata={"VIP": "Yes", "email": "scooby@dooby.do"},
             )
 
 
@@ -522,7 +522,7 @@ class AsyncCustomersClient:
             method="POST",
             json={
                 "name": name,
-                "extra": extra,
+                "metadata": metadata,
                 "tags": tags,
             },
             request_options=request_options,
@@ -716,7 +716,7 @@ class AsyncCustomersClient:
         customer_id: str,
         *,
         name: typing.Optional[str] = OMIT,
-        extra: typing.Optional[CustomerExtraUpdateParams] = OMIT,
+        metadata: typing.Optional[CustomerMetadataUpdateParams] = OMIT,
         tags: typing.Optional[CustomerTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
@@ -733,9 +733,9 @@ class AsyncCustomersClient:
             Unique identifier for the customer
 
         name : typing.Optional[str]
-            An arbitrary string that indentifies and/or describes the customer
+            An arbitrary string that identifies and/or describes the customer
 
-        extra : typing.Optional[CustomerExtraUpdateParams]
+        metadata : typing.Optional[CustomerMetadataUpdateParams]
 
         tags : typing.Optional[CustomerTagUpdateParams]
 
@@ -753,7 +753,7 @@ class AsyncCustomersClient:
 
         from parlant.client import (
             AsyncParlantClient,
-            CustomerExtraUpdateParams,
+            CustomerMetadataUpdateParams,
             CustomerTagUpdateParams,
         )
 
@@ -766,7 +766,7 @@ class AsyncCustomersClient:
             await client.customers.update(
                 customer_id="ck_IdAXUtp",
                 name="Scooby",
-                extra=CustomerExtraUpdateParams(
+                metadata=CustomerMetadataUpdateParams(
                     add={"VIP": "Yes", "email": "scooby@dooby.do"},
                     remove=["old_email", "old_title"],
                 ),
@@ -784,9 +784,9 @@ class AsyncCustomersClient:
             method="PATCH",
             json={
                 "name": name,
-                "extra": convert_and_respect_annotation_metadata(
-                    object_=extra,
-                    annotation=CustomerExtraUpdateParams,
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=CustomerMetadataUpdateParams,
                     direction="write",
                 ),
                 "tags": convert_and_respect_annotation_metadata(

@@ -18,7 +18,7 @@ from ..types.event import Event
 from ..errors.gateway_timeout_error import GatewayTimeoutError
 from ..types.event_kind_dto import EventKindDto
 from ..types.moderation import Moderation
-from ..types.utterance_request import UtteranceRequest
+from ..types.canned_response_request import CannedResponseRequest
 from ..types.event_inspection_result import EventInspectionResult
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -622,7 +622,7 @@ class SessionsClient:
         source: EventSourceDto,
         moderation: typing.Optional[Moderation] = None,
         message: typing.Optional[str] = OMIT,
-        actions: typing.Optional[typing.Sequence[UtteranceRequest]] = OMIT,
+        actions: typing.Optional[typing.Sequence[CannedResponseRequest]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -645,7 +645,7 @@ class SessionsClient:
         message : typing.Optional[str]
             Event payload data, format depends on kind
 
-        actions : typing.Optional[typing.Sequence[UtteranceRequest]]
+        actions : typing.Optional[typing.Sequence[CannedResponseRequest]]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -681,7 +681,7 @@ class SessionsClient:
                 "message": message,
                 "actions": convert_and_respect_annotation_metadata(
                     object_=actions,
-                    annotation=typing.Sequence[UtteranceRequest],
+                    annotation=typing.Sequence[CannedResponseRequest],
                     direction="write",
                 ),
             },
@@ -1530,7 +1530,7 @@ class AsyncSessionsClient:
         source: EventSourceDto,
         moderation: typing.Optional[Moderation] = None,
         message: typing.Optional[str] = OMIT,
-        actions: typing.Optional[typing.Sequence[UtteranceRequest]] = OMIT,
+        actions: typing.Optional[typing.Sequence[CannedResponseRequest]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -1553,7 +1553,7 @@ class AsyncSessionsClient:
         message : typing.Optional[str]
             Event payload data, format depends on kind
 
-        actions : typing.Optional[typing.Sequence[UtteranceRequest]]
+        actions : typing.Optional[typing.Sequence[CannedResponseRequest]]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1597,7 +1597,7 @@ class AsyncSessionsClient:
                 "message": message,
                 "actions": convert_and_respect_annotation_metadata(
                     object_=actions,
-                    annotation=typing.Sequence[UtteranceRequest],
+                    annotation=typing.Sequence[CannedResponseRequest],
                     direction="write",
                 ),
             },

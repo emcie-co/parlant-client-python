@@ -6,22 +6,21 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class UtteranceTagUpdateParams(UniversalBaseModel):
+class CustomerMetadataUpdateParams(UniversalBaseModel):
     """
-    Parameters for updating an utterance's tags.
-
-    Allows adding new tags to and removing existing tags from an utterance.
-    Both operations can be performed in a single request.
+    Parameters for updating a customer's extra metadata.
     """
 
-    add: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    add: typing.Optional[typing.Dict[str, typing.Optional[str]]] = pydantic.Field(
+        default=None
+    )
     """
-    Optional collection of tag ids to add to the utterance's tags
+    Key-value pairs (`str: str`) to describe the customer
     """
 
     remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    Optional collection of tag ids to remove from the utterance's tags
+    Extra metadata keys to remove
     """
 
     if IS_PYDANTIC_V2:

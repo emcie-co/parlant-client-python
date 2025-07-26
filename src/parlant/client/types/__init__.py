@@ -2,6 +2,11 @@
 
 from .agent import Agent
 from .agent_tag_update_params import AgentTagUpdateParams
+from .canned_response import CannedResponse
+from .canned_response_field import CannedResponseField
+from .canned_response_reason_dto import CannedResponseReasonDto
+from .canned_response_request import CannedResponseRequest
+from .canned_response_tag_update_params import CannedResponseTagUpdateParams
 from .capability import Capability
 from .capability_tag_update_params import CapabilityTagUpdateParams
 from .coherence_check import CoherenceCheck
@@ -17,7 +22,7 @@ from .context_variable_read_result import ContextVariableReadResult
 from .context_variable_tags_update_params import ContextVariableTagsUpdateParams
 from .context_variable_value import ContextVariableValue
 from .customer import Customer
-from .customer_extra_update_params import CustomerExtraUpdateParams
+from .customer_metadata_update_params import CustomerMetadataUpdateParams
 from .customer_tag_update_params import CustomerTagUpdateParams
 from .evaluation import Evaluation
 from .evaluation_status_dto import EvaluationStatusDto
@@ -102,17 +107,17 @@ from .tool_parameter_type_dto import ToolParameterTypeDto
 from .tool_result import ToolResult
 from .tool_service_kind_dto import ToolServiceKindDto
 from .usage_info import UsageInfo
-from .utterance import Utterance
-from .utterance_field import UtteranceField
-from .utterance_reason_dto import UtteranceReasonDto
-from .utterance_request import UtteranceRequest
-from .utterance_tag_update_params import UtteranceTagUpdateParams
 from .validation_error import ValidationError
 from .validation_error_loc_item import ValidationErrorLocItem
 
 __all__ = [
     "Agent",
     "AgentTagUpdateParams",
+    "CannedResponse",
+    "CannedResponseField",
+    "CannedResponseReasonDto",
+    "CannedResponseRequest",
+    "CannedResponseTagUpdateParams",
     "Capability",
     "CapabilityTagUpdateParams",
     "CoherenceCheck",
@@ -128,7 +133,7 @@ __all__ = [
     "ContextVariableTagsUpdateParams",
     "ContextVariableValue",
     "Customer",
-    "CustomerExtraUpdateParams",
+    "CustomerMetadataUpdateParams",
     "CustomerTagUpdateParams",
     "Evaluation",
     "EvaluationStatusDto",
@@ -205,11 +210,6 @@ __all__ = [
     "ToolResult",
     "ToolServiceKindDto",
     "UsageInfo",
-    "Utterance",
-    "UtteranceField",
-    "UtteranceReasonDto",
-    "UtteranceRequest",
-    "UtteranceTagUpdateParams",
     "ValidationError",
     "ValidationErrorLocItem",
 ]
