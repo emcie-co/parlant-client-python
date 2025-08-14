@@ -3,23 +3,23 @@
 import typing
 from ..core.client_wrapper import SyncClientWrapper
 from ..core.request_options import RequestOptions
-from ..types.utterance import Utterance
+from ..types.canned_response import CannedResponse
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..types.utterance_field import UtteranceField
+from ..types.canned_response_field import CannedResponseField
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.utterance_tag_update_params import UtteranceTagUpdateParams
+from ..types.canned_response_tag_update_params import CannedResponseTagUpdateParams
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
 OMIT = typing.cast(typing.Any, ...)
 
 
-class UtterancesClient:
+class CannedResponsesClient:
     def __init__(self, *, client_wrapper: SyncClientWrapper):
         self._client_wrapper = client_wrapper
 
@@ -28,20 +28,22 @@ class UtterancesClient:
         *,
         tags: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Utterance]:
+    ) -> typing.List[CannedResponse]:
         """
+        Lists all canned responses, optionally filtered by tags.
+
         Parameters
         ----------
         tags : typing.Optional[typing.Union[str, typing.Sequence[str]]]
-            Filter utterances by tags
+            Filter canned responses by tags
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Utterance]
-            List of all utterances in the system
+        typing.List[CannedResponse]
+            List of all canned responses in the system
 
         Examples
         --------
@@ -50,10 +52,10 @@ class UtterancesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.utterances.list()
+        client.canned_responses.list()
         """
         _response = self._client_wrapper.httpx_client.request(
-            "utterances",
+            "canned_responses",
             method="GET",
             params={
                 "tags": tags,
@@ -63,9 +65,9 @@ class UtterancesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Utterance],
+                    typing.List[CannedResponse],
                     parse_obj_as(
-                        type_=typing.List[Utterance],  # type: ignore
+                        type_=typing.List[CannedResponse],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -88,45 +90,45 @@ class UtterancesClient:
         self,
         *,
         value: str,
-        fields: typing.Sequence[UtteranceField],
+        fields: typing.Sequence[CannedResponseField],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
-        queries: typing.Optional[typing.Sequence[str]] = OMIT,
+        signals: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Utterance:
+    ) -> CannedResponse:
         """
         Parameters
         ----------
         value : str
-            The textual content of the utterance.
+            The textual content of the canned response.
 
-        fields : typing.Sequence[UtteranceField]
-            A sequence of utterance fields associated with the utterance.
+        fields : typing.Sequence[CannedResponseField]
+            A sequence of canned response fields associated with the canned response.
 
         tags : typing.Optional[typing.Sequence[str]]
-            Collection of tag IDs associated with the utterance.
+            Collection of tag IDs associated with the canned response.
 
-        queries : typing.Optional[typing.Sequence[str]]
-            A sequence of queries associated with the utterance, to help with filtering and matching.
+        signals : typing.Optional[typing.Sequence[str]]
+            A sequence of signals associated with the canned response, to help with filtering and matching.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Utterance
-            Utterance successfully created.
+        CannedResponse
+            CannedResponse successfully created.
 
         Examples
         --------
-        from parlant.client import ParlantClient, UtteranceField
+        from parlant.client import CannedResponseField, ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.utterances.create(
+        client.canned_responses.create(
             value="Your account balance is {balance}",
             fields=[
-                UtteranceField(
+                CannedResponseField(
                     name="balance",
                     description="Account's balance",
                     examples=["9000"],
@@ -135,17 +137,17 @@ class UtterancesClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            "utterances",
+            "canned_responses",
             method="POST",
             json={
                 "value": value,
                 "fields": convert_and_respect_annotation_metadata(
                     object_=fields,
-                    annotation=typing.Sequence[UtteranceField],
+                    annotation=typing.Sequence[CannedResponseField],
                     direction="write",
                 ),
                 "tags": tags,
-                "queries": queries,
+                "signals": signals,
             },
             request_options=request_options,
             omit=OMIT,
@@ -153,9 +155,9 @@ class UtterancesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Utterance,
+                    CannedResponse,
                     parse_obj_as(
-                        type_=Utterance,  # type: ignore
+                        type_=CannedResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -176,24 +178,24 @@ class UtterancesClient:
 
     def retrieve(
         self,
-        utterance_id: str,
+        canned_response_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Utterance:
+    ) -> CannedResponse:
         """
-        Retrieves details of a specific utterance by ID.
+        Retrieves details of a specific canned response by ID.
 
         Parameters
         ----------
-        utterance_id : str
+        canned_response_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Utterance
-            Utterance details successfully retrieved. Returns the Utterance object.
+        CannedResponse
+            Canned response details successfully retrieved. Returns the CannedResponse object.
 
         Examples
         --------
@@ -202,21 +204,21 @@ class UtterancesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.utterances.retrieve(
-            utterance_id="t9a8g703f4",
+        client.canned_responses.retrieve(
+            canned_response_id="t9a8g703f4",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"utterances/{jsonable_encoder(utterance_id)}",
+            f"canned_responses/{jsonable_encoder(canned_response_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Utterance,
+                    CannedResponse,
                     parse_obj_as(
-                        type_=Utterance,  # type: ignore
+                        type_=CannedResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -247,14 +249,14 @@ class UtterancesClient:
 
     def delete(
         self,
-        utterance_id: str,
+        canned_response_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
         Parameters
         ----------
-        utterance_id : str
+        canned_response_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -270,12 +272,12 @@ class UtterancesClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.utterances.delete(
-            utterance_id="t9a8g703f4",
+        client.canned_responses.delete(
+            canned_response_id="t9a8g703f4",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"utterances/{jsonable_encoder(utterance_id)}",
+            f"canned_responses/{jsonable_encoder(canned_response_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -309,52 +311,52 @@ class UtterancesClient:
 
     def update(
         self,
-        utterance_id: str,
+        canned_response_id: str,
         *,
         value: typing.Optional[str] = OMIT,
-        fields: typing.Optional[typing.Sequence[UtteranceField]] = OMIT,
-        tags: typing.Optional[UtteranceTagUpdateParams] = OMIT,
+        fields: typing.Optional[typing.Sequence[CannedResponseField]] = OMIT,
+        tags: typing.Optional[CannedResponseTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Utterance:
+    ) -> CannedResponse:
         """
-        Updates an existing utterance's attributes.
+        Updates an existing canned response's attributes.
 
         Only provided attributes will be updated; others remain unchanged.
-        The utterance's ID and creation timestamp cannot be modified.
+        The canned response's ID and creation timestamp cannot be modified.
         Extra metadata and tags can be added or removed independently.
 
         Parameters
         ----------
-        utterance_id : str
+        canned_response_id : str
 
         value : typing.Optional[str]
-            The textual content of the utterance.
+            The textual content of the canned response.
 
-        fields : typing.Optional[typing.Sequence[UtteranceField]]
-            A sequence of utterance fields associated with the utterance.
+        fields : typing.Optional[typing.Sequence[CannedResponseField]]
+            A sequence of canned response fields associated with the canned response.
 
-        tags : typing.Optional[UtteranceTagUpdateParams]
+        tags : typing.Optional[CannedResponseTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Utterance
-            Utterance successfully updated. Returns the updated Utterance object.
+        CannedResponse
+            Canned response successfully updated. Returns the updated CannedResponse object.
 
         Examples
         --------
-        from parlant.client import ParlantClient, UtteranceField
+        from parlant.client import CannedResponseField, ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.utterances.update(
-            utterance_id="t9a8g703f4",
+        client.canned_responses.update(
+            canned_response_id="t9a8g703f4",
             value="Your updated balance is {balance}",
             fields=[
-                UtteranceField(
+                CannedResponseField(
                     name="balance",
                     description="Updated account balance",
                     examples=["10000"],
@@ -363,17 +365,19 @@ class UtterancesClient:
         )
         """
         _response = self._client_wrapper.httpx_client.request(
-            f"utterances/{jsonable_encoder(utterance_id)}",
+            f"canned_responses/{jsonable_encoder(canned_response_id)}",
             method="PATCH",
             json={
                 "value": value,
                 "fields": convert_and_respect_annotation_metadata(
                     object_=fields,
-                    annotation=typing.Sequence[UtteranceField],
+                    annotation=typing.Sequence[CannedResponseField],
                     direction="write",
                 ),
                 "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=UtteranceTagUpdateParams, direction="write"
+                    object_=tags,
+                    annotation=CannedResponseTagUpdateParams,
+                    direction="write",
                 ),
             },
             request_options=request_options,
@@ -382,9 +386,9 @@ class UtterancesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Utterance,
+                    CannedResponse,
                     parse_obj_as(
-                        type_=Utterance,  # type: ignore
+                        type_=CannedResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -414,7 +418,7 @@ class UtterancesClient:
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
-class AsyncUtterancesClient:
+class AsyncCannedResponsesClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
         self._client_wrapper = client_wrapper
 
@@ -423,20 +427,22 @@ class AsyncUtterancesClient:
         *,
         tags: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Utterance]:
+    ) -> typing.List[CannedResponse]:
         """
+        Lists all canned responses, optionally filtered by tags.
+
         Parameters
         ----------
         tags : typing.Optional[typing.Union[str, typing.Sequence[str]]]
-            Filter utterances by tags
+            Filter canned responses by tags
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Utterance]
-            List of all utterances in the system
+        typing.List[CannedResponse]
+            List of all canned responses in the system
 
         Examples
         --------
@@ -450,13 +456,13 @@ class AsyncUtterancesClient:
 
 
         async def main() -> None:
-            await client.utterances.list()
+            await client.canned_responses.list()
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "utterances",
+            "canned_responses",
             method="GET",
             params={
                 "tags": tags,
@@ -466,9 +472,9 @@ class AsyncUtterancesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Utterance],
+                    typing.List[CannedResponse],
                     parse_obj_as(
-                        type_=typing.List[Utterance],  # type: ignore
+                        type_=typing.List[CannedResponse],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -491,39 +497,39 @@ class AsyncUtterancesClient:
         self,
         *,
         value: str,
-        fields: typing.Sequence[UtteranceField],
+        fields: typing.Sequence[CannedResponseField],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
-        queries: typing.Optional[typing.Sequence[str]] = OMIT,
+        signals: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Utterance:
+    ) -> CannedResponse:
         """
         Parameters
         ----------
         value : str
-            The textual content of the utterance.
+            The textual content of the canned response.
 
-        fields : typing.Sequence[UtteranceField]
-            A sequence of utterance fields associated with the utterance.
+        fields : typing.Sequence[CannedResponseField]
+            A sequence of canned response fields associated with the canned response.
 
         tags : typing.Optional[typing.Sequence[str]]
-            Collection of tag IDs associated with the utterance.
+            Collection of tag IDs associated with the canned response.
 
-        queries : typing.Optional[typing.Sequence[str]]
-            A sequence of queries associated with the utterance, to help with filtering and matching.
+        signals : typing.Optional[typing.Sequence[str]]
+            A sequence of signals associated with the canned response, to help with filtering and matching.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Utterance
-            Utterance successfully created.
+        CannedResponse
+            CannedResponse successfully created.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, UtteranceField
+        from parlant.client import AsyncParlantClient, CannedResponseField
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -531,10 +537,10 @@ class AsyncUtterancesClient:
 
 
         async def main() -> None:
-            await client.utterances.create(
+            await client.canned_responses.create(
                 value="Your account balance is {balance}",
                 fields=[
-                    UtteranceField(
+                    CannedResponseField(
                         name="balance",
                         description="Account's balance",
                         examples=["9000"],
@@ -546,17 +552,17 @@ class AsyncUtterancesClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            "utterances",
+            "canned_responses",
             method="POST",
             json={
                 "value": value,
                 "fields": convert_and_respect_annotation_metadata(
                     object_=fields,
-                    annotation=typing.Sequence[UtteranceField],
+                    annotation=typing.Sequence[CannedResponseField],
                     direction="write",
                 ),
                 "tags": tags,
-                "queries": queries,
+                "signals": signals,
             },
             request_options=request_options,
             omit=OMIT,
@@ -564,9 +570,9 @@ class AsyncUtterancesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Utterance,
+                    CannedResponse,
                     parse_obj_as(
-                        type_=Utterance,  # type: ignore
+                        type_=CannedResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -587,24 +593,24 @@ class AsyncUtterancesClient:
 
     async def retrieve(
         self,
-        utterance_id: str,
+        canned_response_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Utterance:
+    ) -> CannedResponse:
         """
-        Retrieves details of a specific utterance by ID.
+        Retrieves details of a specific canned response by ID.
 
         Parameters
         ----------
-        utterance_id : str
+        canned_response_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Utterance
-            Utterance details successfully retrieved. Returns the Utterance object.
+        CannedResponse
+            Canned response details successfully retrieved. Returns the CannedResponse object.
 
         Examples
         --------
@@ -618,24 +624,24 @@ class AsyncUtterancesClient:
 
 
         async def main() -> None:
-            await client.utterances.retrieve(
-                utterance_id="t9a8g703f4",
+            await client.canned_responses.retrieve(
+                canned_response_id="t9a8g703f4",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"utterances/{jsonable_encoder(utterance_id)}",
+            f"canned_responses/{jsonable_encoder(canned_response_id)}",
             method="GET",
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Utterance,
+                    CannedResponse,
                     parse_obj_as(
-                        type_=Utterance,  # type: ignore
+                        type_=CannedResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -666,14 +672,14 @@ class AsyncUtterancesClient:
 
     async def delete(
         self,
-        utterance_id: str,
+        canned_response_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
         Parameters
         ----------
-        utterance_id : str
+        canned_response_id : str
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -694,15 +700,15 @@ class AsyncUtterancesClient:
 
 
         async def main() -> None:
-            await client.utterances.delete(
-                utterance_id="t9a8g703f4",
+            await client.canned_responses.delete(
+                canned_response_id="t9a8g703f4",
             )
 
 
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"utterances/{jsonable_encoder(utterance_id)}",
+            f"canned_responses/{jsonable_encoder(canned_response_id)}",
             method="DELETE",
             request_options=request_options,
         )
@@ -736,45 +742,45 @@ class AsyncUtterancesClient:
 
     async def update(
         self,
-        utterance_id: str,
+        canned_response_id: str,
         *,
         value: typing.Optional[str] = OMIT,
-        fields: typing.Optional[typing.Sequence[UtteranceField]] = OMIT,
-        tags: typing.Optional[UtteranceTagUpdateParams] = OMIT,
+        fields: typing.Optional[typing.Sequence[CannedResponseField]] = OMIT,
+        tags: typing.Optional[CannedResponseTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Utterance:
+    ) -> CannedResponse:
         """
-        Updates an existing utterance's attributes.
+        Updates an existing canned response's attributes.
 
         Only provided attributes will be updated; others remain unchanged.
-        The utterance's ID and creation timestamp cannot be modified.
+        The canned response's ID and creation timestamp cannot be modified.
         Extra metadata and tags can be added or removed independently.
 
         Parameters
         ----------
-        utterance_id : str
+        canned_response_id : str
 
         value : typing.Optional[str]
-            The textual content of the utterance.
+            The textual content of the canned response.
 
-        fields : typing.Optional[typing.Sequence[UtteranceField]]
-            A sequence of utterance fields associated with the utterance.
+        fields : typing.Optional[typing.Sequence[CannedResponseField]]
+            A sequence of canned response fields associated with the canned response.
 
-        tags : typing.Optional[UtteranceTagUpdateParams]
+        tags : typing.Optional[CannedResponseTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        Utterance
-            Utterance successfully updated. Returns the updated Utterance object.
+        CannedResponse
+            Canned response successfully updated. Returns the updated CannedResponse object.
 
         Examples
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, UtteranceField
+        from parlant.client import AsyncParlantClient, CannedResponseField
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -782,11 +788,11 @@ class AsyncUtterancesClient:
 
 
         async def main() -> None:
-            await client.utterances.update(
-                utterance_id="t9a8g703f4",
+            await client.canned_responses.update(
+                canned_response_id="t9a8g703f4",
                 value="Your updated balance is {balance}",
                 fields=[
-                    UtteranceField(
+                    CannedResponseField(
                         name="balance",
                         description="Updated account balance",
                         examples=["10000"],
@@ -798,17 +804,19 @@ class AsyncUtterancesClient:
         asyncio.run(main())
         """
         _response = await self._client_wrapper.httpx_client.request(
-            f"utterances/{jsonable_encoder(utterance_id)}",
+            f"canned_responses/{jsonable_encoder(canned_response_id)}",
             method="PATCH",
             json={
                 "value": value,
                 "fields": convert_and_respect_annotation_metadata(
                     object_=fields,
-                    annotation=typing.Sequence[UtteranceField],
+                    annotation=typing.Sequence[CannedResponseField],
                     direction="write",
                 ),
                 "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=UtteranceTagUpdateParams, direction="write"
+                    object_=tags,
+                    annotation=CannedResponseTagUpdateParams,
+                    direction="write",
                 ),
             },
             request_options=request_options,
@@ -817,9 +825,9 @@ class AsyncUtterancesClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Utterance,
+                    CannedResponse,
                     parse_obj_as(
-                        type_=Utterance,  # type: ignore
+                        type_=CannedResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )

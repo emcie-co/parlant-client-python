@@ -4,11 +4,11 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import datetime as dt
 import typing
-from .utterance_field import UtteranceField
+from .canned_response_field import CannedResponseField
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class Utterance(UniversalBaseModel):
+class CannedResponse(UniversalBaseModel):
     id: str = pydantic.Field()
     """
     Unique identifier for the tag
@@ -16,27 +16,27 @@ class Utterance(UniversalBaseModel):
 
     creation_utc: dt.datetime = pydantic.Field()
     """
-    UTC timestamp of when the utterance was created
+    UTC timestamp of when the canned response was created
     """
 
     value: str = pydantic.Field()
     """
-    The textual content of the utterance.
+    The textual content of the canned response.
     """
 
-    fields: typing.List[UtteranceField] = pydantic.Field()
+    fields: typing.List[CannedResponseField] = pydantic.Field()
     """
-    A sequence of utterance fields associated with the utterance.
+    A sequence of canned response fields associated with the canned response.
     """
 
     tags: typing.List[str] = pydantic.Field()
     """
-    Collection of tag IDs associated with the utterance.
+    Collection of tag IDs associated with the canned response.
     """
 
-    queries: typing.List[str] = pydantic.Field()
+    signals: typing.List[str] = pydantic.Field()
     """
-    A sequence of queries associated with the utterance, to help with filtering and matching.
+    A sequence of signals associated with the canned response, to help with filtering and matching.
     """
 
     if IS_PYDANTIC_V2:

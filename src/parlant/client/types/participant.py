@@ -6,21 +6,15 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class CustomerExtraUpdateParams(UniversalBaseModel):
+class Participant(UniversalBaseModel):
     """
-    Parameters for updating a customer's extra metadata.
-    """
-
-    add: typing.Optional[typing.Dict[str, typing.Optional[str]]] = pydantic.Field(
-        default=None
-    )
-    """
-    Key-value pairs (`str: str`) to describe the customer
+    Represents the participant information in a message event.
     """
 
-    remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    id: typing.Optional[str] = None
+    display_name: str = pydantic.Field()
     """
-    Extra Metadata keys to remove
+    Name to display for the participant
     """
 
     if IS_PYDANTIC_V2:

@@ -18,8 +18,8 @@ from ..types.event import Event
 from ..errors.gateway_timeout_error import GatewayTimeoutError
 from ..types.event_kind_dto import EventKindDto
 from ..types.moderation import Moderation
-from ..types.utterance_request import UtteranceRequest
-from ..types.event_inspection_result import EventInspectionResult
+from ..types.agent_message_guideline import AgentMessageGuideline
+from ..types.participant import Participant
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -622,7 +622,9 @@ class SessionsClient:
         source: EventSourceDto,
         moderation: typing.Optional[Moderation] = None,
         message: typing.Optional[str] = OMIT,
-        actions: typing.Optional[typing.Sequence[UtteranceRequest]] = OMIT,
+        data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
+        guidelines: typing.Optional[typing.Sequence[AgentMessageGuideline]] = OMIT,
+        participant: typing.Optional[Participant] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -645,7 +647,11 @@ class SessionsClient:
         message : typing.Optional[str]
             Event payload data, format depends on kind
 
-        actions : typing.Optional[typing.Sequence[UtteranceRequest]]
+        data : typing.Optional[typing.Optional[typing.Any]]
+
+        guidelines : typing.Optional[typing.Sequence[AgentMessageGuideline]]
+
+        participant : typing.Optional[Participant]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -679,10 +685,14 @@ class SessionsClient:
                 "kind": kind,
                 "source": source,
                 "message": message,
-                "actions": convert_and_respect_annotation_metadata(
-                    object_=actions,
-                    annotation=typing.Sequence[UtteranceRequest],
+                "data": data,
+                "guidelines": convert_and_respect_annotation_metadata(
+                    object_=guidelines,
+                    annotation=typing.Sequence[AgentMessageGuideline],
                     direction="write",
+                ),
+                "participant": convert_and_respect_annotation_metadata(
+                    object_=participant, annotation=Participant, direction="write"
                 ),
             },
             request_options=request_options,
@@ -772,86 +782,6 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    def inspect_event(
-        self,
-        session_id: str,
-        event_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventInspectionResult:
-        """
-        Retrieves detailed inspection information about an event.
-
-        For AI agent message events, includes information about message generation,
-        tool calls, and preparation iterations.
-
-        Parameters
-        ----------
-        session_id : str
-            Unique identifier for the session
-
-        event_id : str
-            Unique identifier for the event
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        EventInspectionResult
-            Event inspection details successfully retrieved
-
-        Examples
-        --------
-        from parlant.client import ParlantClient
-
-        client = ParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-        client.sessions.inspect_event(
-            session_id="sess_123yz",
-            event_id="evt_123xyz",
-        )
-        """
-        _response = self._client_wrapper.httpx_client.request(
-            f"sessions/{jsonable_encoder(session_id)}/events/{jsonable_encoder(event_id)}",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EventInspectionResult,
-                    parse_obj_as(
-                        type_=EventInspectionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
@@ -1530,7 +1460,9 @@ class AsyncSessionsClient:
         source: EventSourceDto,
         moderation: typing.Optional[Moderation] = None,
         message: typing.Optional[str] = OMIT,
-        actions: typing.Optional[typing.Sequence[UtteranceRequest]] = OMIT,
+        data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
+        guidelines: typing.Optional[typing.Sequence[AgentMessageGuideline]] = OMIT,
+        participant: typing.Optional[Participant] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -1553,7 +1485,11 @@ class AsyncSessionsClient:
         message : typing.Optional[str]
             Event payload data, format depends on kind
 
-        actions : typing.Optional[typing.Sequence[UtteranceRequest]]
+        data : typing.Optional[typing.Optional[typing.Any]]
+
+        guidelines : typing.Optional[typing.Sequence[AgentMessageGuideline]]
+
+        participant : typing.Optional[Participant]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1595,10 +1531,14 @@ class AsyncSessionsClient:
                 "kind": kind,
                 "source": source,
                 "message": message,
-                "actions": convert_and_respect_annotation_metadata(
-                    object_=actions,
-                    annotation=typing.Sequence[UtteranceRequest],
+                "data": data,
+                "guidelines": convert_and_respect_annotation_metadata(
+                    object_=guidelines,
+                    annotation=typing.Sequence[AgentMessageGuideline],
                     direction="write",
+                ),
+                "participant": convert_and_respect_annotation_metadata(
+                    object_=participant, annotation=Participant, direction="write"
                 ),
             },
             request_options=request_options,
@@ -1696,94 +1636,6 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
-            if _response.status_code == 404:
-                raise NotFoundError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            if _response.status_code == 422:
-                raise UnprocessableEntityError(
-                    typing.cast(
-                        typing.Optional[typing.Any],
-                        parse_obj_as(
-                            type_=typing.Optional[typing.Any],  # type: ignore
-                            object_=_response.json(),
-                        ),
-                    )
-                )
-            _response_json = _response.json()
-        except JSONDecodeError:
-            raise ApiError(status_code=_response.status_code, body=_response.text)
-        raise ApiError(status_code=_response.status_code, body=_response_json)
-
-    async def inspect_event(
-        self,
-        session_id: str,
-        event_id: str,
-        *,
-        request_options: typing.Optional[RequestOptions] = None,
-    ) -> EventInspectionResult:
-        """
-        Retrieves detailed inspection information about an event.
-
-        For AI agent message events, includes information about message generation,
-        tool calls, and preparation iterations.
-
-        Parameters
-        ----------
-        session_id : str
-            Unique identifier for the session
-
-        event_id : str
-            Unique identifier for the event
-
-        request_options : typing.Optional[RequestOptions]
-            Request-specific configuration.
-
-        Returns
-        -------
-        EventInspectionResult
-            Event inspection details successfully retrieved
-
-        Examples
-        --------
-        import asyncio
-
-        from parlant.client import AsyncParlantClient
-
-        client = AsyncParlantClient(
-            base_url="https://yourhost.com/path/to/api",
-        )
-
-
-        async def main() -> None:
-            await client.sessions.inspect_event(
-                session_id="sess_123yz",
-                event_id="evt_123xyz",
-            )
-
-
-        asyncio.run(main())
-        """
-        _response = await self._client_wrapper.httpx_client.request(
-            f"sessions/{jsonable_encoder(session_id)}/events/{jsonable_encoder(event_id)}",
-            method="GET",
-            request_options=request_options,
-        )
-        try:
-            if 200 <= _response.status_code < 300:
-                return typing.cast(
-                    EventInspectionResult,
-                    parse_obj_as(
-                        type_=EventInspectionResult,  # type: ignore
-                        object_=_response.json(),
-                    ),
-                )
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(

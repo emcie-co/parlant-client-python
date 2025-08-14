@@ -417,6 +417,73 @@ class JourneysClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def mermaid(
+        self,
+        journey_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> str:
+        """
+        Returns the journey as a Mermaid 'stateDiagramv-v2' string.
+        Content-Type: text/plain
+
+        Parameters
+        ----------
+        journey_id : str
+            Unique identifier for the journey
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        str
+            Mermaid stateDiagram V2 (text/plain). Copy/paste directly into a Mermaid renderer.
+
+        Examples
+        --------
+        from parlant.client import ParlantClient
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.journeys.mermaid(
+            journey_id="journey_id",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"journeys/{jsonable_encoder(journey_id)}/mermaid",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return _response.text  # type: ignore
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncJourneysClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -831,6 +898,81 @@ class AsyncJourneysClient:
                         object_=_response.json(),
                     ),
                 )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def mermaid(
+        self,
+        journey_id: str,
+        *,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> str:
+        """
+        Returns the journey as a Mermaid 'stateDiagramv-v2' string.
+        Content-Type: text/plain
+
+        Parameters
+        ----------
+        journey_id : str
+            Unique identifier for the journey
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        str
+            Mermaid stateDiagram V2 (text/plain). Copy/paste directly into a Mermaid renderer.
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.journeys.mermaid(
+                journey_id="journey_id",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"journeys/{jsonable_encoder(journey_id)}/mermaid",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return _response.text  # type: ignore
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(

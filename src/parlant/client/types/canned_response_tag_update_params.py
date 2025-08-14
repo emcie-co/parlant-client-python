@@ -6,22 +6,22 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class UtteranceTagUpdateParams(UniversalBaseModel):
+class CannedResponseTagUpdateParams(UniversalBaseModel):
     """
-    Parameters for updating an utterance's tags.
+    Parameters for updating a canned response's tags.
 
-    Allows adding new tags to and removing existing tags from an utterance.
+    Allows adding new tags to and removing existing tags from a canned response.
     Both operations can be performed in a single request.
     """
 
     add: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    Optional collection of tag ids to add to the utterance's tags
+    Optional collection of tag ids to add to the canned response's tags
     """
 
     remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    Optional collection of tag ids to remove from the utterance's tags
+    Optional collection of tag ids to remove from the canned response's tags
     """
 
     if IS_PYDANTIC_V2:

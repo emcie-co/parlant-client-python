@@ -382,12 +382,7 @@ class GuidelinesClient:
 
         Examples
         --------
-        from parlant.client import (
-            GuidelineMetadataUpdateParams,
-            GuidelineToolAssociationUpdateParams,
-            ParlantClient,
-            ToolId,
-        )
+        from parlant.client import GuidelineToolAssociationUpdateParams, ParlantClient, ToolId
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -411,10 +406,6 @@ class GuidelinesClient:
                 ],
             ),
             enabled=True,
-            metadata=GuidelineMetadataUpdateParams(
-                add={"key1": "value1", "key2": "value2"},
-                remove=["key3", "key4"],
-            ),
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -871,7 +862,6 @@ class AsyncGuidelinesClient:
 
         from parlant.client import (
             AsyncParlantClient,
-            GuidelineMetadataUpdateParams,
             GuidelineToolAssociationUpdateParams,
             ToolId,
         )
@@ -901,10 +891,6 @@ class AsyncGuidelinesClient:
                     ],
                 ),
                 enabled=True,
-                metadata=GuidelineMetadataUpdateParams(
-                    add={"key1": "value1", "key2": "value2"},
-                    remove=["key3", "key4"],
-                ),
             )
 
 

@@ -6,30 +6,18 @@ import typing
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class PreparationIterationTerm(UniversalBaseModel):
-    """
-    A term participating in the preparation for an iteration.
-    """
-
-    id: str = pydantic.Field()
-    """
-    Unique identifier for the term
-    """
-
+class CannedResponseField(UniversalBaseModel):
     name: str = pydantic.Field()
     """
-    The name of the term, e.g., 'Gas' in blockchain.
+    The name of the canned response field.
     """
 
     description: str = pydantic.Field()
     """
-    A detailed description of the term
+    A description of the canned response field.
     """
 
-    synonyms: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
-    """
-    A list of synonyms for the term, including alternate contexts if applicable.
-    """
+    examples: typing.List[str]
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

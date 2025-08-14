@@ -9,7 +9,7 @@ from .services.client import ServicesClient
 from .tags.client import TagsClient
 from .glossary.client import GlossaryClient
 from .customers.client import CustomersClient
-from .utterances.client import UtterancesClient
+from .canned_responses.client import CannedResponsesClient
 from .context_variables.client import ContextVariablesClient
 from .guidelines.client import GuidelinesClient
 from .relationships.client import RelationshipsClient
@@ -23,7 +23,7 @@ from .services.client import AsyncServicesClient
 from .tags.client import AsyncTagsClient
 from .glossary.client import AsyncGlossaryClient
 from .customers.client import AsyncCustomersClient
-from .utterances.client import AsyncUtterancesClient
+from .canned_responses.client import AsyncCannedResponsesClient
 from .context_variables.client import AsyncContextVariablesClient
 from .guidelines.client import AsyncGuidelinesClient
 from .relationships.client import AsyncRelationshipsClient
@@ -87,7 +87,9 @@ class ParlantClient:
         self.tags = TagsClient(client_wrapper=self._client_wrapper)
         self.glossary = GlossaryClient(client_wrapper=self._client_wrapper)
         self.customers = CustomersClient(client_wrapper=self._client_wrapper)
-        self.utterances = UtterancesClient(client_wrapper=self._client_wrapper)
+        self.canned_responses = CannedResponsesClient(
+            client_wrapper=self._client_wrapper
+        )
         self.context_variables = ContextVariablesClient(
             client_wrapper=self._client_wrapper
         )
@@ -153,7 +155,9 @@ class AsyncParlantClient:
         self.tags = AsyncTagsClient(client_wrapper=self._client_wrapper)
         self.glossary = AsyncGlossaryClient(client_wrapper=self._client_wrapper)
         self.customers = AsyncCustomersClient(client_wrapper=self._client_wrapper)
-        self.utterances = AsyncUtterancesClient(client_wrapper=self._client_wrapper)
+        self.canned_responses = AsyncCannedResponsesClient(
+            client_wrapper=self._client_wrapper
+        )
         self.context_variables = AsyncContextVariablesClient(
             client_wrapper=self._client_wrapper
         )

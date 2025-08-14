@@ -74,7 +74,6 @@ class EvaluationsClient:
                         ],
                         operation="add",
                         action_proposition=True,
-                        properties_proposition=True,
                     ),
                 )
             ],
@@ -275,7 +274,6 @@ class AsyncEvaluationsClient:
                             ],
                             operation="add",
                             action_proposition=True,
-                            properties_proposition=True,
                         ),
                     )
                 ],

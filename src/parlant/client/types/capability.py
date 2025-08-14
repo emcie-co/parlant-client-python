@@ -26,9 +26,9 @@ class Capability(UniversalBaseModel):
     Detailed description of the capability's purpose
     """
 
-    queries: typing.List[str] = pydantic.Field()
+    signals: typing.List[str] = pydantic.Field()
     """
-    Example queries that this capability can handle
+    Example signals that this capability can handle
     """
 
     tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)

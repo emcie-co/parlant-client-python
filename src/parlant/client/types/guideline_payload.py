@@ -22,14 +22,19 @@ class GuidelinePayload(UniversalBaseModel):
     Unique identifier for the guideline
     """
 
-    action_proposition: bool = pydantic.Field()
+    action_proposition: typing.Optional[bool] = pydantic.Field(default=None)
     """
     Whether the action proposition is enabled
     """
 
-    properties_proposition: bool = pydantic.Field()
+    properties_proposition: typing.Optional[bool] = pydantic.Field(default=None)
     """
     Properties proposition
+    """
+
+    journey_node_proposition: typing.Optional[bool] = pydantic.Field(default=None)
+    """
+    Journey step proposition
     """
 
     if IS_PYDANTIC_V2:
