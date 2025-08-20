@@ -86,6 +86,7 @@ from .sdk_service_params import SdkServiceParams
 from .service import Service
 from .session import Session
 from .session_mode_dto import SessionModeDto
+from .session_status_dto import SessionStatusDto
 from .tag import Tag
 from .term import Term
 from .term_tags_update_params import TermTagsUpdateParams
@@ -177,6 +178,7 @@ __all__ = [
     "Service",
     "Session",
     "SessionModeDto",
+    "SessionStatusDto",
     "Tag",
     "Term",
     "TermTagsUpdateParams",

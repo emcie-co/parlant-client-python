@@ -20,6 +20,7 @@ from ..types.event_kind_dto import EventKindDto
 from ..types.moderation import Moderation
 from ..types.agent_message_guideline import AgentMessageGuideline
 from ..types.participant import Participant
+from ..types.session_status_dto import SessionStatusDto
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -625,6 +626,7 @@ class SessionsClient:
         data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
         guidelines: typing.Optional[typing.Sequence[AgentMessageGuideline]] = OMIT,
         participant: typing.Optional[Participant] = OMIT,
+        status: typing.Optional[SessionStatusDto] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -652,6 +654,8 @@ class SessionsClient:
         guidelines : typing.Optional[typing.Sequence[AgentMessageGuideline]]
 
         participant : typing.Optional[Participant]
+
+        status : typing.Optional[SessionStatusDto]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -694,6 +698,7 @@ class SessionsClient:
                 "participant": convert_and_respect_annotation_metadata(
                     object_=participant, annotation=Participant, direction="write"
                 ),
+                "status": status,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1463,6 +1468,7 @@ class AsyncSessionsClient:
         data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
         guidelines: typing.Optional[typing.Sequence[AgentMessageGuideline]] = OMIT,
         participant: typing.Optional[Participant] = OMIT,
+        status: typing.Optional[SessionStatusDto] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -1490,6 +1496,8 @@ class AsyncSessionsClient:
         guidelines : typing.Optional[typing.Sequence[AgentMessageGuideline]]
 
         participant : typing.Optional[Participant]
+
+        status : typing.Optional[SessionStatusDto]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1540,6 +1548,7 @@ class AsyncSessionsClient:
                 "participant": convert_and_respect_annotation_metadata(
                     object_=participant, annotation=Participant, direction="write"
                 ),
+                "status": status,
             },
             request_options=request_options,
             omit=OMIT,
