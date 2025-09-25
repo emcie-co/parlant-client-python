@@ -31,7 +31,7 @@ class Event(UniversalBaseModel):
     UTC timestamp of when the event was created
     """
 
-    correlation_id: str = pydantic.Field()
+    trace_id: str = pydantic.Field()
     """
     ID linking related events together
     """

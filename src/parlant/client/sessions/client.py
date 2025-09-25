@@ -17,9 +17,10 @@ from ..types.event_source_dto import EventSourceDto
 from ..types.event import Event
 from ..errors.gateway_timeout_error import GatewayTimeoutError
 from ..types.event_kind_dto import EventKindDto
-from ..types.moderation import Moderation
+from ..types.moderation_dto import ModerationDto
 from ..types.agent_message_guideline import AgentMessageGuideline
 from ..types.participant import Participant
+from ..types.session_status_dto import SessionStatusDto
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -499,7 +500,7 @@ class SessionsClient:
         *,
         min_offset: typing.Optional[int] = None,
         source: typing.Optional[EventSourceDto] = None,
-        correlation_id: typing.Optional[str] = None,
+        trace_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
         wait_for_data: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -508,7 +509,7 @@ class SessionsClient:
         Lists events from a session with optional filtering and waiting capabilities.
 
         This endpoint retrieves events from a specified session and can:
-        1. Filter events by their offset, source, type, and correlation ID
+        1. Filter events by their offset, source, type, and trace ID
         2. Wait for new events to arrive if requested
         3. Return events in chronological order based on their offset
 
@@ -530,7 +531,7 @@ class SessionsClient:
 
         source : typing.Optional[EventSourceDto]
 
-        correlation_id : typing.Optional[str]
+        trace_id : typing.Optional[str]
 
         kinds : typing.Optional[str]
 
@@ -554,7 +555,7 @@ class SessionsClient:
         client.sessions.list_events(
             session_id="sess_123yz",
             min_offset=0,
-            correlation_id="corr_13xyz",
+            trace_id="corr_13xyz",
             kinds="message,tool",
         )
         """
@@ -564,7 +565,7 @@ class SessionsClient:
             params={
                 "min_offset": min_offset,
                 "source": source,
-                "correlation_id": correlation_id,
+                "trace_id": trace_id,
                 "kinds": kinds,
                 "wait_for_data": wait_for_data,
             },
@@ -620,11 +621,12 @@ class SessionsClient:
         *,
         kind: EventKindDto,
         source: EventSourceDto,
-        moderation: typing.Optional[Moderation] = None,
+        moderation: typing.Optional[ModerationDto] = None,
         message: typing.Optional[str] = OMIT,
         data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
         guidelines: typing.Optional[typing.Sequence[AgentMessageGuideline]] = OMIT,
         participant: typing.Optional[Participant] = OMIT,
+        status: typing.Optional[SessionStatusDto] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -641,7 +643,7 @@ class SessionsClient:
 
         source : EventSourceDto
 
-        moderation : typing.Optional[Moderation]
+        moderation : typing.Optional[ModerationDto]
             Content moderation level for the event
 
         message : typing.Optional[str]
@@ -652,6 +654,8 @@ class SessionsClient:
         guidelines : typing.Optional[typing.Sequence[AgentMessageGuideline]]
 
         participant : typing.Optional[Participant]
+
+        status : typing.Optional[SessionStatusDto]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -694,6 +698,7 @@ class SessionsClient:
                 "participant": convert_and_respect_annotation_metadata(
                     object_=participant, annotation=Participant, direction="write"
                 ),
+                "status": status,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1329,7 +1334,7 @@ class AsyncSessionsClient:
         *,
         min_offset: typing.Optional[int] = None,
         source: typing.Optional[EventSourceDto] = None,
-        correlation_id: typing.Optional[str] = None,
+        trace_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
         wait_for_data: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1338,7 +1343,7 @@ class AsyncSessionsClient:
         Lists events from a session with optional filtering and waiting capabilities.
 
         This endpoint retrieves events from a specified session and can:
-        1. Filter events by their offset, source, type, and correlation ID
+        1. Filter events by their offset, source, type, and trace ID
         2. Wait for new events to arrive if requested
         3. Return events in chronological order based on their offset
 
@@ -1360,7 +1365,7 @@ class AsyncSessionsClient:
 
         source : typing.Optional[EventSourceDto]
 
-        correlation_id : typing.Optional[str]
+        trace_id : typing.Optional[str]
 
         kinds : typing.Optional[str]
 
@@ -1389,7 +1394,7 @@ class AsyncSessionsClient:
             await client.sessions.list_events(
                 session_id="sess_123yz",
                 min_offset=0,
-                correlation_id="corr_13xyz",
+                trace_id="corr_13xyz",
                 kinds="message,tool",
             )
 
@@ -1402,7 +1407,7 @@ class AsyncSessionsClient:
             params={
                 "min_offset": min_offset,
                 "source": source,
-                "correlation_id": correlation_id,
+                "trace_id": trace_id,
                 "kinds": kinds,
                 "wait_for_data": wait_for_data,
             },
@@ -1458,11 +1463,12 @@ class AsyncSessionsClient:
         *,
         kind: EventKindDto,
         source: EventSourceDto,
-        moderation: typing.Optional[Moderation] = None,
+        moderation: typing.Optional[ModerationDto] = None,
         message: typing.Optional[str] = OMIT,
         data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
         guidelines: typing.Optional[typing.Sequence[AgentMessageGuideline]] = OMIT,
         participant: typing.Optional[Participant] = OMIT,
+        status: typing.Optional[SessionStatusDto] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Event:
         """
@@ -1479,7 +1485,7 @@ class AsyncSessionsClient:
 
         source : EventSourceDto
 
-        moderation : typing.Optional[Moderation]
+        moderation : typing.Optional[ModerationDto]
             Content moderation level for the event
 
         message : typing.Optional[str]
@@ -1490,6 +1496,8 @@ class AsyncSessionsClient:
         guidelines : typing.Optional[typing.Sequence[AgentMessageGuideline]]
 
         participant : typing.Optional[Participant]
+
+        status : typing.Optional[SessionStatusDto]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1540,6 +1548,7 @@ class AsyncSessionsClient:
                 "participant": convert_and_respect_annotation_metadata(
                     object_=participant, annotation=Participant, direction="write"
                 ),
+                "status": status,
             },
             request_options=request_options,
             omit=OMIT,
