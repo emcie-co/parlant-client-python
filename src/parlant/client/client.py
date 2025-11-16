@@ -16,6 +16,10 @@ from .relationships.client import RelationshipsClient
 from .journeys.client import JourneysClient
 from .evaluations.client import EvaluationsClient
 from .capabilities.client import CapabilitiesClient
+from .core.request_options import RequestOptions
+from .core.pydantic_utilities import parse_obj_as
+from json.decoder import JSONDecodeError
+from .core.api_error import ApiError
 from .core.client_wrapper import AsyncClientWrapper
 from .agents.client import AsyncAgentsClient
 from .sessions.client import AsyncSessionsClient
@@ -99,6 +103,48 @@ class ParlantClient:
         self.evaluations = EvaluationsClient(client_wrapper=self._client_wrapper)
         self.capabilities = CapabilitiesClient(client_wrapper=self._client_wrapper)
 
+    def health_check_healthz_get(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.Dict[str, str]:
+        """
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.Dict[str, str]
+            Successful Response
+
+        Examples
+        --------
+        from parlant.client import ParlantClient
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.health_check_healthz_get()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "healthz",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    typing.Dict[str, str],
+                    parse_obj_as(
+                        type_=typing.Dict[str, str],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncParlantClient:
     """
@@ -168,3 +214,53 @@ class AsyncParlantClient:
         self.journeys = AsyncJourneysClient(client_wrapper=self._client_wrapper)
         self.evaluations = AsyncEvaluationsClient(client_wrapper=self._client_wrapper)
         self.capabilities = AsyncCapabilitiesClient(client_wrapper=self._client_wrapper)
+
+    async def health_check_healthz_get(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.Dict[str, str]:
+        """
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.Dict[str, str]
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.health_check_healthz_get()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "healthz",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    typing.Dict[str, str],
+                    parse_obj_as(
+                        type_=typing.Dict[str, str],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
