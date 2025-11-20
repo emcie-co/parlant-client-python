@@ -676,6 +676,7 @@ class SessionsClient:
         moderation: typing.Optional[ModerationDto] = None,
         message: typing.Optional[str] = OMIT,
         data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         guidelines: typing.Optional[typing.Sequence[AgentMessageGuideline]] = OMIT,
         participant: typing.Optional[Participant] = OMIT,
         status: typing.Optional[SessionStatusDto] = OMIT,
@@ -702,6 +703,9 @@ class SessionsClient:
             Event payload data, format depends on kind
 
         data : typing.Optional[typing.Optional[typing.Any]]
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Metadata associated with the event
 
         guidelines : typing.Optional[typing.Sequence[AgentMessageGuideline]]
 
@@ -742,6 +746,7 @@ class SessionsClient:
                 "source": source,
                 "message": message,
                 "data": data,
+                "metadata": metadata,
                 "guidelines": convert_and_respect_annotation_metadata(
                     object_=guidelines,
                     annotation=typing.Sequence[AgentMessageGuideline],
@@ -839,6 +844,105 @@ class SessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    def update_event(
+        self,
+        session_id: str,
+        event_id: str,
+        *,
+        metadata: typing.Optional[SessionMetadataUpdateParams] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Event:
+        """
+        Updates an event's properties.
+
+        Currently only supports updating metadata. Other event properties cannot be modified.
+        This API is designed to be extensible for future event property updates.
+
+        Parameters
+        ----------
+        session_id : str
+            Unique identifier for the session
+
+        event_id : str
+            Unique identifier for the event
+
+        metadata : typing.Optional[SessionMetadataUpdateParams]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        Event
+            Event successfully updated
+
+        Examples
+        --------
+        from parlant.client import ParlantClient, SessionMetadataUpdateParams
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.sessions.update_event(
+            session_id="sess_123yz",
+            event_id="evt_123xyz",
+            metadata=SessionMetadataUpdateParams(
+                set_={
+                    "agent_id": "agent_123",
+                    "category": "support",
+                    "priority": "high",
+                },
+                unset=["old_priority"],
+            ),
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"sessions/{jsonable_encoder(session_id)}/events/{jsonable_encoder(event_id)}",
+            method="PATCH",
+            json={
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=SessionMetadataUpdateParams,
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Event,
+                    parse_obj_as(
+                        type_=Event,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(
@@ -1567,6 +1671,7 @@ class AsyncSessionsClient:
         moderation: typing.Optional[ModerationDto] = None,
         message: typing.Optional[str] = OMIT,
         data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         guidelines: typing.Optional[typing.Sequence[AgentMessageGuideline]] = OMIT,
         participant: typing.Optional[Participant] = OMIT,
         status: typing.Optional[SessionStatusDto] = OMIT,
@@ -1593,6 +1698,9 @@ class AsyncSessionsClient:
             Event payload data, format depends on kind
 
         data : typing.Optional[typing.Optional[typing.Any]]
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Metadata associated with the event
 
         guidelines : typing.Optional[typing.Sequence[AgentMessageGuideline]]
 
@@ -1641,6 +1749,7 @@ class AsyncSessionsClient:
                 "source": source,
                 "message": message,
                 "data": data,
+                "metadata": metadata,
                 "guidelines": convert_and_respect_annotation_metadata(
                     object_=guidelines,
                     annotation=typing.Sequence[AgentMessageGuideline],
@@ -1746,6 +1855,113 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_event(
+        self,
+        session_id: str,
+        event_id: str,
+        *,
+        metadata: typing.Optional[SessionMetadataUpdateParams] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Event:
+        """
+        Updates an event's properties.
+
+        Currently only supports updating metadata. Other event properties cannot be modified.
+        This API is designed to be extensible for future event property updates.
+
+        Parameters
+        ----------
+        session_id : str
+            Unique identifier for the session
+
+        event_id : str
+            Unique identifier for the event
+
+        metadata : typing.Optional[SessionMetadataUpdateParams]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        Event
+            Event successfully updated
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient, SessionMetadataUpdateParams
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.sessions.update_event(
+                session_id="sess_123yz",
+                event_id="evt_123xyz",
+                metadata=SessionMetadataUpdateParams(
+                    set_={
+                        "agent_id": "agent_123",
+                        "category": "support",
+                        "priority": "high",
+                    },
+                    unset=["old_priority"],
+                ),
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"sessions/{jsonable_encoder(session_id)}/events/{jsonable_encoder(event_id)}",
+            method="PATCH",
+            json={
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=SessionMetadataUpdateParams,
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Event,
+                    parse_obj_as(
+                        type_=Event,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(

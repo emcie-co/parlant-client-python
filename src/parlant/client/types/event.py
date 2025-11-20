@@ -42,6 +42,11 @@ class Event(UniversalBaseModel):
     """
 
     data: typing.Optional[typing.Any] = None
+    metadata: typing.Dict[str, typing.Optional[typing.Any]] = pydantic.Field()
+    """
+    Metadata associated with the event
+    """
+
     deleted: bool
 
     if IS_PYDANTIC_V2:
