@@ -2,21 +2,20 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .legacy_guideline_connection_addition import LegacyGuidelineConnectionAddition
+from .customer import Customer
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
 
-class LegacyGuidelineConnectionUpdateParams(UniversalBaseModel):
+class PaginatedCustomers(UniversalBaseModel):
     """
-    Parameters for updating a guideline connection.
-
-    `add` is expected to be a collection of addition objects.
-    `remove` should contain the `id`s of the guidelines to remove.
+    Paginated response for customers
     """
 
-    add: typing.Optional[typing.List[LegacyGuidelineConnectionAddition]] = None
-    remove: typing.Optional[typing.List[str]] = None
+    items: typing.List[Customer]
+    total_count: int
+    has_more: bool
+    next_cursor: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

@@ -3,6 +3,7 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
+from .composition_mode_dto import CompositionModeDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -29,6 +30,8 @@ class Journey(UniversalBaseModel):
     """
     List of tag IDs associated with the journey
     """
+
+    composition_mode: typing.Optional[CompositionModeDto] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

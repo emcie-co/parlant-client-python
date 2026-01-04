@@ -74,6 +74,7 @@ class AgentsClient:
         self,
         *,
         name: str,
+        id: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
@@ -84,10 +85,11 @@ class AgentsClient:
         Creates a new agent in the system.
 
         The agent will be initialized with the provided name and optional settings.
-        A unique identifier will be automatically generated.
+        A unique identifier will be automatically generated unless a custom ID is provided.
 
         Default behaviors:
         - `name` defaults to `"Unnamed Agent"` if not provided
+        - `id` is auto-generated if not provided
         - `description` defaults to `None`
         - `max_engine_iterations` defaults to `None` (uses system default)
 
@@ -95,6 +97,9 @@ class AgentsClient:
         ----------
         name : str
             The display name of the agent, mainly for management purposes
+
+        id : typing.Optional[str]
+            Unique identifier for the agent
 
         description : typing.Optional[str]
             Detailed description of the agent's purpose and capabilities
@@ -135,6 +140,7 @@ class AgentsClient:
             method="POST",
             json={
                 "name": name,
+                "id": id,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,
@@ -472,6 +478,7 @@ class AsyncAgentsClient:
         self,
         *,
         name: str,
+        id: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
@@ -482,10 +489,11 @@ class AsyncAgentsClient:
         Creates a new agent in the system.
 
         The agent will be initialized with the provided name and optional settings.
-        A unique identifier will be automatically generated.
+        A unique identifier will be automatically generated unless a custom ID is provided.
 
         Default behaviors:
         - `name` defaults to `"Unnamed Agent"` if not provided
+        - `id` is auto-generated if not provided
         - `description` defaults to `None`
         - `max_engine_iterations` defaults to `None` (uses system default)
 
@@ -493,6 +501,9 @@ class AsyncAgentsClient:
         ----------
         name : str
             The display name of the agent, mainly for management purposes
+
+        id : typing.Optional[str]
+            Unique identifier for the agent
 
         description : typing.Optional[str]
             Detailed description of the agent's purpose and capabilities
@@ -541,6 +552,7 @@ class AsyncAgentsClient:
             method="POST",
             json={
                 "name": name,
+                "id": id,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,

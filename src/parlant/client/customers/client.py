@@ -2,12 +2,14 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
+from ..types.sort_direction_dto import SortDirectionDto
 from ..core.request_options import RequestOptions
-from ..types.customer import Customer
+from .types.customers_list_response import CustomersListResponse
 from ..core.pydantic_utilities import parse_obj_as
+from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..errors.unprocessable_entity_error import UnprocessableEntityError
+from ..types.customer import Customer
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
 from ..types.customer_metadata_update_params import CustomerMetadataUpdateParams
@@ -24,23 +26,41 @@ class CustomersClient:
         self._client_wrapper = client_wrapper
 
     def list(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[Customer]:
+        self,
+        *,
+        limit: typing.Optional[int] = None,
+        cursor: typing.Optional[str] = None,
+        sort: typing.Optional[SortDirectionDto] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> CustomersListResponse:
         """
-        Retrieves a list of all customers in the system.
+        Retrieves a list of customers from the system.
+
+        If a cursor is provided, the results are returned using cursor-based pagination
+        with a configurable sort direction. If no cursor is provided, the full list of
+        customers is returned.
 
         Returns an empty list if no customers exist.
-        Customers are returned in no guaranteed order.
+
+        Note:
+            When using paginated results, the first page will always include the special
+            'guest' customer as first item.
 
         Parameters
         ----------
+        limit : typing.Optional[int]
+
+        cursor : typing.Optional[str]
+
+        sort : typing.Optional[SortDirectionDto]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Customer]
-            List of all customers in the system.
+        CustomersListResponse
+            If a cursor is provided, a paginated list of customers will be returned. Otherwise, the full list of customers will be returned.
 
         Examples
         --------
@@ -49,21 +69,39 @@ class CustomersClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.customers.list()
+        client.customers.list(
+            limit=10,
+            cursor="AAABjnBU9gBl/0BQt1axI0VniQI=",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "customers",
             method="GET",
+            params={
+                "limit": limit,
+                "cursor": cursor,
+                "sort": sort,
+            },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Customer],
+                    CustomersListResponse,
                     parse_obj_as(
-                        type_=typing.List[Customer],  # type: ignore
+                        type_=CustomersListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -74,6 +112,7 @@ class CustomersClient:
         self,
         *,
         name: str,
+        id: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -88,6 +127,9 @@ class CustomersClient:
         ----------
         name : str
             An arbitrary string that identifies and/or describes the customer
+
+        id : typing.Optional[str]
+            Unique identifier for the customer
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[str]]]
             Key-value pairs (`str: str`) to describe the customer
@@ -120,6 +162,7 @@ class CustomersClient:
             method="POST",
             json={
                 "name": name,
+                "id": id,
                 "metadata": metadata,
                 "tags": tags,
             },
@@ -402,23 +445,41 @@ class AsyncCustomersClient:
         self._client_wrapper = client_wrapper
 
     async def list(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[Customer]:
+        self,
+        *,
+        limit: typing.Optional[int] = None,
+        cursor: typing.Optional[str] = None,
+        sort: typing.Optional[SortDirectionDto] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> CustomersListResponse:
         """
-        Retrieves a list of all customers in the system.
+        Retrieves a list of customers from the system.
+
+        If a cursor is provided, the results are returned using cursor-based pagination
+        with a configurable sort direction. If no cursor is provided, the full list of
+        customers is returned.
 
         Returns an empty list if no customers exist.
-        Customers are returned in no guaranteed order.
+
+        Note:
+            When using paginated results, the first page will always include the special
+            'guest' customer as first item.
 
         Parameters
         ----------
+        limit : typing.Optional[int]
+
+        cursor : typing.Optional[str]
+
+        sort : typing.Optional[SortDirectionDto]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Customer]
-            List of all customers in the system.
+        CustomersListResponse
+            If a cursor is provided, a paginated list of customers will be returned. Otherwise, the full list of customers will be returned.
 
         Examples
         --------
@@ -432,7 +493,10 @@ class AsyncCustomersClient:
 
 
         async def main() -> None:
-            await client.customers.list()
+            await client.customers.list(
+                limit=10,
+                cursor="AAABjnBU9gBl/0BQt1axI0VniQI=",
+            )
 
 
         asyncio.run(main())
@@ -440,16 +504,31 @@ class AsyncCustomersClient:
         _response = await self._client_wrapper.httpx_client.request(
             "customers",
             method="GET",
+            params={
+                "limit": limit,
+                "cursor": cursor,
+                "sort": sort,
+            },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Customer],
+                    CustomersListResponse,
                     parse_obj_as(
-                        type_=typing.List[Customer],  # type: ignore
+                        type_=CustomersListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -460,6 +539,7 @@ class AsyncCustomersClient:
         self,
         *,
         name: str,
+        id: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
@@ -474,6 +554,9 @@ class AsyncCustomersClient:
         ----------
         name : str
             An arbitrary string that identifies and/or describes the customer
+
+        id : typing.Optional[str]
+            Unique identifier for the customer
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[str]]]
             Key-value pairs (`str: str`) to describe the customer
@@ -514,6 +597,7 @@ class AsyncCustomersClient:
             method="POST",
             json={
                 "name": name,
+                "id": id,
                 "metadata": metadata,
                 "tags": tags,
             },

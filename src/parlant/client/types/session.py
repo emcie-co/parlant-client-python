@@ -45,6 +45,10 @@ class Session(UniversalBaseModel):
     """
 
     consumption_offsets: ConsumptionOffsets
+    metadata: typing.Dict[str, typing.Optional[typing.Any]] = pydantic.Field()
+    """
+    Metadata for the session
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

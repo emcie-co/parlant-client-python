@@ -13,6 +13,9 @@ from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
 from ..types.canned_response_tag_update_params import CannedResponseTagUpdateParams
+from ..types.canned_response_metadata_update_params import (
+    CannedResponseMetadataUpdateParams,
+)
 from ..core.client_wrapper import AsyncClientWrapper
 
 # this is used as the default value for optional parameters
@@ -93,6 +96,7 @@ class CannedResponsesClient:
         fields: typing.Sequence[CannedResponseField],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         signals: typing.Optional[typing.Sequence[str]] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CannedResponse:
         """
@@ -109,6 +113,9 @@ class CannedResponsesClient:
 
         signals : typing.Optional[typing.Sequence[str]]
             A sequence of signals associated with the canned response, to help with filtering and matching.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Additional metadata associated with the canned response.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -134,6 +141,7 @@ class CannedResponsesClient:
                     examples=["9000"],
                 )
             ],
+            metadata={"category": "account", "priority": 1},
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -148,6 +156,7 @@ class CannedResponsesClient:
                 ),
                 "tags": tags,
                 "signals": signals,
+                "metadata": metadata,
             },
             request_options=request_options,
             omit=OMIT,
@@ -316,6 +325,7 @@ class CannedResponsesClient:
         value: typing.Optional[str] = OMIT,
         fields: typing.Optional[typing.Sequence[CannedResponseField]] = OMIT,
         tags: typing.Optional[CannedResponseTagUpdateParams] = OMIT,
+        metadata: typing.Optional[CannedResponseMetadataUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CannedResponse:
         """
@@ -337,6 +347,8 @@ class CannedResponsesClient:
 
         tags : typing.Optional[CannedResponseTagUpdateParams]
 
+        metadata : typing.Optional[CannedResponseMetadataUpdateParams]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -347,7 +359,11 @@ class CannedResponsesClient:
 
         Examples
         --------
-        from parlant.client import CannedResponseField, ParlantClient
+        from parlant.client import (
+            CannedResponseField,
+            CannedResponseMetadataUpdateParams,
+            ParlantClient,
+        )
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -362,6 +378,10 @@ class CannedResponsesClient:
                     examples=["10000"],
                 )
             ],
+            metadata=CannedResponseMetadataUpdateParams(
+                set_={"category": "account", "priority": 2},
+                unset=["old_field"],
+            ),
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -377,6 +397,11 @@ class CannedResponsesClient:
                 "tags": convert_and_respect_annotation_metadata(
                     object_=tags,
                     annotation=CannedResponseTagUpdateParams,
+                    direction="write",
+                ),
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=CannedResponseMetadataUpdateParams,
                     direction="write",
                 ),
             },
@@ -500,6 +525,7 @@ class AsyncCannedResponsesClient:
         fields: typing.Sequence[CannedResponseField],
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         signals: typing.Optional[typing.Sequence[str]] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CannedResponse:
         """
@@ -516,6 +542,9 @@ class AsyncCannedResponsesClient:
 
         signals : typing.Optional[typing.Sequence[str]]
             A sequence of signals associated with the canned response, to help with filtering and matching.
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Additional metadata associated with the canned response.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -546,6 +575,7 @@ class AsyncCannedResponsesClient:
                         examples=["9000"],
                     )
                 ],
+                metadata={"category": "account", "priority": 1},
             )
 
 
@@ -563,6 +593,7 @@ class AsyncCannedResponsesClient:
                 ),
                 "tags": tags,
                 "signals": signals,
+                "metadata": metadata,
             },
             request_options=request_options,
             omit=OMIT,
@@ -747,6 +778,7 @@ class AsyncCannedResponsesClient:
         value: typing.Optional[str] = OMIT,
         fields: typing.Optional[typing.Sequence[CannedResponseField]] = OMIT,
         tags: typing.Optional[CannedResponseTagUpdateParams] = OMIT,
+        metadata: typing.Optional[CannedResponseMetadataUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CannedResponse:
         """
@@ -768,6 +800,8 @@ class AsyncCannedResponsesClient:
 
         tags : typing.Optional[CannedResponseTagUpdateParams]
 
+        metadata : typing.Optional[CannedResponseMetadataUpdateParams]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -780,7 +814,11 @@ class AsyncCannedResponsesClient:
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, CannedResponseField
+        from parlant.client import (
+            AsyncParlantClient,
+            CannedResponseField,
+            CannedResponseMetadataUpdateParams,
+        )
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -798,6 +836,10 @@ class AsyncCannedResponsesClient:
                         examples=["10000"],
                     )
                 ],
+                metadata=CannedResponseMetadataUpdateParams(
+                    set_={"category": "account", "priority": 2},
+                    unset=["old_field"],
+                ),
             )
 
 
@@ -816,6 +858,11 @@ class AsyncCannedResponsesClient:
                 "tags": convert_and_respect_annotation_metadata(
                     object_=tags,
                     annotation=CannedResponseTagUpdateParams,
+                    direction="write",
+                ),
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=CannedResponseMetadataUpdateParams,
                     direction="write",
                 ),
             },

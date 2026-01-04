@@ -31,12 +31,22 @@ class Event(UniversalBaseModel):
     UTC timestamp of when the event was created
     """
 
+    trace_id: str = pydantic.Field()
+    """
+    ID linking related events together
+    """
+
     correlation_id: str = pydantic.Field()
     """
     ID linking related events together
     """
 
     data: typing.Optional[typing.Any] = None
+    metadata: typing.Dict[str, typing.Optional[typing.Any]] = pydantic.Field()
+    """
+    Metadata associated with the event
+    """
+
     deleted: bool
 
     if IS_PYDANTIC_V2:

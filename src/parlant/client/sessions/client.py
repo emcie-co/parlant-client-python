@@ -2,22 +2,25 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
+from ..types.sort_direction_dto import SortDirectionDto
 from ..core.request_options import RequestOptions
-from ..types.session import Session
+from .types.sessions_list_response import SessionsListResponse
 from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.session import Session
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
 from ..types.consumption_offsets_update_params import ConsumptionOffsetsUpdateParams
 from ..types.session_mode_dto import SessionModeDto
+from ..types.session_metadata_update_params import SessionMetadataUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.event_source_dto import EventSourceDto
 from ..types.event import Event
 from ..errors.gateway_timeout_error import GatewayTimeoutError
 from ..types.event_kind_dto import EventKindDto
-from ..types.moderation import Moderation
+from ..types.moderation_dto import ModerationDto
 from ..types.agent_message_guideline import AgentMessageGuideline
 from ..types.participant import Participant
 from ..types.session_status_dto import SessionStatusDto
@@ -36,13 +39,16 @@ class SessionsClient:
         *,
         agent_id: typing.Optional[str] = None,
         customer_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        cursor: typing.Optional[str] = None,
+        sort: typing.Optional[SortDirectionDto] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Session]:
+    ) -> SessionsListResponse:
         """
-        Lists all sessions matching the specified filters.
+        Lists all sessions matching the specified filters with pagination support.
 
-        Can filter by agent_id and/or customer_id. Returns all sessions if no
-        filters are provided.
+        Can filter by agent_id and/or customer_id. Supports cursor-based pagination
+        with configurable sort direction.
 
         Parameters
         ----------
@@ -50,13 +56,19 @@ class SessionsClient:
 
         customer_id : typing.Optional[str]
 
+        limit : typing.Optional[int]
+
+        cursor : typing.Optional[str]
+
+        sort : typing.Optional[SortDirectionDto]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Session]
-            List of all matching sessions
+        SessionsListResponse
+            If a limit is provided, a paginated list of sessions will be returned. Otherwise, the full list of sessions will be returned.
 
         Examples
         --------
@@ -68,6 +80,8 @@ class SessionsClient:
         client.sessions.list(
             agent_id="ag_123xyz",
             customer_id="cust_123xy",
+            limit=10,
+            cursor="AAABjnBU9gBl/0BQt1axI0VniQI=",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -76,15 +90,18 @@ class SessionsClient:
             params={
                 "agent_id": agent_id,
                 "customer_id": customer_id,
+                "limit": limit,
+                "cursor": cursor,
+                "sort": sort,
             },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Session],
+                    SessionsListResponse,
                     parse_obj_as(
-                        type_=typing.List[Session],  # type: ignore
+                        type_=SessionsListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -110,6 +127,7 @@ class SessionsClient:
         allow_greeting: typing.Optional[bool] = None,
         customer_id: typing.Optional[str] = OMIT,
         title: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
@@ -132,6 +150,9 @@ class SessionsClient:
         title : typing.Optional[str]
             Descriptive title for the session
 
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Metadata for the session
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -151,6 +172,7 @@ class SessionsClient:
             agent_id="ag_123xyz",
             customer_id="cust_123xy",
             title="Product inquiry session",
+            metadata={"priority": "high", "project": "demo"},
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -163,6 +185,7 @@ class SessionsClient:
                 "agent_id": agent_id,
                 "customer_id": customer_id,
                 "title": title,
+                "metadata": metadata,
             },
             request_options=request_options,
             omit=OMIT,
@@ -402,6 +425,9 @@ class SessionsClient:
         consumption_offsets: typing.Optional[ConsumptionOffsetsUpdateParams] = OMIT,
         title: typing.Optional[str] = OMIT,
         mode: typing.Optional[SessionModeDto] = OMIT,
+        customer_id: typing.Optional[str] = OMIT,
+        agent_id: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[SessionMetadataUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
@@ -422,6 +448,12 @@ class SessionsClient:
         mode : typing.Optional[SessionModeDto]
             The mode of the session, either 'auto' or 'manual'. In manual mode, events added to a session will not be responded to automatically by the agent.
 
+        customer_id : typing.Optional[str]
+
+        agent_id : typing.Optional[str]
+
+        metadata : typing.Optional[SessionMetadataUpdateParams]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -432,7 +464,11 @@ class SessionsClient:
 
         Examples
         --------
-        from parlant.client import ConsumptionOffsetsUpdateParams, ParlantClient
+        from parlant.client import (
+            ConsumptionOffsetsUpdateParams,
+            ParlantClient,
+            SessionMetadataUpdateParams,
+        )
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -443,6 +479,10 @@ class SessionsClient:
                 client=42,
             ),
             title="Updated session title",
+            metadata=SessionMetadataUpdateParams(
+                set_={"priority": "low", "simulation": True},
+                unset=["old_project"],
+            ),
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -456,6 +496,13 @@ class SessionsClient:
                 ),
                 "title": title,
                 "mode": mode,
+                "customer_id": customer_id,
+                "agent_id": agent_id,
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=SessionMetadataUpdateParams,
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -501,6 +548,7 @@ class SessionsClient:
         min_offset: typing.Optional[int] = None,
         source: typing.Optional[EventSourceDto] = None,
         correlation_id: typing.Optional[str] = None,
+        trace_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
         wait_for_data: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -509,7 +557,7 @@ class SessionsClient:
         Lists events from a session with optional filtering and waiting capabilities.
 
         This endpoint retrieves events from a specified session and can:
-        1. Filter events by their offset, source, type, and correlation ID
+        1. Filter events by their offset, source, type, and trace ID
         2. Wait for new events to arrive if requested
         3. Return events in chronological order based on their offset
 
@@ -532,6 +580,8 @@ class SessionsClient:
         source : typing.Optional[EventSourceDto]
 
         correlation_id : typing.Optional[str]
+
+        trace_id : typing.Optional[str]
 
         kinds : typing.Optional[str]
 
@@ -556,6 +606,7 @@ class SessionsClient:
             session_id="sess_123yz",
             min_offset=0,
             correlation_id="corr_13xyz",
+            trace_id="corr_13xyz",
             kinds="message,tool",
         )
         """
@@ -566,6 +617,7 @@ class SessionsClient:
                 "min_offset": min_offset,
                 "source": source,
                 "correlation_id": correlation_id,
+                "trace_id": trace_id,
                 "kinds": kinds,
                 "wait_for_data": wait_for_data,
             },
@@ -621,9 +673,10 @@ class SessionsClient:
         *,
         kind: EventKindDto,
         source: EventSourceDto,
-        moderation: typing.Optional[Moderation] = None,
+        moderation: typing.Optional[ModerationDto] = None,
         message: typing.Optional[str] = OMIT,
         data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         guidelines: typing.Optional[typing.Sequence[AgentMessageGuideline]] = OMIT,
         participant: typing.Optional[Participant] = OMIT,
         status: typing.Optional[SessionStatusDto] = OMIT,
@@ -643,13 +696,16 @@ class SessionsClient:
 
         source : EventSourceDto
 
-        moderation : typing.Optional[Moderation]
+        moderation : typing.Optional[ModerationDto]
             Content moderation level for the event
 
         message : typing.Optional[str]
             Event payload data, format depends on kind
 
         data : typing.Optional[typing.Optional[typing.Any]]
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Metadata associated with the event
 
         guidelines : typing.Optional[typing.Sequence[AgentMessageGuideline]]
 
@@ -690,6 +746,7 @@ class SessionsClient:
                 "source": source,
                 "message": message,
                 "data": data,
+                "metadata": metadata,
                 "guidelines": convert_and_respect_annotation_metadata(
                     object_=guidelines,
                     annotation=typing.Sequence[AgentMessageGuideline],
@@ -812,6 +869,105 @@ class SessionsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def update_event(
+        self,
+        session_id: str,
+        event_id: str,
+        *,
+        metadata: typing.Optional[SessionMetadataUpdateParams] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Event:
+        """
+        Updates an event's properties.
+
+        Currently only supports updating metadata. Other event properties cannot be modified.
+        This API is designed to be extensible for future event property updates.
+
+        Parameters
+        ----------
+        session_id : str
+            Unique identifier for the session
+
+        event_id : str
+            Unique identifier for the event
+
+        metadata : typing.Optional[SessionMetadataUpdateParams]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        Event
+            Event successfully updated
+
+        Examples
+        --------
+        from parlant.client import ParlantClient, SessionMetadataUpdateParams
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.sessions.update_event(
+            session_id="sess_123yz",
+            event_id="evt_123xyz",
+            metadata=SessionMetadataUpdateParams(
+                set_={
+                    "agent_id": "agent_123",
+                    "category": "support",
+                    "priority": "high",
+                },
+                unset=["old_priority"],
+            ),
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"sessions/{jsonable_encoder(session_id)}/events/{jsonable_encoder(event_id)}",
+            method="PATCH",
+            json={
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=SessionMetadataUpdateParams,
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Event,
+                    parse_obj_as(
+                        type_=Event,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
 
 class AsyncSessionsClient:
     def __init__(self, *, client_wrapper: AsyncClientWrapper):
@@ -822,13 +978,16 @@ class AsyncSessionsClient:
         *,
         agent_id: typing.Optional[str] = None,
         customer_id: typing.Optional[str] = None,
+        limit: typing.Optional[int] = None,
+        cursor: typing.Optional[str] = None,
+        sort: typing.Optional[SortDirectionDto] = None,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> typing.List[Session]:
+    ) -> SessionsListResponse:
         """
-        Lists all sessions matching the specified filters.
+        Lists all sessions matching the specified filters with pagination support.
 
-        Can filter by agent_id and/or customer_id. Returns all sessions if no
-        filters are provided.
+        Can filter by agent_id and/or customer_id. Supports cursor-based pagination
+        with configurable sort direction.
 
         Parameters
         ----------
@@ -836,13 +995,19 @@ class AsyncSessionsClient:
 
         customer_id : typing.Optional[str]
 
+        limit : typing.Optional[int]
+
+        cursor : typing.Optional[str]
+
+        sort : typing.Optional[SortDirectionDto]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Session]
-            List of all matching sessions
+        SessionsListResponse
+            If a limit is provided, a paginated list of sessions will be returned. Otherwise, the full list of sessions will be returned.
 
         Examples
         --------
@@ -859,6 +1024,8 @@ class AsyncSessionsClient:
             await client.sessions.list(
                 agent_id="ag_123xyz",
                 customer_id="cust_123xy",
+                limit=10,
+                cursor="AAABjnBU9gBl/0BQt1axI0VniQI=",
             )
 
 
@@ -870,15 +1037,18 @@ class AsyncSessionsClient:
             params={
                 "agent_id": agent_id,
                 "customer_id": customer_id,
+                "limit": limit,
+                "cursor": cursor,
+                "sort": sort,
             },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Session],
+                    SessionsListResponse,
                     parse_obj_as(
-                        type_=typing.List[Session],  # type: ignore
+                        type_=SessionsListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -904,6 +1074,7 @@ class AsyncSessionsClient:
         allow_greeting: typing.Optional[bool] = None,
         customer_id: typing.Optional[str] = OMIT,
         title: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
@@ -925,6 +1096,9 @@ class AsyncSessionsClient:
 
         title : typing.Optional[str]
             Descriptive title for the session
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Metadata for the session
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -950,6 +1124,7 @@ class AsyncSessionsClient:
                 agent_id="ag_123xyz",
                 customer_id="cust_123xy",
                 title="Product inquiry session",
+                metadata={"priority": "high", "project": "demo"},
             )
 
 
@@ -965,6 +1140,7 @@ class AsyncSessionsClient:
                 "agent_id": agent_id,
                 "customer_id": customer_id,
                 "title": title,
+                "metadata": metadata,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1228,6 +1404,9 @@ class AsyncSessionsClient:
         consumption_offsets: typing.Optional[ConsumptionOffsetsUpdateParams] = OMIT,
         title: typing.Optional[str] = OMIT,
         mode: typing.Optional[SessionModeDto] = OMIT,
+        customer_id: typing.Optional[str] = OMIT,
+        agent_id: typing.Optional[str] = OMIT,
+        metadata: typing.Optional[SessionMetadataUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
@@ -1248,6 +1427,12 @@ class AsyncSessionsClient:
         mode : typing.Optional[SessionModeDto]
             The mode of the session, either 'auto' or 'manual'. In manual mode, events added to a session will not be responded to automatically by the agent.
 
+        customer_id : typing.Optional[str]
+
+        agent_id : typing.Optional[str]
+
+        metadata : typing.Optional[SessionMetadataUpdateParams]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -1260,7 +1445,11 @@ class AsyncSessionsClient:
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, ConsumptionOffsetsUpdateParams
+        from parlant.client import (
+            AsyncParlantClient,
+            ConsumptionOffsetsUpdateParams,
+            SessionMetadataUpdateParams,
+        )
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -1274,6 +1463,10 @@ class AsyncSessionsClient:
                     client=42,
                 ),
                 title="Updated session title",
+                metadata=SessionMetadataUpdateParams(
+                    set_={"priority": "low", "simulation": True},
+                    unset=["old_project"],
+                ),
             )
 
 
@@ -1290,6 +1483,13 @@ class AsyncSessionsClient:
                 ),
                 "title": title,
                 "mode": mode,
+                "customer_id": customer_id,
+                "agent_id": agent_id,
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=SessionMetadataUpdateParams,
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -1335,6 +1535,7 @@ class AsyncSessionsClient:
         min_offset: typing.Optional[int] = None,
         source: typing.Optional[EventSourceDto] = None,
         correlation_id: typing.Optional[str] = None,
+        trace_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
         wait_for_data: typing.Optional[int] = None,
         request_options: typing.Optional[RequestOptions] = None,
@@ -1343,7 +1544,7 @@ class AsyncSessionsClient:
         Lists events from a session with optional filtering and waiting capabilities.
 
         This endpoint retrieves events from a specified session and can:
-        1. Filter events by their offset, source, type, and correlation ID
+        1. Filter events by their offset, source, type, and trace ID
         2. Wait for new events to arrive if requested
         3. Return events in chronological order based on their offset
 
@@ -1366,6 +1567,8 @@ class AsyncSessionsClient:
         source : typing.Optional[EventSourceDto]
 
         correlation_id : typing.Optional[str]
+
+        trace_id : typing.Optional[str]
 
         kinds : typing.Optional[str]
 
@@ -1395,6 +1598,7 @@ class AsyncSessionsClient:
                 session_id="sess_123yz",
                 min_offset=0,
                 correlation_id="corr_13xyz",
+                trace_id="corr_13xyz",
                 kinds="message,tool",
             )
 
@@ -1408,6 +1612,7 @@ class AsyncSessionsClient:
                 "min_offset": min_offset,
                 "source": source,
                 "correlation_id": correlation_id,
+                "trace_id": trace_id,
                 "kinds": kinds,
                 "wait_for_data": wait_for_data,
             },
@@ -1463,9 +1668,10 @@ class AsyncSessionsClient:
         *,
         kind: EventKindDto,
         source: EventSourceDto,
-        moderation: typing.Optional[Moderation] = None,
+        moderation: typing.Optional[ModerationDto] = None,
         message: typing.Optional[str] = OMIT,
         data: typing.Optional[typing.Optional[typing.Any]] = OMIT,
+        metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         guidelines: typing.Optional[typing.Sequence[AgentMessageGuideline]] = OMIT,
         participant: typing.Optional[Participant] = OMIT,
         status: typing.Optional[SessionStatusDto] = OMIT,
@@ -1485,13 +1691,16 @@ class AsyncSessionsClient:
 
         source : EventSourceDto
 
-        moderation : typing.Optional[Moderation]
+        moderation : typing.Optional[ModerationDto]
             Content moderation level for the event
 
         message : typing.Optional[str]
             Event payload data, format depends on kind
 
         data : typing.Optional[typing.Optional[typing.Any]]
+
+        metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
+            Metadata associated with the event
 
         guidelines : typing.Optional[typing.Sequence[AgentMessageGuideline]]
 
@@ -1540,6 +1749,7 @@ class AsyncSessionsClient:
                 "source": source,
                 "message": message,
                 "data": data,
+                "metadata": metadata,
                 "guidelines": convert_and_respect_annotation_metadata(
                     object_=guidelines,
                     annotation=typing.Sequence[AgentMessageGuideline],
@@ -1645,6 +1855,113 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def update_event(
+        self,
+        session_id: str,
+        event_id: str,
+        *,
+        metadata: typing.Optional[SessionMetadataUpdateParams] = OMIT,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Event:
+        """
+        Updates an event's properties.
+
+        Currently only supports updating metadata. Other event properties cannot be modified.
+        This API is designed to be extensible for future event property updates.
+
+        Parameters
+        ----------
+        session_id : str
+            Unique identifier for the session
+
+        event_id : str
+            Unique identifier for the event
+
+        metadata : typing.Optional[SessionMetadataUpdateParams]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        Event
+            Event successfully updated
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient, SessionMetadataUpdateParams
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.sessions.update_event(
+                session_id="sess_123yz",
+                event_id="evt_123xyz",
+                metadata=SessionMetadataUpdateParams(
+                    set_={
+                        "agent_id": "agent_123",
+                        "category": "support",
+                        "priority": "high",
+                    },
+                    unset=["old_priority"],
+                ),
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"sessions/{jsonable_encoder(session_id)}/events/{jsonable_encoder(event_id)}",
+            method="PATCH",
+            json={
+                "metadata": convert_and_respect_annotation_metadata(
+                    object_=metadata,
+                    annotation=SessionMetadataUpdateParams,
+                    direction="write",
+                ),
+            },
+            request_options=request_options,
+            omit=OMIT,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Event,
+                    parse_obj_as(
+                        type_=Event,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(

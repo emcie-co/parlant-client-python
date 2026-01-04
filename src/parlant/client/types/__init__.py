@@ -6,20 +6,18 @@ from .agent_message_guideline_rationale_dto import AgentMessageGuidelineRational
 from .agent_tag_update_params import AgentTagUpdateParams
 from .canned_response import CannedResponse
 from .canned_response_field import CannedResponseField
+from .canned_response_metadata_update_params import CannedResponseMetadataUpdateParams
 from .canned_response_tag_update_params import CannedResponseTagUpdateParams
 from .capability import Capability
 from .capability_tag_update_params import CapabilityTagUpdateParams
-from .coherence_check import CoherenceCheck
-from .coherence_check_kind_dto import CoherenceCheckKindDto
 from .composition_mode_dto import CompositionModeDto
-from .connection_proposition import ConnectionProposition
-from .connection_proposition_kind_dto import ConnectionPropositionKindDto
 from .consumption_offsets import ConsumptionOffsets
 from .consumption_offsets_update_params import ConsumptionOffsetsUpdateParams
 from .context_variable import ContextVariable
 from .context_variable_read_result import ContextVariableReadResult
 from .context_variable_tags_update_params import ContextVariableTagsUpdateParams
 from .context_variable_value import ContextVariableValue
+from .criticality_dto import CriticalityDto
 from .customer import Customer
 from .customer_metadata_update_params import CustomerMetadataUpdateParams
 from .customer_tag_update_params import CustomerTagUpdateParams
@@ -48,35 +46,10 @@ from .invoice_data import InvoiceData
 from .journey import Journey
 from .journey_condition_update_params import JourneyConditionUpdateParams
 from .journey_tag_update_params import JourneyTagUpdateParams
-from .legacy_context_variable import LegacyContextVariable
-from .legacy_context_variable_creation_params import LegacyContextVariableCreationParams
-from .legacy_context_variable_read_result import LegacyContextVariableReadResult
-from .legacy_context_variable_update_params import LegacyContextVariableUpdateParams
-from .legacy_evaluation import LegacyEvaluation
-from .legacy_evaluation_creation_params import LegacyEvaluationCreationParams
-from .legacy_guideline import LegacyGuideline
-from .legacy_guideline_connection import LegacyGuidelineConnection
-from .legacy_guideline_connection_addition import LegacyGuidelineConnectionAddition
-from .legacy_guideline_connection_update_params import (
-    LegacyGuidelineConnectionUpdateParams,
-)
-from .legacy_guideline_creation_params import LegacyGuidelineCreationParams
-from .legacy_guideline_creation_result import LegacyGuidelineCreationResult
-from .legacy_guideline_invoice_data import LegacyGuidelineInvoiceData
-from .legacy_guideline_payload import LegacyGuidelinePayload
-from .legacy_guideline_update_params import LegacyGuidelineUpdateParams
-from .legacy_guideline_with_connections_and_tool_associations import (
-    LegacyGuidelineWithConnectionsAndToolAssociations,
-)
-from .legacy_invoice import LegacyInvoice
-from .legacy_invoice_data import LegacyInvoiceData
-from .legacy_payload import LegacyPayload
-from .legacy_term import LegacyTerm
-from .legacy_term_creation_params import LegacyTermCreationParams
-from .legacy_term_update_params import LegacyTermUpdateParams
 from .mcp_service_params import McpServiceParams
-from .moderation import Moderation
+from .moderation_dto import ModerationDto
 from .open_api_service_params import OpenApiServiceParams
+from .paginated_customers import PaginatedCustomers
 from .participant import Participant
 from .payload import Payload
 from .payload_kind_dto import PayloadKindDto
@@ -85,8 +58,11 @@ from .relationship_kind_dto import RelationshipKindDto
 from .sdk_service_params import SdkServiceParams
 from .service import Service
 from .session import Session
+from .session_listing import SessionListing
+from .session_metadata_update_params import SessionMetadataUpdateParams
 from .session_mode_dto import SessionModeDto
 from .session_status_dto import SessionStatusDto
+from .sort_direction_dto import SortDirectionDto
 from .tag import Tag
 from .term import Term
 from .term_tags_update_params import TermTagsUpdateParams
@@ -106,20 +82,18 @@ __all__ = [
     "AgentTagUpdateParams",
     "CannedResponse",
     "CannedResponseField",
+    "CannedResponseMetadataUpdateParams",
     "CannedResponseTagUpdateParams",
     "Capability",
     "CapabilityTagUpdateParams",
-    "CoherenceCheck",
-    "CoherenceCheckKindDto",
     "CompositionModeDto",
-    "ConnectionProposition",
-    "ConnectionPropositionKindDto",
     "ConsumptionOffsets",
     "ConsumptionOffsetsUpdateParams",
     "ContextVariable",
     "ContextVariableReadResult",
     "ContextVariableTagsUpdateParams",
     "ContextVariableValue",
+    "CriticalityDto",
     "Customer",
     "CustomerMetadataUpdateParams",
     "CustomerTagUpdateParams",
@@ -144,31 +118,10 @@ __all__ = [
     "Journey",
     "JourneyConditionUpdateParams",
     "JourneyTagUpdateParams",
-    "LegacyContextVariable",
-    "LegacyContextVariableCreationParams",
-    "LegacyContextVariableReadResult",
-    "LegacyContextVariableUpdateParams",
-    "LegacyEvaluation",
-    "LegacyEvaluationCreationParams",
-    "LegacyGuideline",
-    "LegacyGuidelineConnection",
-    "LegacyGuidelineConnectionAddition",
-    "LegacyGuidelineConnectionUpdateParams",
-    "LegacyGuidelineCreationParams",
-    "LegacyGuidelineCreationResult",
-    "LegacyGuidelineInvoiceData",
-    "LegacyGuidelinePayload",
-    "LegacyGuidelineUpdateParams",
-    "LegacyGuidelineWithConnectionsAndToolAssociations",
-    "LegacyInvoice",
-    "LegacyInvoiceData",
-    "LegacyPayload",
-    "LegacyTerm",
-    "LegacyTermCreationParams",
-    "LegacyTermUpdateParams",
     "McpServiceParams",
-    "Moderation",
+    "ModerationDto",
     "OpenApiServiceParams",
+    "PaginatedCustomers",
     "Participant",
     "Payload",
     "PayloadKindDto",
@@ -177,8 +130,11 @@ __all__ = [
     "SdkServiceParams",
     "Service",
     "Session",
+    "SessionListing",
+    "SessionMetadataUpdateParams",
     "SessionModeDto",
     "SessionStatusDto",
+    "SortDirectionDto",
     "Tag",
     "Term",
     "TermTagsUpdateParams",

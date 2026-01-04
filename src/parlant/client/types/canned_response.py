@@ -39,6 +39,11 @@ class CannedResponse(UniversalBaseModel):
     A sequence of signals associated with the canned response, to help with filtering and matching.
     """
 
+    metadata: typing.Dict[str, typing.Optional[typing.Any]] = pydantic.Field()
+    """
+    Additional metadata associated with the canned response.
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
             extra="allow", frozen=True

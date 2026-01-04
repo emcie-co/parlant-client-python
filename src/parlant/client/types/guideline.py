@@ -3,6 +3,8 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
+from .criticality_dto import CriticalityDto
+from .composition_mode_dto import CompositionModeDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -26,6 +28,16 @@ class Guideline(UniversalBaseModel):
     This action will be performed if the condition is satisfied
     """
 
+    description: typing.Optional[str] = pydantic.Field(default=None)
+    """
+    Optional description providing additional context for the guideline
+    """
+
+    criticality: typing.Optional[CriticalityDto] = pydantic.Field(default=None)
+    """
+    The criticality level of the guideline
+    """
+
     enabled: typing.Optional[bool] = pydantic.Field(default=None)
     """
     Whether the guideline is enabled
@@ -40,6 +52,8 @@ class Guideline(UniversalBaseModel):
     """
     Metadata for the guideline
     """
+
+    composition_mode: typing.Optional[CompositionModeDto] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
