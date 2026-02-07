@@ -13,6 +13,7 @@ from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
 from ..types.journey_condition_update_params import JourneyConditionUpdateParams
 from ..types.journey_tag_update_params import JourneyTagUpdateParams
+from ..types.journey_labels_update_params import JourneyLabelsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -96,6 +97,7 @@ class JourneysClient:
         id: typing.Optional[str] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -121,6 +123,9 @@ class JourneysClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
+        labels : typing.Optional[typing.Sequence[str]]
+            Labels associated with the journey
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -145,6 +150,7 @@ class JourneysClient:
             ],
             id="IUCGT-lvpS",
             tags=["tag1", "tag2"],
+            labels=["vip", "priority"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -157,6 +163,7 @@ class JourneysClient:
                 "id": id,
                 "tags": tags,
                 "composition_mode": composition_mode,
+                "labels": labels,
             },
             request_options=request_options,
             omit=OMIT,
@@ -335,6 +342,7 @@ class JourneysClient:
         conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
         tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[JourneyLabelsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -357,6 +365,8 @@ class JourneysClient:
         tags : typing.Optional[JourneyTagUpdateParams]
 
         composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[JourneyLabelsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -394,6 +404,11 @@ class JourneysClient:
                     object_=tags, annotation=JourneyTagUpdateParams, direction="write"
                 ),
                 "composition_mode": composition_mode,
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=JourneyLabelsUpdateParams,
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -584,6 +599,7 @@ class AsyncJourneysClient:
         id: typing.Optional[str] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -608,6 +624,9 @@ class AsyncJourneysClient:
             List of tag IDs associated with the journey
 
         composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[typing.Sequence[str]]
+            Labels associated with the journey
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -638,6 +657,7 @@ class AsyncJourneysClient:
                 ],
                 id="IUCGT-lvpS",
                 tags=["tag1", "tag2"],
+                labels=["vip", "priority"],
             )
 
 
@@ -653,6 +673,7 @@ class AsyncJourneysClient:
                 "id": id,
                 "tags": tags,
                 "composition_mode": composition_mode,
+                "labels": labels,
             },
             request_options=request_options,
             omit=OMIT,
@@ -847,6 +868,7 @@ class AsyncJourneysClient:
         conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
         tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[JourneyLabelsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -869,6 +891,8 @@ class AsyncJourneysClient:
         tags : typing.Optional[JourneyTagUpdateParams]
 
         composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[JourneyLabelsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -914,6 +938,11 @@ class AsyncJourneysClient:
                     object_=tags, annotation=JourneyTagUpdateParams, direction="write"
                 ),
                 "composition_mode": composition_mode,
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=JourneyLabelsUpdateParams,
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,

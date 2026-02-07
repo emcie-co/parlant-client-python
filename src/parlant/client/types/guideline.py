@@ -54,6 +54,11 @@ class Guideline(UniversalBaseModel):
     """
 
     composition_mode: typing.Optional[CompositionModeDto] = None
+    track: typing.Optional[bool] = None
+    labels: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    The labels associated with the guideline
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

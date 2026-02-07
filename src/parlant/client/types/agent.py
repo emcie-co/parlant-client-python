@@ -4,6 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
 from .composition_mode_dto import CompositionModeDto
+from .message_output_mode_dto import MessageOutputModeDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -38,6 +39,7 @@ class Agent(UniversalBaseModel):
     """
 
     composition_mode: CompositionModeDto
+    message_output_mode: MessageOutputModeDto
     tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
     List of tag IDs associated with the agent

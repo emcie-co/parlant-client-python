@@ -44,6 +44,11 @@ class CannedResponse(UniversalBaseModel):
     Additional metadata associated with the canned response.
     """
 
+    field_dependencies: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    A sequence of field names that must be available in context for this response to be considered.
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
             extra="allow", frozen=True

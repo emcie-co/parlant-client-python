@@ -97,6 +97,7 @@ class CannedResponsesClient:
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         signals: typing.Optional[typing.Sequence[str]] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        field_dependencies: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CannedResponse:
         """
@@ -116,6 +117,9 @@ class CannedResponsesClient:
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Additional metadata associated with the canned response.
+
+        field_dependencies : typing.Optional[typing.Sequence[str]]
+            A sequence of field names that must be available in context for this response to be considered.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -142,6 +146,7 @@ class CannedResponsesClient:
                 )
             ],
             metadata={"category": "account", "priority": 1},
+            field_dependencies=["account"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -157,6 +162,7 @@ class CannedResponsesClient:
                 "tags": tags,
                 "signals": signals,
                 "metadata": metadata,
+                "field_dependencies": field_dependencies,
             },
             request_options=request_options,
             omit=OMIT,
@@ -526,6 +532,7 @@ class AsyncCannedResponsesClient:
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         signals: typing.Optional[typing.Sequence[str]] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        field_dependencies: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> CannedResponse:
         """
@@ -545,6 +552,9 @@ class AsyncCannedResponsesClient:
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Additional metadata associated with the canned response.
+
+        field_dependencies : typing.Optional[typing.Sequence[str]]
+            A sequence of field names that must be available in context for this response to be considered.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -576,6 +586,7 @@ class AsyncCannedResponsesClient:
                     )
                 ],
                 metadata={"category": "account", "priority": 1},
+                field_dependencies=["account"],
             )
 
 
@@ -594,6 +605,7 @@ class AsyncCannedResponsesClient:
                 "tags": tags,
                 "signals": signals,
                 "metadata": metadata,
+                "field_dependencies": field_dependencies,
             },
             request_options=request_options,
             omit=OMIT,

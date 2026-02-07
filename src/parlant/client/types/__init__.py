@@ -29,6 +29,7 @@ from .event_source_dto import EventSourceDto
 from .guideline import Guideline
 from .guideline_content import GuidelineContent
 from .guideline_invoice_data import GuidelineInvoiceData
+from .guideline_labels_update_params import GuidelineLabelsUpdateParams
 from .guideline_metadata_update_params import GuidelineMetadataUpdateParams
 from .guideline_payload import GuidelinePayload
 from .guideline_payload_operation_dto import GuidelinePayloadOperationDto
@@ -45,8 +46,10 @@ from .invoice import Invoice
 from .invoice_data import InvoiceData
 from .journey import Journey
 from .journey_condition_update_params import JourneyConditionUpdateParams
+from .journey_labels_update_params import JourneyLabelsUpdateParams
 from .journey_tag_update_params import JourneyTagUpdateParams
 from .mcp_service_params import McpServiceParams
+from .message_output_mode_dto import MessageOutputModeDto
 from .moderation_dto import ModerationDto
 from .open_api_service_params import OpenApiServiceParams
 from .paginated_customers import PaginatedCustomers
@@ -58,6 +61,7 @@ from .relationship_kind_dto import RelationshipKindDto
 from .sdk_service_params import SdkServiceParams
 from .service import Service
 from .session import Session
+from .session_labels_update_params import SessionLabelsUpdateParams
 from .session_listing import SessionListing
 from .session_metadata_update_params import SessionMetadataUpdateParams
 from .session_mode_dto import SessionModeDto
@@ -105,6 +109,7 @@ __all__ = [
     "Guideline",
     "GuidelineContent",
     "GuidelineInvoiceData",
+    "GuidelineLabelsUpdateParams",
     "GuidelineMetadataUpdateParams",
     "GuidelinePayload",
     "GuidelinePayloadOperationDto",
@@ -117,8 +122,10 @@ __all__ = [
     "InvoiceData",
     "Journey",
     "JourneyConditionUpdateParams",
+    "JourneyLabelsUpdateParams",
     "JourneyTagUpdateParams",
     "McpServiceParams",
+    "MessageOutputModeDto",
     "ModerationDto",
     "OpenApiServiceParams",
     "PaginatedCustomers",
@@ -130,6 +137,7 @@ __all__ = [
     "SdkServiceParams",
     "Service",
     "Session",
+    "SessionLabelsUpdateParams",
     "SessionListing",
     "SessionMetadataUpdateParams",
     "SessionModeDto",

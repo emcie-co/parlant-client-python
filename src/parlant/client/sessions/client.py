@@ -15,6 +15,7 @@ from ..errors.not_found_error import NotFoundError
 from ..types.consumption_offsets_update_params import ConsumptionOffsetsUpdateParams
 from ..types.session_mode_dto import SessionModeDto
 from ..types.session_metadata_update_params import SessionMetadataUpdateParams
+from ..types.session_labels_update_params import SessionLabelsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..types.event_source_dto import EventSourceDto
 from ..types.event import Event
@@ -39,6 +40,7 @@ class SessionsClient:
         *,
         agent_id: typing.Optional[str] = None,
         customer_id: typing.Optional[str] = None,
+        labels: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         limit: typing.Optional[int] = None,
         cursor: typing.Optional[str] = None,
         sort: typing.Optional[SortDirectionDto] = None,
@@ -55,6 +57,8 @@ class SessionsClient:
         agent_id : typing.Optional[str]
 
         customer_id : typing.Optional[str]
+
+        labels : typing.Optional[typing.Union[str, typing.Sequence[str]]]
 
         limit : typing.Optional[int]
 
@@ -90,6 +94,7 @@ class SessionsClient:
             params={
                 "agent_id": agent_id,
                 "customer_id": customer_id,
+                "labels": labels,
                 "limit": limit,
                 "cursor": cursor,
                 "sort": sort,
@@ -128,6 +133,7 @@ class SessionsClient:
         customer_id: typing.Optional[str] = OMIT,
         title: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
@@ -153,6 +159,9 @@ class SessionsClient:
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Metadata for the session
 
+        labels : typing.Optional[typing.Sequence[str]]
+            Labels associated with the session
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -173,6 +182,7 @@ class SessionsClient:
             customer_id="cust_123xy",
             title="Product inquiry session",
             metadata={"priority": "high", "project": "demo"},
+            labels=["vip", "priority"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -186,6 +196,7 @@ class SessionsClient:
                 "customer_id": customer_id,
                 "title": title,
                 "metadata": metadata,
+                "labels": labels,
             },
             request_options=request_options,
             omit=OMIT,
@@ -428,6 +439,7 @@ class SessionsClient:
         customer_id: typing.Optional[str] = OMIT,
         agent_id: typing.Optional[str] = OMIT,
         metadata: typing.Optional[SessionMetadataUpdateParams] = OMIT,
+        labels: typing.Optional[SessionLabelsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
@@ -454,6 +466,8 @@ class SessionsClient:
 
         metadata : typing.Optional[SessionMetadataUpdateParams]
 
+        labels : typing.Optional[SessionLabelsUpdateParams]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -467,6 +481,7 @@ class SessionsClient:
         from parlant.client import (
             ConsumptionOffsetsUpdateParams,
             ParlantClient,
+            SessionLabelsUpdateParams,
             SessionMetadataUpdateParams,
         )
 
@@ -482,6 +497,10 @@ class SessionsClient:
             metadata=SessionMetadataUpdateParams(
                 set_={"priority": "low", "simulation": True},
                 unset=["old_project"],
+            ),
+            labels=SessionLabelsUpdateParams(
+                upsert=["vip", "priority"],
+                remove=["old_label"],
             ),
         )
         """
@@ -501,6 +520,11 @@ class SessionsClient:
                 "metadata": convert_and_respect_annotation_metadata(
                     object_=metadata,
                     annotation=SessionMetadataUpdateParams,
+                    direction="write",
+                ),
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=SessionLabelsUpdateParams,
                     direction="write",
                 ),
             },
@@ -551,6 +575,7 @@ class SessionsClient:
         trace_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
         wait_for_data: typing.Optional[int] = None,
+        sse: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Event]:
         """
@@ -560,15 +585,21 @@ class SessionsClient:
         1. Filter events by their offset, source, type, and trace ID
         2. Wait for new events to arrive if requested
         3. Return events in chronological order based on their offset
+        4. Stream events via Server-Sent Events (SSE) when sse=true
 
         Notes:
-            Long Polling Behavior:
+            Long Polling Behavior (when sse=false):
             - When wait_for_data = 0:
                 Returns immediately with any existing events that match the criteria
             - When wait_for_data > 0:
                 - If new matching events arrive within the timeout period, returns with those events
                 - If no new events arrive before timeout, raises 504 Gateway Timeout
                 - If matching events already exist, returns immediately with those events
+
+            SSE Mode (when sse=true):
+            - Returns a text/event-stream response
+            - Continuously sends events as they arrive
+            - wait_for_data is used as the timeout between events before closing the stream
 
         Parameters
         ----------
@@ -586,6 +617,8 @@ class SessionsClient:
         kinds : typing.Optional[str]
 
         wait_for_data : typing.Optional[int]
+
+        sse : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -620,6 +653,7 @@ class SessionsClient:
                 "trace_id": trace_id,
                 "kinds": kinds,
                 "wait_for_data": wait_for_data,
+                "sse": sse,
             },
             request_options=request_options,
         )
@@ -869,6 +903,117 @@ class SessionsClient:
             raise ApiError(status_code=_response.status_code, body=_response.text)
         raise ApiError(status_code=_response.status_code, body=_response_json)
 
+    def read_event(
+        self,
+        session_id: str,
+        event_id: str,
+        *,
+        wait_for_completion: typing.Optional[bool] = None,
+        wait_for_data: typing.Optional[int] = None,
+        sse: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Event:
+        """
+        Reads a single event from a session.
+
+        This endpoint retrieves a specific event by its ID and optionally waits
+        for the event to complete (useful for streaming messages).
+
+        Args:
+            wait_for_completion: If true, wait for the event to complete (for streaming events,
+                this means waiting until chunks contains None terminator)
+            wait_for_data: Timeout in seconds for wait_for_completion
+            sse: If true, stream event updates via Server-Sent Events until completion
+
+        Notes:
+            For streaming message events (events with 'chunks' property):
+            - The event is considered complete when chunks contains a None terminator
+            - Use wait_for_completion=true to wait for the full message
+            - Use sse=true to stream updates as chunks are added
+
+            SSE Mode (when sse=true):
+            - Returns a text/event-stream response
+            - Sends the event each time it's updated
+            - Closes when the event is complete (chunks ends with None)
+
+        Parameters
+        ----------
+        session_id : str
+            Unique identifier for the session
+
+        event_id : str
+            Unique identifier for the event
+
+        wait_for_completion : typing.Optional[bool]
+
+        wait_for_data : typing.Optional[int]
+
+        sse : typing.Optional[bool]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        Event
+            Event details successfully retrieved
+
+        Examples
+        --------
+        from parlant.client import ParlantClient
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.sessions.read_event(
+            session_id="sess_123yz",
+            event_id="evt_123xyz",
+        )
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            f"sessions/{jsonable_encoder(session_id)}/events/{jsonable_encoder(event_id)}",
+            method="GET",
+            params={
+                "wait_for_completion": wait_for_completion,
+                "wait_for_data": wait_for_data,
+                "sse": sse,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Event,
+                    parse_obj_as(
+                        type_=Event,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
     def update_event(
         self,
         session_id: str,
@@ -978,6 +1123,7 @@ class AsyncSessionsClient:
         *,
         agent_id: typing.Optional[str] = None,
         customer_id: typing.Optional[str] = None,
+        labels: typing.Optional[typing.Union[str, typing.Sequence[str]]] = None,
         limit: typing.Optional[int] = None,
         cursor: typing.Optional[str] = None,
         sort: typing.Optional[SortDirectionDto] = None,
@@ -994,6 +1140,8 @@ class AsyncSessionsClient:
         agent_id : typing.Optional[str]
 
         customer_id : typing.Optional[str]
+
+        labels : typing.Optional[typing.Union[str, typing.Sequence[str]]]
 
         limit : typing.Optional[int]
 
@@ -1037,6 +1185,7 @@ class AsyncSessionsClient:
             params={
                 "agent_id": agent_id,
                 "customer_id": customer_id,
+                "labels": labels,
                 "limit": limit,
                 "cursor": cursor,
                 "sort": sort,
@@ -1075,6 +1224,7 @@ class AsyncSessionsClient:
         customer_id: typing.Optional[str] = OMIT,
         title: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
@@ -1099,6 +1249,9 @@ class AsyncSessionsClient:
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Metadata for the session
+
+        labels : typing.Optional[typing.Sequence[str]]
+            Labels associated with the session
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1125,6 +1278,7 @@ class AsyncSessionsClient:
                 customer_id="cust_123xy",
                 title="Product inquiry session",
                 metadata={"priority": "high", "project": "demo"},
+                labels=["vip", "priority"],
             )
 
 
@@ -1141,6 +1295,7 @@ class AsyncSessionsClient:
                 "customer_id": customer_id,
                 "title": title,
                 "metadata": metadata,
+                "labels": labels,
             },
             request_options=request_options,
             omit=OMIT,
@@ -1407,6 +1562,7 @@ class AsyncSessionsClient:
         customer_id: typing.Optional[str] = OMIT,
         agent_id: typing.Optional[str] = OMIT,
         metadata: typing.Optional[SessionMetadataUpdateParams] = OMIT,
+        labels: typing.Optional[SessionLabelsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Session:
         """
@@ -1433,6 +1589,8 @@ class AsyncSessionsClient:
 
         metadata : typing.Optional[SessionMetadataUpdateParams]
 
+        labels : typing.Optional[SessionLabelsUpdateParams]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -1448,6 +1606,7 @@ class AsyncSessionsClient:
         from parlant.client import (
             AsyncParlantClient,
             ConsumptionOffsetsUpdateParams,
+            SessionLabelsUpdateParams,
             SessionMetadataUpdateParams,
         )
 
@@ -1466,6 +1625,10 @@ class AsyncSessionsClient:
                 metadata=SessionMetadataUpdateParams(
                     set_={"priority": "low", "simulation": True},
                     unset=["old_project"],
+                ),
+                labels=SessionLabelsUpdateParams(
+                    upsert=["vip", "priority"],
+                    remove=["old_label"],
                 ),
             )
 
@@ -1488,6 +1651,11 @@ class AsyncSessionsClient:
                 "metadata": convert_and_respect_annotation_metadata(
                     object_=metadata,
                     annotation=SessionMetadataUpdateParams,
+                    direction="write",
+                ),
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=SessionLabelsUpdateParams,
                     direction="write",
                 ),
             },
@@ -1538,6 +1706,7 @@ class AsyncSessionsClient:
         trace_id: typing.Optional[str] = None,
         kinds: typing.Optional[str] = None,
         wait_for_data: typing.Optional[int] = None,
+        sse: typing.Optional[bool] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Event]:
         """
@@ -1547,15 +1716,21 @@ class AsyncSessionsClient:
         1. Filter events by their offset, source, type, and trace ID
         2. Wait for new events to arrive if requested
         3. Return events in chronological order based on their offset
+        4. Stream events via Server-Sent Events (SSE) when sse=true
 
         Notes:
-            Long Polling Behavior:
+            Long Polling Behavior (when sse=false):
             - When wait_for_data = 0:
                 Returns immediately with any existing events that match the criteria
             - When wait_for_data > 0:
                 - If new matching events arrive within the timeout period, returns with those events
                 - If no new events arrive before timeout, raises 504 Gateway Timeout
                 - If matching events already exist, returns immediately with those events
+
+            SSE Mode (when sse=true):
+            - Returns a text/event-stream response
+            - Continuously sends events as they arrive
+            - wait_for_data is used as the timeout between events before closing the stream
 
         Parameters
         ----------
@@ -1573,6 +1748,8 @@ class AsyncSessionsClient:
         kinds : typing.Optional[str]
 
         wait_for_data : typing.Optional[int]
+
+        sse : typing.Optional[bool]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1615,6 +1792,7 @@ class AsyncSessionsClient:
                 "trace_id": trace_id,
                 "kinds": kinds,
                 "wait_for_data": wait_for_data,
+                "sse": sse,
             },
             request_options=request_options,
         )
@@ -1855,6 +2033,125 @@ class AsyncSessionsClient:
         try:
             if 200 <= _response.status_code < 300:
                 return
+            if _response.status_code == 404:
+                raise NotFoundError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
+
+    async def read_event(
+        self,
+        session_id: str,
+        event_id: str,
+        *,
+        wait_for_completion: typing.Optional[bool] = None,
+        wait_for_data: typing.Optional[int] = None,
+        sse: typing.Optional[bool] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> Event:
+        """
+        Reads a single event from a session.
+
+        This endpoint retrieves a specific event by its ID and optionally waits
+        for the event to complete (useful for streaming messages).
+
+        Args:
+            wait_for_completion: If true, wait for the event to complete (for streaming events,
+                this means waiting until chunks contains None terminator)
+            wait_for_data: Timeout in seconds for wait_for_completion
+            sse: If true, stream event updates via Server-Sent Events until completion
+
+        Notes:
+            For streaming message events (events with 'chunks' property):
+            - The event is considered complete when chunks contains a None terminator
+            - Use wait_for_completion=true to wait for the full message
+            - Use sse=true to stream updates as chunks are added
+
+            SSE Mode (when sse=true):
+            - Returns a text/event-stream response
+            - Sends the event each time it's updated
+            - Closes when the event is complete (chunks ends with None)
+
+        Parameters
+        ----------
+        session_id : str
+            Unique identifier for the session
+
+        event_id : str
+            Unique identifier for the event
+
+        wait_for_completion : typing.Optional[bool]
+
+        wait_for_data : typing.Optional[int]
+
+        sse : typing.Optional[bool]
+
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        Event
+            Event details successfully retrieved
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.sessions.read_event(
+                session_id="sess_123yz",
+                event_id="evt_123xyz",
+            )
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            f"sessions/{jsonable_encoder(session_id)}/events/{jsonable_encoder(event_id)}",
+            method="GET",
+            params={
+                "wait_for_completion": wait_for_completion,
+                "wait_for_data": wait_for_data,
+                "sse": sse,
+            },
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    Event,
+                    parse_obj_as(
+                        type_=Event,  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
             if _response.status_code == 404:
                 raise NotFoundError(
                     typing.cast(

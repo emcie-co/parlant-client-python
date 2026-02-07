@@ -32,6 +32,10 @@ class Journey(UniversalBaseModel):
     """
 
     composition_mode: typing.Optional[CompositionModeDto] = None
+    labels: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Labels associated with the journey
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

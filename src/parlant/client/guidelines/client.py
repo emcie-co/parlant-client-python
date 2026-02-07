@@ -20,6 +20,7 @@ from ..types.guideline_tool_association_update_params import (
 )
 from ..types.guideline_tags_update_params import GuidelineTagsUpdateParams
 from ..types.guideline_metadata_update_params import GuidelineMetadataUpdateParams
+from ..types.guideline_labels_update_params import GuidelineLabelsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -110,6 +111,8 @@ class GuidelinesClient:
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        track: typing.Optional[bool] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Guideline:
         """
@@ -147,6 +150,11 @@ class GuidelinesClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
+        track : typing.Optional[bool]
+
+        labels : typing.Optional[typing.Sequence[str]]
+            The labels associated with the guideline
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -168,6 +176,7 @@ class GuidelinesClient:
             metadata={"key1": "value1", "key2": "value2"},
             enabled=False,
             composition_mode="strict_canned",
+            labels=["vip", "priority"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -183,6 +192,8 @@ class GuidelinesClient:
                 "enabled": enabled,
                 "tags": tags,
                 "composition_mode": composition_mode,
+                "track": track,
+                "labels": labels,
             },
             request_options=request_options,
             omit=OMIT,
@@ -362,6 +373,7 @@ class GuidelinesClient:
         tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
         metadata: typing.Optional[GuidelineMetadataUpdateParams] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[GuidelineLabelsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
@@ -405,6 +417,8 @@ class GuidelinesClient:
         metadata : typing.Optional[GuidelineMetadataUpdateParams]
 
         composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[GuidelineLabelsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -476,6 +490,11 @@ class GuidelinesClient:
                     direction="write",
                 ),
                 "composition_mode": composition_mode,
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=GuidelineLabelsUpdateParams,
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
@@ -606,6 +625,8 @@ class AsyncGuidelinesClient:
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        track: typing.Optional[bool] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Guideline:
         """
@@ -643,6 +664,11 @@ class AsyncGuidelinesClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
+        track : typing.Optional[bool]
+
+        labels : typing.Optional[typing.Sequence[str]]
+            The labels associated with the guideline
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -669,6 +695,7 @@ class AsyncGuidelinesClient:
                 metadata={"key1": "value1", "key2": "value2"},
                 enabled=False,
                 composition_mode="strict_canned",
+                labels=["vip", "priority"],
             )
 
 
@@ -687,6 +714,8 @@ class AsyncGuidelinesClient:
                 "enabled": enabled,
                 "tags": tags,
                 "composition_mode": composition_mode,
+                "track": track,
+                "labels": labels,
             },
             request_options=request_options,
             omit=OMIT,
@@ -882,6 +911,7 @@ class AsyncGuidelinesClient:
         tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
         metadata: typing.Optional[GuidelineMetadataUpdateParams] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[GuidelineLabelsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
@@ -925,6 +955,8 @@ class AsyncGuidelinesClient:
         metadata : typing.Optional[GuidelineMetadataUpdateParams]
 
         composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[GuidelineLabelsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1004,6 +1036,11 @@ class AsyncGuidelinesClient:
                     direction="write",
                 ),
                 "composition_mode": composition_mode,
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=GuidelineLabelsUpdateParams,
+                    direction="write",
+                ),
             },
             request_options=request_options,
             omit=OMIT,
