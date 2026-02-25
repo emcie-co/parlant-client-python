@@ -2,17 +2,24 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .validation_error_loc_item import ValidationErrorLocItem
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class ValidationError(UniversalBaseModel):
-    loc: typing.List[ValidationErrorLocItem]
-    msg: str
-    type: str
-    input: typing.Optional[typing.Optional[typing.Any]] = None
-    ctx: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
+class JourneyLabelsUpdateParams(UniversalBaseModel):
+    """
+    Parameters for updating an existing journey's labels.
+    """
+
+    upsert: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Labels associated with the journey
+    """
+
+    remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Labels associated with the journey
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

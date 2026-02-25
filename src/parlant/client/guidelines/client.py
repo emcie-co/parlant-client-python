@@ -8,6 +8,8 @@ from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.criticality_dto import CriticalityDto
+from ..types.composition_mode_dto import CompositionModeDto
 from ..types.guideline_with_relationships_and_tool_associations import (
     GuidelineWithRelationshipsAndToolAssociations,
 )
@@ -18,6 +20,7 @@ from ..types.guideline_tool_association_update_params import (
 )
 from ..types.guideline_tags_update_params import GuidelineTagsUpdateParams
 from ..types.guideline_metadata_update_params import GuidelineMetadataUpdateParams
+from ..types.guideline_labels_update_params import GuidelineLabelsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -100,14 +103,24 @@ class GuidelinesClient:
         self,
         *,
         condition: str,
+        id: typing.Optional[str] = OMIT,
         action: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        criticality: typing.Optional[CriticalityDto] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        track: typing.Optional[bool] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Guideline:
         """
         Creates a new guideline.
+
+        The guideline will be initialized with the provided condition and optional action and settings.
+        A unique identifier will be automatically generated unless a custom ID is provided.
 
         See the [documentation](https://parlant.io/docs/concepts/customization/guidelines) for more information.
 
@@ -116,8 +129,16 @@ class GuidelinesClient:
         condition : str
             If this condition is satisfied, the action will be performed
 
+        id : typing.Optional[str]
+            Unique identifier for the guideline
+
         action : typing.Optional[str]
             This action will be performed if the condition is satisfied
+
+        description : typing.Optional[str]
+            Optional description providing additional context for the guideline
+
+        criticality : typing.Optional[CriticalityDto]
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Metadata for the guideline
@@ -127,6 +148,15 @@ class GuidelinesClient:
 
         tags : typing.Optional[typing.Sequence[str]]
             The tags associated with the guideline
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        track : typing.Optional[bool]
+
+        labels : typing.Optional[typing.Sequence[str]]
+            The labels associated with the guideline
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -148,17 +178,26 @@ class GuidelinesClient:
             action="provide current pricing information and mention any ongoing promotions",
             metadata={"key1": "value1", "key2": "value2"},
             enabled=False,
+            composition_mode="strict_canned",
+            labels=["vip", "priority"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
             "guidelines",
             method="POST",
             json={
+                "id": id,
                 "condition": condition,
                 "action": action,
+                "description": description,
+                "criticality": criticality,
                 "metadata": metadata,
                 "enabled": enabled,
                 "tags": tags,
+                "composition_mode": composition_mode,
+                "track": track,
+                "labels": labels,
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -331,10 +370,15 @@ class GuidelinesClient:
         *,
         condition: typing.Optional[str] = OMIT,
         action: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        criticality: typing.Optional[CriticalityDto] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
         metadata: typing.Optional[GuidelineMetadataUpdateParams] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[GuidelineLabelsUpdateParams] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
@@ -363,6 +407,11 @@ class GuidelinesClient:
         action : typing.Optional[str]
             This action will be performed if the condition is satisfied
 
+        description : typing.Optional[str]
+            Optional description providing additional context for the guideline
+
+        criticality : typing.Optional[CriticalityDto]
+
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
 
         enabled : typing.Optional[bool]
@@ -371,6 +420,12 @@ class GuidelinesClient:
         tags : typing.Optional[GuidelineTagsUpdateParams]
 
         metadata : typing.Optional[GuidelineMetadataUpdateParams]
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[GuidelineLabelsUpdateParams]
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -382,7 +437,12 @@ class GuidelinesClient:
 
         Examples
         --------
-        from parlant.client import GuidelineToolAssociationUpdateParams, ParlantClient, ToolId
+        from parlant.client import (
+            GuidelineMetadataUpdateParams,
+            GuidelineToolAssociationUpdateParams,
+            ParlantClient,
+            ToolId,
+        )
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -406,6 +466,10 @@ class GuidelinesClient:
                 ],
             ),
             enabled=True,
+            metadata=GuidelineMetadataUpdateParams(
+                set_={"key1": "value1", "key2": "value2"},
+                unset=["key3", "key4"],
+            ),
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -414,6 +478,8 @@ class GuidelinesClient:
             json={
                 "condition": condition,
                 "action": action,
+                "description": description,
+                "criticality": criticality,
                 "tool_associations": convert_and_respect_annotation_metadata(
                     object_=tool_associations,
                     annotation=GuidelineToolAssociationUpdateParams,
@@ -430,6 +496,13 @@ class GuidelinesClient:
                     annotation=GuidelineMetadataUpdateParams,
                     direction="write",
                 ),
+                "composition_mode": composition_mode,
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=GuidelineLabelsUpdateParams,
+                    direction="write",
+                ),
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -552,14 +625,24 @@ class AsyncGuidelinesClient:
         self,
         *,
         condition: str,
+        id: typing.Optional[str] = OMIT,
         action: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        criticality: typing.Optional[CriticalityDto] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        track: typing.Optional[bool] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Guideline:
         """
         Creates a new guideline.
+
+        The guideline will be initialized with the provided condition and optional action and settings.
+        A unique identifier will be automatically generated unless a custom ID is provided.
 
         See the [documentation](https://parlant.io/docs/concepts/customization/guidelines) for more information.
 
@@ -568,8 +651,16 @@ class AsyncGuidelinesClient:
         condition : str
             If this condition is satisfied, the action will be performed
 
+        id : typing.Optional[str]
+            Unique identifier for the guideline
+
         action : typing.Optional[str]
             This action will be performed if the condition is satisfied
+
+        description : typing.Optional[str]
+            Optional description providing additional context for the guideline
+
+        criticality : typing.Optional[CriticalityDto]
 
         metadata : typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]]
             Metadata for the guideline
@@ -579,6 +670,15 @@ class AsyncGuidelinesClient:
 
         tags : typing.Optional[typing.Sequence[str]]
             The tags associated with the guideline
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        track : typing.Optional[bool]
+
+        labels : typing.Optional[typing.Sequence[str]]
+            The labels associated with the guideline
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -605,6 +705,8 @@ class AsyncGuidelinesClient:
                 action="provide current pricing information and mention any ongoing promotions",
                 metadata={"key1": "value1", "key2": "value2"},
                 enabled=False,
+                composition_mode="strict_canned",
+                labels=["vip", "priority"],
             )
 
 
@@ -614,11 +716,18 @@ class AsyncGuidelinesClient:
             "guidelines",
             method="POST",
             json={
+                "id": id,
                 "condition": condition,
                 "action": action,
+                "description": description,
+                "criticality": criticality,
                 "metadata": metadata,
                 "enabled": enabled,
                 "tags": tags,
+                "composition_mode": composition_mode,
+                "track": track,
+                "labels": labels,
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -807,10 +916,15 @@ class AsyncGuidelinesClient:
         *,
         condition: typing.Optional[str] = OMIT,
         action: typing.Optional[str] = OMIT,
+        description: typing.Optional[str] = OMIT,
+        criticality: typing.Optional[CriticalityDto] = OMIT,
         tool_associations: typing.Optional[GuidelineToolAssociationUpdateParams] = OMIT,
         enabled: typing.Optional[bool] = OMIT,
         tags: typing.Optional[GuidelineTagsUpdateParams] = OMIT,
         metadata: typing.Optional[GuidelineMetadataUpdateParams] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[GuidelineLabelsUpdateParams] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
@@ -839,6 +953,11 @@ class AsyncGuidelinesClient:
         action : typing.Optional[str]
             This action will be performed if the condition is satisfied
 
+        description : typing.Optional[str]
+            Optional description providing additional context for the guideline
+
+        criticality : typing.Optional[CriticalityDto]
+
         tool_associations : typing.Optional[GuidelineToolAssociationUpdateParams]
 
         enabled : typing.Optional[bool]
@@ -847,6 +966,12 @@ class AsyncGuidelinesClient:
         tags : typing.Optional[GuidelineTagsUpdateParams]
 
         metadata : typing.Optional[GuidelineMetadataUpdateParams]
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[GuidelineLabelsUpdateParams]
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -862,6 +987,7 @@ class AsyncGuidelinesClient:
 
         from parlant.client import (
             AsyncParlantClient,
+            GuidelineMetadataUpdateParams,
             GuidelineToolAssociationUpdateParams,
             ToolId,
         )
@@ -891,6 +1017,10 @@ class AsyncGuidelinesClient:
                     ],
                 ),
                 enabled=True,
+                metadata=GuidelineMetadataUpdateParams(
+                    set_={"key1": "value1", "key2": "value2"},
+                    unset=["key3", "key4"],
+                ),
             )
 
 
@@ -902,6 +1032,8 @@ class AsyncGuidelinesClient:
             json={
                 "condition": condition,
                 "action": action,
+                "description": description,
+                "criticality": criticality,
                 "tool_associations": convert_and_respect_annotation_metadata(
                     object_=tool_associations,
                     annotation=GuidelineToolAssociationUpdateParams,
@@ -918,6 +1050,13 @@ class AsyncGuidelinesClient:
                     annotation=GuidelineMetadataUpdateParams,
                     direction="write",
                 ),
+                "composition_mode": composition_mode,
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=GuidelineLabelsUpdateParams,
+                    direction="write",
+                ),
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,

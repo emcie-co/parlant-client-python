@@ -95,6 +95,7 @@ class GlossaryClient:
         description: str,
         synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
@@ -119,6 +120,8 @@ class GlossaryClient:
 
         tags : typing.Optional[typing.Sequence[str]]
             List of tag IDs associated with the term
+
+        id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -149,6 +152,7 @@ class GlossaryClient:
                 "description": description,
                 "synonyms": synonyms,
                 "tags": tags,
+                "id": id,
             },
             request_options=request_options,
             omit=OMIT,
@@ -503,6 +507,7 @@ class AsyncGlossaryClient:
         description: str,
         synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
@@ -527,6 +532,8 @@ class AsyncGlossaryClient:
 
         tags : typing.Optional[typing.Sequence[str]]
             List of tag IDs associated with the term
+
+        id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -565,6 +572,7 @@ class AsyncGlossaryClient:
                 "description": description,
                 "synonyms": synonyms,
                 "tags": tags,
+                "id": id,
             },
             request_options=request_options,
             omit=OMIT,

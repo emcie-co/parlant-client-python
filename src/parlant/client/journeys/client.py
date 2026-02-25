@@ -8,10 +8,12 @@ from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.composition_mode_dto import CompositionModeDto
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
 from ..types.journey_condition_update_params import JourneyConditionUpdateParams
 from ..types.journey_tag_update_params import JourneyTagUpdateParams
+from ..types.journey_labels_update_params import JourneyLabelsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -92,14 +94,18 @@ class JourneysClient:
         title: str,
         description: str,
         conditions: typing.Sequence[str],
+        id: typing.Optional[str] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
         Creates a new journey in the system.
 
         The journey will be initialized with the provided title, description, and conditions.
-        A unique identifier will be automatically generated.
+        A unique identifier will be automatically generated unless a custom ID is provided.
 
         Parameters
         ----------
@@ -110,8 +116,18 @@ class JourneysClient:
 
         conditions : typing.Sequence[str]
 
+        id : typing.Optional[str]
+            Unique identifier for the journey
+
         tags : typing.Optional[typing.Sequence[str]]
             List of tag IDs associated with the journey
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[typing.Sequence[str]]
+            Labels associated with the journey
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -135,7 +151,9 @@ class JourneysClient:
                 "customer needs unlocking their card",
                 "customer needs help with card",
             ],
+            id="IUCGT-lvpS",
             tags=["tag1", "tag2"],
+            labels=["vip", "priority"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -145,7 +163,11 @@ class JourneysClient:
                 "title": title,
                 "description": description,
                 "conditions": conditions,
+                "id": id,
                 "tags": tags,
+                "composition_mode": composition_mode,
+                "labels": labels,
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -323,6 +345,9 @@ class JourneysClient:
         description: typing.Optional[str] = OMIT,
         conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
         tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[JourneyLabelsUpdateParams] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -343,6 +368,12 @@ class JourneysClient:
         conditions : typing.Optional[JourneyConditionUpdateParams]
 
         tags : typing.Optional[JourneyTagUpdateParams]
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[JourneyLabelsUpdateParams]
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -379,6 +410,13 @@ class JourneysClient:
                 "tags": convert_and_respect_annotation_metadata(
                     object_=tags, annotation=JourneyTagUpdateParams, direction="write"
                 ),
+                "composition_mode": composition_mode,
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=JourneyLabelsUpdateParams,
+                    direction="write",
+                ),
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -566,14 +604,18 @@ class AsyncJourneysClient:
         title: str,
         description: str,
         conditions: typing.Sequence[str],
+        id: typing.Optional[str] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
         Creates a new journey in the system.
 
         The journey will be initialized with the provided title, description, and conditions.
-        A unique identifier will be automatically generated.
+        A unique identifier will be automatically generated unless a custom ID is provided.
 
         Parameters
         ----------
@@ -584,8 +626,18 @@ class AsyncJourneysClient:
 
         conditions : typing.Sequence[str]
 
+        id : typing.Optional[str]
+            Unique identifier for the journey
+
         tags : typing.Optional[typing.Sequence[str]]
             List of tag IDs associated with the journey
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[typing.Sequence[str]]
+            Labels associated with the journey
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -614,7 +666,9 @@ class AsyncJourneysClient:
                     "customer needs unlocking their card",
                     "customer needs help with card",
                 ],
+                id="IUCGT-lvpS",
                 tags=["tag1", "tag2"],
+                labels=["vip", "priority"],
             )
 
 
@@ -627,7 +681,11 @@ class AsyncJourneysClient:
                 "title": title,
                 "description": description,
                 "conditions": conditions,
+                "id": id,
                 "tags": tags,
+                "composition_mode": composition_mode,
+                "labels": labels,
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -821,6 +879,9 @@ class AsyncJourneysClient:
         description: typing.Optional[str] = OMIT,
         conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
         tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[JourneyLabelsUpdateParams] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -841,6 +902,12 @@ class AsyncJourneysClient:
         conditions : typing.Optional[JourneyConditionUpdateParams]
 
         tags : typing.Optional[JourneyTagUpdateParams]
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[JourneyLabelsUpdateParams]
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -885,6 +952,13 @@ class AsyncJourneysClient:
                 "tags": convert_and_respect_annotation_metadata(
                     object_=tags, annotation=JourneyTagUpdateParams, direction="write"
                 ),
+                "composition_mode": composition_mode,
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=JourneyLabelsUpdateParams,
+                    direction="write",
+                ),
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,

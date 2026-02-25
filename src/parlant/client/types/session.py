@@ -50,6 +50,11 @@ class Session(UniversalBaseModel):
     Metadata for the session
     """
 
+    labels: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Labels associated with the session
+    """
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
             extra="allow", frozen=True

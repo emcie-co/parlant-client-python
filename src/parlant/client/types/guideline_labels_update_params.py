@@ -2,17 +2,24 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .validation_error_loc_item import ValidationErrorLocItem
-from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
+from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class ValidationError(UniversalBaseModel):
-    loc: typing.List[ValidationErrorLocItem]
-    msg: str
-    type: str
-    input: typing.Optional[typing.Optional[typing.Any]] = None
-    ctx: typing.Optional[typing.Dict[str, typing.Optional[typing.Any]]] = None
+class GuidelineLabelsUpdateParams(UniversalBaseModel):
+    """
+    Parameters for updating the labels of an existing guideline.
+    """
+
+    upsert: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    The labels associated with the guideline
+    """
+
+    remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    The labels associated with the guideline
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

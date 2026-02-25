@@ -8,6 +8,7 @@ from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..types.composition_mode_dto import CompositionModeDto
+from ..types.message_output_mode_dto import MessageOutputModeDto
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
@@ -78,6 +79,7 @@ class AgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        message_output_mode: typing.Optional[MessageOutputModeDto] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
@@ -109,6 +111,8 @@ class AgentsClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
+        message_output_mode : typing.Optional[MessageOutputModeDto]
+
         tags : typing.Optional[typing.Sequence[str]]
             List of tag IDs associated with the agent
 
@@ -132,6 +136,7 @@ class AgentsClient:
             description="Technical Support Assistant",
             max_engine_iterations=3,
             composition_mode="fluid",
+            message_output_mode="block",
             tags=["tag1", "tag2"],
         )
         """
@@ -144,6 +149,7 @@ class AgentsClient:
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,
+                "message_output_mode": message_output_mode,
                 "tags": tags,
             },
             request_options=request_options,
@@ -315,6 +321,7 @@ class AgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        message_output_mode: typing.Optional[MessageOutputModeDto] = OMIT,
         tags: typing.Optional[AgentTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
@@ -340,6 +347,8 @@ class AgentsClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
+        message_output_mode : typing.Optional[MessageOutputModeDto]
+
         tags : typing.Optional[AgentTagUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
@@ -363,6 +372,7 @@ class AgentsClient:
             description="Technical Support Assistant",
             max_engine_iterations=3,
             composition_mode="fluid",
+            message_output_mode="block",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -373,6 +383,7 @@ class AgentsClient:
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,
+                "message_output_mode": message_output_mode,
                 "tags": convert_and_respect_annotation_metadata(
                     object_=tags, annotation=AgentTagUpdateParams, direction="write"
                 ),
@@ -482,6 +493,7 @@ class AsyncAgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        message_output_mode: typing.Optional[MessageOutputModeDto] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
@@ -513,6 +525,8 @@ class AsyncAgentsClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
+        message_output_mode : typing.Optional[MessageOutputModeDto]
+
         tags : typing.Optional[typing.Sequence[str]]
             List of tag IDs associated with the agent
 
@@ -541,6 +555,7 @@ class AsyncAgentsClient:
                 description="Technical Support Assistant",
                 max_engine_iterations=3,
                 composition_mode="fluid",
+                message_output_mode="block",
                 tags=["tag1", "tag2"],
             )
 
@@ -556,6 +571,7 @@ class AsyncAgentsClient:
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,
+                "message_output_mode": message_output_mode,
                 "tags": tags,
             },
             request_options=request_options,
@@ -743,6 +759,7 @@ class AsyncAgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        message_output_mode: typing.Optional[MessageOutputModeDto] = OMIT,
         tags: typing.Optional[AgentTagUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
@@ -767,6 +784,8 @@ class AsyncAgentsClient:
             Maximum number of processing iterations the agent can perform per request
 
         composition_mode : typing.Optional[CompositionModeDto]
+
+        message_output_mode : typing.Optional[MessageOutputModeDto]
 
         tags : typing.Optional[AgentTagUpdateParams]
 
@@ -796,6 +815,7 @@ class AsyncAgentsClient:
                 description="Technical Support Assistant",
                 max_engine_iterations=3,
                 composition_mode="fluid",
+                message_output_mode="block",
             )
 
 
@@ -809,6 +829,7 @@ class AsyncAgentsClient:
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,
+                "message_output_mode": message_output_mode,
                 "tags": convert_and_respect_annotation_metadata(
                     object_=tags, annotation=AgentTagUpdateParams, direction="write"
                 ),
