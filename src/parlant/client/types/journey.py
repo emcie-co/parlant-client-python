@@ -37,6 +37,8 @@ class Journey(UniversalBaseModel):
     Labels associated with the journey
     """
 
+    priority: typing.Optional[int] = None
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
             extra="allow", frozen=True

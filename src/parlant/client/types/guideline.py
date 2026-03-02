@@ -60,6 +60,8 @@ class Guideline(UniversalBaseModel):
     The labels associated with the guideline
     """
 
+    priority: typing.Optional[int] = None
+
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
             extra="allow", frozen=True

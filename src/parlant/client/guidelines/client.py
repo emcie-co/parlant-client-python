@@ -113,6 +113,7 @@ class GuidelinesClient:
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         track: typing.Optional[bool] = OMIT,
         labels: typing.Optional[typing.Sequence[str]] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Guideline:
         """
@@ -155,6 +156,8 @@ class GuidelinesClient:
         labels : typing.Optional[typing.Sequence[str]]
             The labels associated with the guideline
 
+        priority : typing.Optional[int]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -194,6 +197,7 @@ class GuidelinesClient:
                 "composition_mode": composition_mode,
                 "track": track,
                 "labels": labels,
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -374,6 +378,7 @@ class GuidelinesClient:
         metadata: typing.Optional[GuidelineMetadataUpdateParams] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         labels: typing.Optional[GuidelineLabelsUpdateParams] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
@@ -419,6 +424,8 @@ class GuidelinesClient:
         composition_mode : typing.Optional[CompositionModeDto]
 
         labels : typing.Optional[GuidelineLabelsUpdateParams]
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -495,6 +502,7 @@ class GuidelinesClient:
                     annotation=GuidelineLabelsUpdateParams,
                     direction="write",
                 ),
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -627,6 +635,7 @@ class AsyncGuidelinesClient:
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         track: typing.Optional[bool] = OMIT,
         labels: typing.Optional[typing.Sequence[str]] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Guideline:
         """
@@ -668,6 +677,8 @@ class AsyncGuidelinesClient:
 
         labels : typing.Optional[typing.Sequence[str]]
             The labels associated with the guideline
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -716,6 +727,7 @@ class AsyncGuidelinesClient:
                 "composition_mode": composition_mode,
                 "track": track,
                 "labels": labels,
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -912,6 +924,7 @@ class AsyncGuidelinesClient:
         metadata: typing.Optional[GuidelineMetadataUpdateParams] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         labels: typing.Optional[GuidelineLabelsUpdateParams] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> GuidelineWithRelationshipsAndToolAssociations:
         """
@@ -957,6 +970,8 @@ class AsyncGuidelinesClient:
         composition_mode : typing.Optional[CompositionModeDto]
 
         labels : typing.Optional[GuidelineLabelsUpdateParams]
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1041,6 +1056,7 @@ class AsyncGuidelinesClient:
                     annotation=GuidelineLabelsUpdateParams,
                     direction="write",
                 ),
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,

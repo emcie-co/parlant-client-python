@@ -98,6 +98,7 @@ class JourneysClient:
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         labels: typing.Optional[typing.Sequence[str]] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -125,6 +126,8 @@ class JourneysClient:
 
         labels : typing.Optional[typing.Sequence[str]]
             Labels associated with the journey
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -164,6 +167,7 @@ class JourneysClient:
                 "tags": tags,
                 "composition_mode": composition_mode,
                 "labels": labels,
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -343,6 +347,7 @@ class JourneysClient:
         tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         labels: typing.Optional[JourneyLabelsUpdateParams] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -367,6 +372,8 @@ class JourneysClient:
         composition_mode : typing.Optional[CompositionModeDto]
 
         labels : typing.Optional[JourneyLabelsUpdateParams]
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -409,6 +416,7 @@ class JourneysClient:
                     annotation=JourneyLabelsUpdateParams,
                     direction="write",
                 ),
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -600,6 +608,7 @@ class AsyncJourneysClient:
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         labels: typing.Optional[typing.Sequence[str]] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -627,6 +636,8 @@ class AsyncJourneysClient:
 
         labels : typing.Optional[typing.Sequence[str]]
             Labels associated with the journey
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -674,6 +685,7 @@ class AsyncJourneysClient:
                 "tags": tags,
                 "composition_mode": composition_mode,
                 "labels": labels,
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -869,6 +881,7 @@ class AsyncJourneysClient:
         tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         labels: typing.Optional[JourneyLabelsUpdateParams] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -893,6 +906,8 @@ class AsyncJourneysClient:
         composition_mode : typing.Optional[CompositionModeDto]
 
         labels : typing.Optional[JourneyLabelsUpdateParams]
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -943,6 +958,7 @@ class AsyncJourneysClient:
                     annotation=JourneyLabelsUpdateParams,
                     direction="write",
                 ),
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
