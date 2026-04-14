@@ -105,7 +105,7 @@ class ParlantClient:
 
     def health_check_healthz_get(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Dict[str, str]:
+    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
         """
         Parameters
         ----------
@@ -114,7 +114,7 @@ class ParlantClient:
 
         Returns
         -------
-        typing.Dict[str, str]
+        typing.Dict[str, typing.Optional[typing.Any]]
             Successful Response
 
         Examples
@@ -134,9 +134,9 @@ class ParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.Dict[str, str],
+                    typing.Dict[str, typing.Optional[typing.Any]],
                     parse_obj_as(
-                        type_=typing.Dict[str, str],  # type: ignore
+                        type_=typing.Dict[str, typing.Optional[typing.Any]],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -217,7 +217,7 @@ class AsyncParlantClient:
 
     async def health_check_healthz_get(
         self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.Dict[str, str]:
+    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
         """
         Parameters
         ----------
@@ -226,7 +226,7 @@ class AsyncParlantClient:
 
         Returns
         -------
-        typing.Dict[str, str]
+        typing.Dict[str, typing.Optional[typing.Any]]
             Successful Response
 
         Examples
@@ -254,9 +254,9 @@ class AsyncParlantClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.Dict[str, str],
+                    typing.Dict[str, typing.Optional[typing.Any]],
                     parse_obj_as(
-                        type_=typing.Dict[str, str],  # type: ignore
+                        type_=typing.Dict[str, typing.Optional[typing.Any]],  # type: ignore
                         object_=_response.json(),
                     ),
                 )
