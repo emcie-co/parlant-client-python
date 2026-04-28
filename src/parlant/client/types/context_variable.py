@@ -4,6 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
 from .tool_id import ToolId
+import datetime as dt
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -36,6 +37,11 @@ class ContextVariable(UniversalBaseModel):
     tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
     List of tags associated with the context variable
+    """
+
+    last_modified: dt.datetime = pydantic.Field()
+    """
+    UTC timestamp of the last modification to the context variable
     """
 
     if IS_PYDANTIC_V2:

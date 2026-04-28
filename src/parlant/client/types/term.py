@@ -3,6 +3,7 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
+import datetime as dt
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -36,6 +37,11 @@ class Term(UniversalBaseModel):
     tags: typing.List[str] = pydantic.Field()
     """
     List of tag IDs associated with the term
+    """
+
+    last_modified: dt.datetime = pydantic.Field()
+    """
+    UTC timestamp of the last modification to the term
     """
 
     if IS_PYDANTIC_V2:

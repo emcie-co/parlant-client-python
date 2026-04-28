@@ -9,9 +9,10 @@ from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..types.composition_mode_dto import CompositionModeDto
+from ..types.journey_graph import JourneyGraph
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.journey_condition_update_params import JourneyConditionUpdateParams
+from ..types.journey_trigger_update_params import JourneyTriggerUpdateParams
 from ..types.journey_tag_update_params import JourneyTagUpdateParams
 from ..types.journey_labels_update_params import JourneyLabelsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
@@ -93,7 +94,7 @@ class JourneysClient:
         *,
         title: str,
         description: str,
-        conditions: typing.Sequence[str],
+        triggers: typing.Sequence[str],
         id: typing.Optional[str] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
@@ -104,7 +105,7 @@ class JourneysClient:
         """
         Creates a new journey in the system.
 
-        The journey will be initialized with the provided title, description, and conditions.
+        The journey will be initialized with the provided title, description, and triggers.
         A unique identifier will be automatically generated unless a custom ID is provided.
 
         Parameters
@@ -114,7 +115,7 @@ class JourneysClient:
 
         description : str
 
-        conditions : typing.Sequence[str]
+        triggers : typing.Sequence[str]
 
         id : typing.Optional[str]
             Unique identifier for the journey
@@ -147,7 +148,7 @@ class JourneysClient:
         client.journeys.create(
             title="Customer Onboarding",
             description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
-            conditions=[
+            triggers=[
                 "customer needs unlocking their card",
                 "customer needs help with card",
             ],
@@ -162,7 +163,7 @@ class JourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "conditions": conditions,
+                "triggers": triggers,
                 "id": id,
                 "tags": tags,
                 "composition_mode": composition_mode,
@@ -201,7 +202,7 @@ class JourneysClient:
         journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Journey:
+    ) -> JourneyGraph:
         """
         Retrieves details of a specific journey by ID.
 
@@ -215,7 +216,7 @@ class JourneysClient:
 
         Returns
         -------
-        Journey
+        JourneyGraph
             Journey details successfully retrieved. Returns the complete journey object.
 
         Examples
@@ -237,9 +238,9 @@ class JourneysClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Journey,
+                    JourneyGraph,
                     parse_obj_as(
-                        type_=Journey,  # type: ignore
+                        type_=JourneyGraph,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -343,7 +344,7 @@ class JourneysClient:
         *,
         title: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
-        conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
+        triggers: typing.Optional[JourneyTriggerUpdateParams] = OMIT,
         tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         labels: typing.Optional[JourneyLabelsUpdateParams] = OMIT,
@@ -365,7 +366,7 @@ class JourneysClient:
 
         description : typing.Optional[str]
 
-        conditions : typing.Optional[JourneyConditionUpdateParams]
+        triggers : typing.Optional[JourneyTriggerUpdateParams]
 
         tags : typing.Optional[JourneyTagUpdateParams]
 
@@ -402,9 +403,9 @@ class JourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "conditions": convert_and_respect_annotation_metadata(
-                    object_=conditions,
-                    annotation=JourneyConditionUpdateParams,
+                "triggers": convert_and_respect_annotation_metadata(
+                    object_=triggers,
+                    annotation=JourneyTriggerUpdateParams,
                     direction="write",
                 ),
                 "tags": convert_and_respect_annotation_metadata(
@@ -603,7 +604,7 @@ class AsyncJourneysClient:
         *,
         title: str,
         description: str,
-        conditions: typing.Sequence[str],
+        triggers: typing.Sequence[str],
         id: typing.Optional[str] = OMIT,
         tags: typing.Optional[typing.Sequence[str]] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
@@ -614,7 +615,7 @@ class AsyncJourneysClient:
         """
         Creates a new journey in the system.
 
-        The journey will be initialized with the provided title, description, and conditions.
+        The journey will be initialized with the provided title, description, and triggers.
         A unique identifier will be automatically generated unless a custom ID is provided.
 
         Parameters
@@ -624,7 +625,7 @@ class AsyncJourneysClient:
 
         description : str
 
-        conditions : typing.Sequence[str]
+        triggers : typing.Sequence[str]
 
         id : typing.Optional[str]
             Unique identifier for the journey
@@ -662,7 +663,7 @@ class AsyncJourneysClient:
             await client.journeys.create(
                 title="Customer Onboarding",
                 description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
-                conditions=[
+                triggers=[
                     "customer needs unlocking their card",
                     "customer needs help with card",
                 ],
@@ -680,7 +681,7 @@ class AsyncJourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "conditions": conditions,
+                "triggers": triggers,
                 "id": id,
                 "tags": tags,
                 "composition_mode": composition_mode,
@@ -719,7 +720,7 @@ class AsyncJourneysClient:
         journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Journey:
+    ) -> JourneyGraph:
         """
         Retrieves details of a specific journey by ID.
 
@@ -733,7 +734,7 @@ class AsyncJourneysClient:
 
         Returns
         -------
-        Journey
+        JourneyGraph
             Journey details successfully retrieved. Returns the complete journey object.
 
         Examples
@@ -763,9 +764,9 @@ class AsyncJourneysClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Journey,
+                    JourneyGraph,
                     parse_obj_as(
-                        type_=Journey,  # type: ignore
+                        type_=JourneyGraph,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -877,7 +878,7 @@ class AsyncJourneysClient:
         *,
         title: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
-        conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
+        triggers: typing.Optional[JourneyTriggerUpdateParams] = OMIT,
         tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
         labels: typing.Optional[JourneyLabelsUpdateParams] = OMIT,
@@ -899,7 +900,7 @@ class AsyncJourneysClient:
 
         description : typing.Optional[str]
 
-        conditions : typing.Optional[JourneyConditionUpdateParams]
+        triggers : typing.Optional[JourneyTriggerUpdateParams]
 
         tags : typing.Optional[JourneyTagUpdateParams]
 
@@ -944,9 +945,9 @@ class AsyncJourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "conditions": convert_and_respect_annotation_metadata(
-                    object_=conditions,
-                    annotation=JourneyConditionUpdateParams,
+                "triggers": convert_and_respect_annotation_metadata(
+                    object_=triggers,
+                    annotation=JourneyTriggerUpdateParams,
                     direction="write",
                 ),
                 "tags": convert_and_respect_annotation_metadata(

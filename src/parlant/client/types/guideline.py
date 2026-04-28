@@ -4,6 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
 from .criticality_dto import CriticalityDto
+import datetime as dt
 from .composition_mode_dto import CompositionModeDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
@@ -51,6 +52,11 @@ class Guideline(UniversalBaseModel):
     metadata: typing.Dict[str, typing.Optional[typing.Any]] = pydantic.Field()
     """
     Metadata for the guideline
+    """
+
+    last_modified: dt.datetime = pydantic.Field()
+    """
+    UTC timestamp of the last modification to the guideline
     """
 
     composition_mode: typing.Optional[CompositionModeDto] = None

@@ -6,9 +6,9 @@ import pydantic
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class JourneyConditionUpdateParams(UniversalBaseModel):
+class JourneyTriggerUpdateParams(UniversalBaseModel):
     """
-    Parameters for updating an existing journey's conditions.
+    Parameters for updating an existing journey's triggers.
     """
 
     add: typing.Optional[typing.List[str]] = pydantic.Field(default=None)

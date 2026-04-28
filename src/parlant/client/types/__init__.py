@@ -45,9 +45,12 @@ from .http_validation_error import HttpValidationError
 from .invoice import Invoice
 from .invoice_data import InvoiceData
 from .journey import Journey
-from .journey_condition_update_params import JourneyConditionUpdateParams
+from .journey_edge import JourneyEdge
+from .journey_graph import JourneyGraph
 from .journey_labels_update_params import JourneyLabelsUpdateParams
+from .journey_node import JourneyNode
 from .journey_tag_update_params import JourneyTagUpdateParams
+from .journey_trigger_update_params import JourneyTriggerUpdateParams
 from .mcp_service_params import McpServiceParams
 from .message_output_mode_dto import MessageOutputModeDto
 from .moderation_dto import ModerationDto
@@ -121,9 +124,12 @@ __all__ = [
     "Invoice",
     "InvoiceData",
     "Journey",
-    "JourneyConditionUpdateParams",
+    "JourneyEdge",
+    "JourneyGraph",
     "JourneyLabelsUpdateParams",
+    "JourneyNode",
     "JourneyTagUpdateParams",
+    "JourneyTriggerUpdateParams",
     "McpServiceParams",
     "MessageOutputModeDto",
     "ModerationDto",

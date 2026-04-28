@@ -19,6 +19,11 @@ class CannedResponse(UniversalBaseModel):
     UTC timestamp of when the canned response was created
     """
 
+    last_modified: dt.datetime = pydantic.Field()
+    """
+    UTC timestamp of the last modification to the canned response
+    """
+
     value: str = pydantic.Field()
     """
     The textual content of the canned response.

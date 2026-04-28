@@ -5,16 +5,12 @@ import pydantic
 import typing
 from .composition_mode_dto import CompositionModeDto
 import datetime as dt
+from .journey_node import JourneyNode
+from .journey_edge import JourneyEdge
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
-class Journey(UniversalBaseModel):
-    """
-    A journey represents a guided interaction path for specific user scenarios.
-
-    Each journey is activated by one or more triggers and contains steps to guide the interaction.
-    """
-
+class JourneyGraph(UniversalBaseModel):
     id: str = pydantic.Field()
     """
     Unique identifier for the journey
@@ -43,6 +39,9 @@ class Journey(UniversalBaseModel):
     """
     UTC timestamp of the last modification to the journey
     """
+
+    nodes: typing.Optional[typing.List[JourneyNode]] = None
+    edges: typing.Optional[typing.List[JourneyEdge]] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(
