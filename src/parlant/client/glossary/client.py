@@ -10,7 +10,7 @@ from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.term_tags_update_params import TermTagsUpdateParams
+from ..types.term_groups_update_params import TermGroupsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -25,7 +25,7 @@ class GlossaryClient:
     def list_terms(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Term]:
         """
@@ -36,8 +36,8 @@ class GlossaryClient:
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            Filter terms by tag ID
+        group_id : typing.Optional[str]
+            Filter terms by group ID
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -60,7 +60,7 @@ class GlossaryClient:
             "terms",
             method="GET",
             params={
-                "tag_id": tag_id,
+                "group_id": group_id,
             },
             request_options=request_options,
         )
@@ -94,7 +94,8 @@ class GlossaryClient:
         name: str,
         description: str,
         synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
+        id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
@@ -117,8 +118,10 @@ class GlossaryClient:
         synonyms : typing.Optional[typing.Sequence[str]]
             A list of synonyms for the term, including alternate contexts if applicable.
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the term
+        groups : typing.Optional[typing.Sequence[str]]
+            List of group IDs associated with the term
+
+        id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -148,7 +151,8 @@ class GlossaryClient:
                 "name": name,
                 "description": description,
                 "synonyms": synonyms,
-                "tags": tags,
+                "groups": groups,
+                "id": id,
             },
             request_options=request_options,
             omit=OMIT,
@@ -318,7 +322,7 @@ class GlossaryClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
-        tags: typing.Optional[TermTagsUpdateParams] = OMIT,
+        groups: typing.Optional[TermGroupsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
@@ -341,7 +345,7 @@ class GlossaryClient:
         synonyms : typing.Optional[typing.Sequence[str]]
             A list of synonyms for the term, including alternate contexts if applicable.
 
-        tags : typing.Optional[TermTagsUpdateParams]
+        groups : typing.Optional[TermGroupsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -353,7 +357,7 @@ class GlossaryClient:
 
         Examples
         --------
-        from parlant.client import ParlantClient, TermTagsUpdateParams
+        from parlant.client import ParlantClient, TermGroupsUpdateParams
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -363,9 +367,9 @@ class GlossaryClient:
             name="Gas",
             description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
             synonyms=["Transaction Fee", "Blockchain Fuel"],
-            tags=TermTagsUpdateParams(
-                add=["tag1", "tag2"],
-                remove=["tag3", "tag4"],
+            groups=TermGroupsUpdateParams(
+                add=["group1", "group2"],
+                remove=["group3", "group4"],
             ),
         )
         """
@@ -376,8 +380,8 @@ class GlossaryClient:
                 "name": name,
                 "description": description,
                 "synonyms": synonyms,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=TermTagsUpdateParams, direction="write"
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups, annotation=TermGroupsUpdateParams, direction="write"
                 ),
             },
             request_options=request_options,
@@ -425,7 +429,7 @@ class AsyncGlossaryClient:
     async def list_terms(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Term]:
         """
@@ -436,8 +440,8 @@ class AsyncGlossaryClient:
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            Filter terms by tag ID
+        group_id : typing.Optional[str]
+            Filter terms by group ID
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -468,7 +472,7 @@ class AsyncGlossaryClient:
             "terms",
             method="GET",
             params={
-                "tag_id": tag_id,
+                "group_id": group_id,
             },
             request_options=request_options,
         )
@@ -502,7 +506,8 @@ class AsyncGlossaryClient:
         name: str,
         description: str,
         synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
+        id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
@@ -525,8 +530,10 @@ class AsyncGlossaryClient:
         synonyms : typing.Optional[typing.Sequence[str]]
             A list of synonyms for the term, including alternate contexts if applicable.
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the term
+        groups : typing.Optional[typing.Sequence[str]]
+            List of group IDs associated with the term
+
+        id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -564,7 +571,8 @@ class AsyncGlossaryClient:
                 "name": name,
                 "description": description,
                 "synonyms": synonyms,
-                "tags": tags,
+                "groups": groups,
+                "id": id,
             },
             request_options=request_options,
             omit=OMIT,
@@ -750,7 +758,7 @@ class AsyncGlossaryClient:
         name: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         synonyms: typing.Optional[typing.Sequence[str]] = OMIT,
-        tags: typing.Optional[TermTagsUpdateParams] = OMIT,
+        groups: typing.Optional[TermGroupsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Term:
         """
@@ -773,7 +781,7 @@ class AsyncGlossaryClient:
         synonyms : typing.Optional[typing.Sequence[str]]
             A list of synonyms for the term, including alternate contexts if applicable.
 
-        tags : typing.Optional[TermTagsUpdateParams]
+        groups : typing.Optional[TermGroupsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -787,7 +795,7 @@ class AsyncGlossaryClient:
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, TermTagsUpdateParams
+        from parlant.client import AsyncParlantClient, TermGroupsUpdateParams
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -800,9 +808,9 @@ class AsyncGlossaryClient:
                 name="Gas",
                 description="A unit in Ethereum that measures the computational effort to execute transactions or smart contracts",
                 synonyms=["Transaction Fee", "Blockchain Fuel"],
-                tags=TermTagsUpdateParams(
-                    add=["tag1", "tag2"],
-                    remove=["tag3", "tag4"],
+                groups=TermGroupsUpdateParams(
+                    add=["group1", "group2"],
+                    remove=["group3", "group4"],
                 ),
             )
 
@@ -816,8 +824,8 @@ class AsyncGlossaryClient:
                 "name": name,
                 "description": description,
                 "synonyms": synonyms,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=TermTagsUpdateParams, direction="write"
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups, annotation=TermGroupsUpdateParams, direction="write"
                 ),
             },
             request_options=request_options,

@@ -4,6 +4,7 @@ from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
 from .tool_id import ToolId
+import datetime as dt
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -33,9 +34,14 @@ class ContextVariable(UniversalBaseModel):
     Cron expression defining the freshness rules
     """
 
-    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    groups: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    List of tags associated with the context variable
+    List of groups associated with the context variable
+    """
+
+    modified_utc: dt.datetime = pydantic.Field()
+    """
+    UTC timestamp of the last modification to the context variable
     """
 
     if IS_PYDANTIC_V2:

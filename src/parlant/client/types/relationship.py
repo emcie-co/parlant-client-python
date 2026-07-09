@@ -3,8 +3,8 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
-from .guideline import Guideline
-from .tag import Tag
+from .rule import Rule
+from .group import Group
 from .tool import Tool
 from .relationship_kind_dto import RelationshipKindDto
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
@@ -14,8 +14,8 @@ class Relationship(UniversalBaseModel):
     """
     Represents a relationship.
 
-    Only one of `source_guideline` and `source_tag` can have a value.
-    Only one of `target_guideline` and `target_tag` can have a value.
+    Only one of `source_rule` and `source_group` can have a value.
+    Only one of `target_rule` and `target_group` can have a value.
     Only one of `source_tool` and `target_tool` can have a value.
     """
 
@@ -24,13 +24,14 @@ class Relationship(UniversalBaseModel):
     Unique identifier for the relationship
     """
 
-    source_guideline: typing.Optional[Guideline] = None
-    source_tag: typing.Optional[Tag] = None
-    target_guideline: typing.Optional[Guideline] = None
-    target_tag: typing.Optional[Tag] = None
+    source_rule: typing.Optional[Rule] = None
+    source_group: typing.Optional[Group] = None
+    target_rule: typing.Optional[Rule] = None
+    target_group: typing.Optional[Group] = None
     source_tool: typing.Optional[Tool] = None
     target_tool: typing.Optional[Tool] = None
     kind: RelationshipKindDto
+    group_id: typing.Optional[str] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

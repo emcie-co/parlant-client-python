@@ -8,17 +8,17 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 class ContextVariableTagsUpdateParams(UniversalBaseModel):
     """
-    Parameters for updating the tags of an existing context variable.
+    Parameters for updating the groups of an existing context variable.
     """
 
     add: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    List of tag IDs to add to the context variable
+    List of group IDs to add to the context variable
     """
 
     remove: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    List of tag IDs to remove from the context variable
+    List of group IDs to remove from the context variable
     """
 
     if IS_PYDANTIC_V2:

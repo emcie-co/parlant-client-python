@@ -34,6 +34,11 @@ class Session(UniversalBaseModel):
     UTC timestamp of when the session was created
     """
 
+    modified_utc: dt.datetime = pydantic.Field()
+    """
+    UTC timestamp of when the session was last modified
+    """
+
     title: typing.Optional[str] = pydantic.Field(default=None)
     """
     Descriptive title for the session
@@ -45,6 +50,15 @@ class Session(UniversalBaseModel):
     """
 
     consumption_offsets: ConsumptionOffsets
+    metadata: typing.Dict[str, typing.Optional[typing.Any]] = pydantic.Field()
+    """
+    Metadata for the session
+    """
+
+    labels: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Labels associated with the session
+    """
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

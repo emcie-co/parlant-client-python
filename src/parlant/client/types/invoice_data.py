@@ -2,7 +2,7 @@
 
 from ..core.pydantic_utilities import UniversalBaseModel
 import typing
-from .guideline_invoice_data import GuidelineInvoiceData
+from .rule_invoice_data import RuleInvoiceData
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 import pydantic
 
@@ -11,10 +11,10 @@ class InvoiceData(UniversalBaseModel):
     """
     Contains the relevant invoice data.
 
-    At this point only `guideline` is supported.
+    At this point only `rule` is supported.
     """
 
-    guideline: typing.Optional[GuidelineInvoiceData] = None
+    rule: typing.Optional[RuleInvoiceData] = None
 
     if IS_PYDANTIC_V2:
         model_config: typing.ClassVar[pydantic.ConfigDict] = pydantic.ConfigDict(

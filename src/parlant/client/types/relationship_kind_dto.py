@@ -7,6 +7,7 @@ RelationshipKindDto = typing.Union[
         "entailment",
         "priority",
         "dependency",
+        "dependency_any",
         "disambiguation",
         "overlap",
         "reevaluation",

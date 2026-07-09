@@ -6,29 +6,35 @@ from .core.client_wrapper import SyncClientWrapper
 from .agents.client import AgentsClient
 from .sessions.client import SessionsClient
 from .services.client import ServicesClient
-from .tags.client import TagsClient
+from .groups.client import GroupsClient
 from .glossary.client import GlossaryClient
 from .customers.client import CustomersClient
 from .canned_responses.client import CannedResponsesClient
 from .context_variables.client import ContextVariablesClient
-from .guidelines.client import GuidelinesClient
+from .rules.client import RulesClient
 from .relationships.client import RelationshipsClient
 from .journeys.client import JourneysClient
 from .evaluations.client import EvaluationsClient
+from .train.client import TrainClient
 from .capabilities.client import CapabilitiesClient
+from .core.request_options import RequestOptions
+from .core.pydantic_utilities import parse_obj_as
+from json.decoder import JSONDecodeError
+from .core.api_error import ApiError
 from .core.client_wrapper import AsyncClientWrapper
 from .agents.client import AsyncAgentsClient
 from .sessions.client import AsyncSessionsClient
 from .services.client import AsyncServicesClient
-from .tags.client import AsyncTagsClient
+from .groups.client import AsyncGroupsClient
 from .glossary.client import AsyncGlossaryClient
 from .customers.client import AsyncCustomersClient
 from .canned_responses.client import AsyncCannedResponsesClient
 from .context_variables.client import AsyncContextVariablesClient
-from .guidelines.client import AsyncGuidelinesClient
+from .rules.client import AsyncRulesClient
 from .relationships.client import AsyncRelationshipsClient
 from .journeys.client import AsyncJourneysClient
 from .evaluations.client import AsyncEvaluationsClient
+from .train.client import AsyncTrainClient
 from .capabilities.client import AsyncCapabilitiesClient
 
 
@@ -84,7 +90,7 @@ class ParlantClient:
         self.agents = AgentsClient(client_wrapper=self._client_wrapper)
         self.sessions = SessionsClient(client_wrapper=self._client_wrapper)
         self.services = ServicesClient(client_wrapper=self._client_wrapper)
-        self.tags = TagsClient(client_wrapper=self._client_wrapper)
+        self.groups = GroupsClient(client_wrapper=self._client_wrapper)
         self.glossary = GlossaryClient(client_wrapper=self._client_wrapper)
         self.customers = CustomersClient(client_wrapper=self._client_wrapper)
         self.canned_responses = CannedResponsesClient(
@@ -93,11 +99,54 @@ class ParlantClient:
         self.context_variables = ContextVariablesClient(
             client_wrapper=self._client_wrapper
         )
-        self.guidelines = GuidelinesClient(client_wrapper=self._client_wrapper)
+        self.rules = RulesClient(client_wrapper=self._client_wrapper)
         self.relationships = RelationshipsClient(client_wrapper=self._client_wrapper)
         self.journeys = JourneysClient(client_wrapper=self._client_wrapper)
         self.evaluations = EvaluationsClient(client_wrapper=self._client_wrapper)
+        self.train = TrainClient(client_wrapper=self._client_wrapper)
         self.capabilities = CapabilitiesClient(client_wrapper=self._client_wrapper)
+
+    def health_check_healthz_get(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
+        """
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.Dict[str, typing.Optional[typing.Any]]
+            Successful Response
+
+        Examples
+        --------
+        from parlant.client import ParlantClient
+
+        client = ParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+        client.health_check_healthz_get()
+        """
+        _response = self._client_wrapper.httpx_client.request(
+            "healthz",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    typing.Dict[str, typing.Optional[typing.Any]],
+                    parse_obj_as(
+                        type_=typing.Dict[str, typing.Optional[typing.Any]],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)
 
 
 class AsyncParlantClient:
@@ -152,7 +201,7 @@ class AsyncParlantClient:
         self.agents = AsyncAgentsClient(client_wrapper=self._client_wrapper)
         self.sessions = AsyncSessionsClient(client_wrapper=self._client_wrapper)
         self.services = AsyncServicesClient(client_wrapper=self._client_wrapper)
-        self.tags = AsyncTagsClient(client_wrapper=self._client_wrapper)
+        self.groups = AsyncGroupsClient(client_wrapper=self._client_wrapper)
         self.glossary = AsyncGlossaryClient(client_wrapper=self._client_wrapper)
         self.customers = AsyncCustomersClient(client_wrapper=self._client_wrapper)
         self.canned_responses = AsyncCannedResponsesClient(
@@ -161,10 +210,61 @@ class AsyncParlantClient:
         self.context_variables = AsyncContextVariablesClient(
             client_wrapper=self._client_wrapper
         )
-        self.guidelines = AsyncGuidelinesClient(client_wrapper=self._client_wrapper)
+        self.rules = AsyncRulesClient(client_wrapper=self._client_wrapper)
         self.relationships = AsyncRelationshipsClient(
             client_wrapper=self._client_wrapper
         )
         self.journeys = AsyncJourneysClient(client_wrapper=self._client_wrapper)
         self.evaluations = AsyncEvaluationsClient(client_wrapper=self._client_wrapper)
+        self.train = AsyncTrainClient(client_wrapper=self._client_wrapper)
         self.capabilities = AsyncCapabilitiesClient(client_wrapper=self._client_wrapper)
+
+    async def health_check_healthz_get(
+        self, *, request_options: typing.Optional[RequestOptions] = None
+    ) -> typing.Dict[str, typing.Optional[typing.Any]]:
+        """
+        Parameters
+        ----------
+        request_options : typing.Optional[RequestOptions]
+            Request-specific configuration.
+
+        Returns
+        -------
+        typing.Dict[str, typing.Optional[typing.Any]]
+            Successful Response
+
+        Examples
+        --------
+        import asyncio
+
+        from parlant.client import AsyncParlantClient
+
+        client = AsyncParlantClient(
+            base_url="https://yourhost.com/path/to/api",
+        )
+
+
+        async def main() -> None:
+            await client.health_check_healthz_get()
+
+
+        asyncio.run(main())
+        """
+        _response = await self._client_wrapper.httpx_client.request(
+            "healthz",
+            method="GET",
+            request_options=request_options,
+        )
+        try:
+            if 200 <= _response.status_code < 300:
+                return typing.cast(
+                    typing.Dict[str, typing.Optional[typing.Any]],
+                    parse_obj_as(
+                        type_=typing.Dict[str, typing.Optional[typing.Any]],  # type: ignore
+                        object_=_response.json(),
+                    ),
+                )
+            _response_json = _response.json()
+        except JSONDecodeError:
+            raise ApiError(status_code=_response.status_code, body=_response.text)
+        raise ApiError(status_code=_response.status_code, body=_response_json)

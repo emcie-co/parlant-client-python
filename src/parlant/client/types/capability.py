@@ -31,9 +31,9 @@ class Capability(UniversalBaseModel):
     Example signals that this capability can handle
     """
 
-    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    groups: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    List of tag IDs associated with the capability
+    List of group IDs associated with the capability
     """
 
     if IS_PYDANTIC_V2:

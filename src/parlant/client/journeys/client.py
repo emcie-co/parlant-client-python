@@ -8,10 +8,13 @@ from ..core.pydantic_utilities import parse_obj_as
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
+from ..types.composition_mode_dto import CompositionModeDto
+from ..types.journey_graph import JourneyGraph
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.journey_condition_update_params import JourneyConditionUpdateParams
-from ..types.journey_tag_update_params import JourneyTagUpdateParams
+from ..types.journey_trigger_update_params import JourneyTriggerUpdateParams
+from ..types.journey_group_update_params import JourneyGroupUpdateParams
+from ..types.journey_labels_update_params import JourneyLabelsUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -26,7 +29,7 @@ class JourneysClient:
     def list(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Journey]:
         """
@@ -34,8 +37,8 @@ class JourneysClient:
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter journeys by
+        group_id : typing.Optional[str]
+            The group ID to filter journeys by
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -58,7 +61,7 @@ class JourneysClient:
             "journeys",
             method="GET",
             params={
-                "tag_id": tag_id,
+                "group_id": group_id,
             },
             request_options=request_options,
         )
@@ -91,15 +94,19 @@ class JourneysClient:
         *,
         title: str,
         description: str,
-        conditions: typing.Sequence[str],
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        triggers: typing.Sequence[str],
+        id: typing.Optional[str] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
         Creates a new journey in the system.
 
-        The journey will be initialized with the provided title, description, and conditions.
-        A unique identifier will be automatically generated.
+        The journey will be initialized with the provided title, description, and triggers.
+        A unique identifier will be automatically generated unless a custom ID is provided.
 
         Parameters
         ----------
@@ -108,10 +115,20 @@ class JourneysClient:
 
         description : str
 
-        conditions : typing.Sequence[str]
+        triggers : typing.Sequence[str]
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the journey
+        id : typing.Optional[str]
+            Unique identifier for the journey
+
+        groups : typing.Optional[typing.Sequence[str]]
+            List of group IDs associated with the journey
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[typing.Sequence[str]]
+            Labels associated with the journey
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -131,11 +148,13 @@ class JourneysClient:
         client.journeys.create(
             title="Customer Onboarding",
             description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
-            conditions=[
+            triggers=[
                 "customer needs unlocking their card",
                 "customer needs help with card",
             ],
-            tags=["tag1", "tag2"],
+            id="IUCGT-lvpS",
+            groups=["group1", "group2"],
+            labels=["vip", "priority"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -144,8 +163,12 @@ class JourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "conditions": conditions,
-                "tags": tags,
+                "triggers": triggers,
+                "id": id,
+                "groups": groups,
+                "composition_mode": composition_mode,
+                "labels": labels,
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -179,7 +202,7 @@ class JourneysClient:
         journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Journey:
+    ) -> JourneyGraph:
         """
         Retrieves details of a specific journey by ID.
 
@@ -193,7 +216,7 @@ class JourneysClient:
 
         Returns
         -------
-        Journey
+        JourneyGraph
             Journey details successfully retrieved. Returns the complete journey object.
 
         Examples
@@ -215,9 +238,9 @@ class JourneysClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Journey,
+                    JourneyGraph,
                     parse_obj_as(
-                        type_=Journey,  # type: ignore
+                        type_=JourneyGraph,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -255,7 +278,7 @@ class JourneysClient:
         """
         Deletes a journey from the system.
 
-        Also deletes the associated guideline.
+        Also deletes the associated rule.
         Deleting a non-existent journey will return 404.
         No content will be returned from a successful deletion.
 
@@ -321,8 +344,11 @@ class JourneysClient:
         *,
         title: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
-        conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
-        tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
+        triggers: typing.Optional[JourneyTriggerUpdateParams] = OMIT,
+        groups: typing.Optional[JourneyGroupUpdateParams] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[JourneyLabelsUpdateParams] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -340,9 +366,15 @@ class JourneysClient:
 
         description : typing.Optional[str]
 
-        conditions : typing.Optional[JourneyConditionUpdateParams]
+        triggers : typing.Optional[JourneyTriggerUpdateParams]
 
-        tags : typing.Optional[JourneyTagUpdateParams]
+        groups : typing.Optional[JourneyGroupUpdateParams]
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[JourneyLabelsUpdateParams]
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -371,14 +403,23 @@ class JourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "conditions": convert_and_respect_annotation_metadata(
-                    object_=conditions,
-                    annotation=JourneyConditionUpdateParams,
+                "triggers": convert_and_respect_annotation_metadata(
+                    object_=triggers,
+                    annotation=JourneyTriggerUpdateParams,
                     direction="write",
                 ),
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=JourneyTagUpdateParams, direction="write"
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups,
+                    annotation=JourneyGroupUpdateParams,
+                    direction="write",
                 ),
+                "composition_mode": composition_mode,
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=JourneyLabelsUpdateParams,
+                    direction="write",
+                ),
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -492,7 +533,7 @@ class AsyncJourneysClient:
     async def list(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Journey]:
         """
@@ -500,8 +541,8 @@ class AsyncJourneysClient:
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter journeys by
+        group_id : typing.Optional[str]
+            The group ID to filter journeys by
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -532,7 +573,7 @@ class AsyncJourneysClient:
             "journeys",
             method="GET",
             params={
-                "tag_id": tag_id,
+                "group_id": group_id,
             },
             request_options=request_options,
         )
@@ -565,15 +606,19 @@ class AsyncJourneysClient:
         *,
         title: str,
         description: str,
-        conditions: typing.Sequence[str],
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        triggers: typing.Sequence[str],
+        id: typing.Optional[str] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[typing.Sequence[str]] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
         Creates a new journey in the system.
 
-        The journey will be initialized with the provided title, description, and conditions.
-        A unique identifier will be automatically generated.
+        The journey will be initialized with the provided title, description, and triggers.
+        A unique identifier will be automatically generated unless a custom ID is provided.
 
         Parameters
         ----------
@@ -582,10 +627,20 @@ class AsyncJourneysClient:
 
         description : str
 
-        conditions : typing.Sequence[str]
+        triggers : typing.Sequence[str]
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the journey
+        id : typing.Optional[str]
+            Unique identifier for the journey
+
+        groups : typing.Optional[typing.Sequence[str]]
+            List of group IDs associated with the journey
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[typing.Sequence[str]]
+            Labels associated with the journey
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -610,11 +665,13 @@ class AsyncJourneysClient:
             await client.journeys.create(
                 title="Customer Onboarding",
                 description="1. Customer wants to lock their card\n2. Customer reports that their card doesn't work\n3. Customer suspects their card has been stolen",
-                conditions=[
+                triggers=[
                     "customer needs unlocking their card",
                     "customer needs help with card",
                 ],
-                tags=["tag1", "tag2"],
+                id="IUCGT-lvpS",
+                groups=["group1", "group2"],
+                labels=["vip", "priority"],
             )
 
 
@@ -626,8 +683,12 @@ class AsyncJourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "conditions": conditions,
-                "tags": tags,
+                "triggers": triggers,
+                "id": id,
+                "groups": groups,
+                "composition_mode": composition_mode,
+                "labels": labels,
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,
@@ -661,7 +722,7 @@ class AsyncJourneysClient:
         journey_id: str,
         *,
         request_options: typing.Optional[RequestOptions] = None,
-    ) -> Journey:
+    ) -> JourneyGraph:
         """
         Retrieves details of a specific journey by ID.
 
@@ -675,7 +736,7 @@ class AsyncJourneysClient:
 
         Returns
         -------
-        Journey
+        JourneyGraph
             Journey details successfully retrieved. Returns the complete journey object.
 
         Examples
@@ -705,9 +766,9 @@ class AsyncJourneysClient:
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    Journey,
+                    JourneyGraph,
                     parse_obj_as(
-                        type_=Journey,  # type: ignore
+                        type_=JourneyGraph,  # type: ignore
                         object_=_response.json(),
                     ),
                 )
@@ -745,7 +806,7 @@ class AsyncJourneysClient:
         """
         Deletes a journey from the system.
 
-        Also deletes the associated guideline.
+        Also deletes the associated rule.
         Deleting a non-existent journey will return 404.
         No content will be returned from a successful deletion.
 
@@ -819,8 +880,11 @@ class AsyncJourneysClient:
         *,
         title: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
-        conditions: typing.Optional[JourneyConditionUpdateParams] = OMIT,
-        tags: typing.Optional[JourneyTagUpdateParams] = OMIT,
+        triggers: typing.Optional[JourneyTriggerUpdateParams] = OMIT,
+        groups: typing.Optional[JourneyGroupUpdateParams] = OMIT,
+        composition_mode: typing.Optional[CompositionModeDto] = OMIT,
+        labels: typing.Optional[JourneyLabelsUpdateParams] = OMIT,
+        priority: typing.Optional[int] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Journey:
         """
@@ -838,9 +902,15 @@ class AsyncJourneysClient:
 
         description : typing.Optional[str]
 
-        conditions : typing.Optional[JourneyConditionUpdateParams]
+        triggers : typing.Optional[JourneyTriggerUpdateParams]
 
-        tags : typing.Optional[JourneyTagUpdateParams]
+        groups : typing.Optional[JourneyGroupUpdateParams]
+
+        composition_mode : typing.Optional[CompositionModeDto]
+
+        labels : typing.Optional[JourneyLabelsUpdateParams]
+
+        priority : typing.Optional[int]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -877,14 +947,23 @@ class AsyncJourneysClient:
             json={
                 "title": title,
                 "description": description,
-                "conditions": convert_and_respect_annotation_metadata(
-                    object_=conditions,
-                    annotation=JourneyConditionUpdateParams,
+                "triggers": convert_and_respect_annotation_metadata(
+                    object_=triggers,
+                    annotation=JourneyTriggerUpdateParams,
                     direction="write",
                 ),
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=JourneyTagUpdateParams, direction="write"
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups,
+                    annotation=JourneyGroupUpdateParams,
+                    direction="write",
                 ),
+                "composition_mode": composition_mode,
+                "labels": convert_and_respect_annotation_metadata(
+                    object_=labels,
+                    annotation=JourneyLabelsUpdateParams,
+                    direction="write",
+                ),
+                "priority": priority,
             },
             request_options=request_options,
             omit=OMIT,

@@ -11,12 +11,17 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 class CannedResponse(UniversalBaseModel):
     id: str = pydantic.Field()
     """
-    Unique identifier for the tag
+    Unique identifier for the group
     """
 
     creation_utc: dt.datetime = pydantic.Field()
     """
     UTC timestamp of when the canned response was created
+    """
+
+    modified_utc: dt.datetime = pydantic.Field()
+    """
+    UTC timestamp of the last modification to the canned response
     """
 
     value: str = pydantic.Field()
@@ -29,14 +34,24 @@ class CannedResponse(UniversalBaseModel):
     A sequence of canned response fields associated with the canned response.
     """
 
-    tags: typing.List[str] = pydantic.Field()
+    groups: typing.List[str] = pydantic.Field()
     """
-    Collection of tag IDs associated with the canned response.
+    Collection of group IDs associated with the canned response.
     """
 
     signals: typing.List[str] = pydantic.Field()
     """
     A sequence of signals associated with the canned response, to help with filtering and matching.
+    """
+
+    metadata: typing.Dict[str, typing.Optional[typing.Any]] = pydantic.Field()
+    """
+    Additional metadata associated with the canned response.
+    """
+
+    field_dependencies: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    A sequence of field names that must be available in context for this response to be considered.
     """
 
     if IS_PYDANTIC_V2:

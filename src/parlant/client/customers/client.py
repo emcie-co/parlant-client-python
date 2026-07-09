@@ -2,16 +2,18 @@
 
 import typing
 from ..core.client_wrapper import SyncClientWrapper
+from ..types.sort_direction_dto import SortDirectionDto
 from ..core.request_options import RequestOptions
-from ..types.customer import Customer
+from .types.customers_list_response import CustomersListResponse
 from ..core.pydantic_utilities import parse_obj_as
+from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
-from ..errors.unprocessable_entity_error import UnprocessableEntityError
+from ..types.customer import Customer
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
 from ..types.customer_metadata_update_params import CustomerMetadataUpdateParams
-from ..types.customer_tag_update_params import CustomerTagUpdateParams
+from ..types.customer_group_update_params import CustomerGroupUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -24,23 +26,41 @@ class CustomersClient:
         self._client_wrapper = client_wrapper
 
     def list(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[Customer]:
+        self,
+        *,
+        limit: typing.Optional[int] = None,
+        cursor: typing.Optional[str] = None,
+        sort: typing.Optional[SortDirectionDto] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> CustomersListResponse:
         """
-        Retrieves a list of all customers in the system.
+        Retrieves a list of customers from the system.
+
+        If a cursor is provided, the results are returned using cursor-based pagination
+        with a configurable sort direction. If no cursor is provided, the full list of
+        customers is returned.
 
         Returns an empty list if no customers exist.
-        Customers are returned in no guaranteed order.
+
+        Note:
+            When using paginated results, the first page will always include the special
+            'guest' customer as first item.
 
         Parameters
         ----------
+        limit : typing.Optional[int]
+
+        cursor : typing.Optional[str]
+
+        sort : typing.Optional[SortDirectionDto]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Customer]
-            List of all customers in the system.
+        CustomersListResponse
+            If a cursor is provided, a paginated list of customers will be returned. Otherwise, the full list of customers will be returned.
 
         Examples
         --------
@@ -49,21 +69,39 @@ class CustomersClient:
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
-        client.customers.list()
+        client.customers.list(
+            limit=10,
+            cursor="AAABjnBU9gBl/0BQt1axI0VniQI=",
+        )
         """
         _response = self._client_wrapper.httpx_client.request(
             "customers",
             method="GET",
+            params={
+                "limit": limit,
+                "cursor": cursor,
+                "sort": sort,
+            },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Customer],
+                    CustomersListResponse,
                     parse_obj_as(
-                        type_=typing.List[Customer],  # type: ignore
+                        type_=CustomersListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -74,26 +112,30 @@ class CustomersClient:
         self,
         *,
         name: str,
+        id: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
         Creates a new customer in the system.
 
         A customer may be created with as little as a `name`.
-        `metadata` key-value pairs and additional `tags` may be attached to a customer.
+        `metadata` key-value pairs and additional `groups` may be attached to a customer.
 
         Parameters
         ----------
         name : str
             An arbitrary string that identifies and/or describes the customer
 
+        id : typing.Optional[str]
+            Unique identifier for the customer
+
         metadata : typing.Optional[typing.Dict[str, typing.Optional[str]]]
             Key-value pairs (`str: str`) to describe the customer
 
-        tags : typing.Optional[typing.Sequence[str]]
-            Collection of ids of tags that describe the customer
+        groups : typing.Optional[typing.Sequence[str]]
+            Collection of ids of groups that describe the customer
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -120,8 +162,9 @@ class CustomersClient:
             method="POST",
             json={
                 "name": name,
+                "id": id,
                 "metadata": metadata,
-                "tags": tags,
+                "groups": groups,
             },
             request_options=request_options,
             omit=OMIT,
@@ -159,7 +202,7 @@ class CustomersClient:
         """
         Retrieves details of a specific customer by ID.
 
-        Returns a complete customer object including their metadata and tags.
+        Returns a complete customer object including their metadata and groups.
         The customer must exist in the system.
 
         Parameters
@@ -299,7 +342,7 @@ class CustomersClient:
         *,
         name: typing.Optional[str] = OMIT,
         metadata: typing.Optional[CustomerMetadataUpdateParams] = OMIT,
-        tags: typing.Optional[CustomerTagUpdateParams] = OMIT,
+        groups: typing.Optional[CustomerGroupUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
@@ -307,7 +350,7 @@ class CustomersClient:
 
         Only provided attributes will be updated; others remain unchanged.
         The customer's ID and creation timestamp cannot be modified.
-        Extra metadata and tags can be added or removed independently.
+        Extra metadata and groups can be added or removed independently.
 
         Parameters
         ----------
@@ -319,7 +362,7 @@ class CustomersClient:
 
         metadata : typing.Optional[CustomerMetadataUpdateParams]
 
-        tags : typing.Optional[CustomerTagUpdateParams]
+        groups : typing.Optional[CustomerGroupUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -331,7 +374,7 @@ class CustomersClient:
 
         Examples
         --------
-        from parlant.client import CustomerTagUpdateParams, ParlantClient
+        from parlant.client import CustomerGroupUpdateParams, ParlantClient
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -339,9 +382,9 @@ class CustomersClient:
         client.customers.update(
             customer_id="ck_IdAXUtp",
             name="Scooby",
-            tags=CustomerTagUpdateParams(
-                add=["t9a8g703f4", "tag_456abc"],
-                remove=["tag_789def", "tag_012ghi"],
+            groups=CustomerGroupUpdateParams(
+                add=["t9a8g703f4", "group_456abc"],
+                remove=["group_789def", "group_012ghi"],
             ),
         )
         """
@@ -355,8 +398,10 @@ class CustomersClient:
                     annotation=CustomerMetadataUpdateParams,
                     direction="write",
                 ),
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=CustomerTagUpdateParams, direction="write"
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups,
+                    annotation=CustomerGroupUpdateParams,
+                    direction="write",
                 ),
             },
             request_options=request_options,
@@ -402,23 +447,41 @@ class AsyncCustomersClient:
         self._client_wrapper = client_wrapper
 
     async def list(
-        self, *, request_options: typing.Optional[RequestOptions] = None
-    ) -> typing.List[Customer]:
+        self,
+        *,
+        limit: typing.Optional[int] = None,
+        cursor: typing.Optional[str] = None,
+        sort: typing.Optional[SortDirectionDto] = None,
+        request_options: typing.Optional[RequestOptions] = None,
+    ) -> CustomersListResponse:
         """
-        Retrieves a list of all customers in the system.
+        Retrieves a list of customers from the system.
+
+        If a cursor is provided, the results are returned using cursor-based pagination
+        with a configurable sort direction. If no cursor is provided, the full list of
+        customers is returned.
 
         Returns an empty list if no customers exist.
-        Customers are returned in no guaranteed order.
+
+        Note:
+            When using paginated results, the first page will always include the special
+            'guest' customer as first item.
 
         Parameters
         ----------
+        limit : typing.Optional[int]
+
+        cursor : typing.Optional[str]
+
+        sort : typing.Optional[SortDirectionDto]
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
         Returns
         -------
-        typing.List[Customer]
-            List of all customers in the system.
+        CustomersListResponse
+            If a cursor is provided, a paginated list of customers will be returned. Otherwise, the full list of customers will be returned.
 
         Examples
         --------
@@ -432,7 +495,10 @@ class AsyncCustomersClient:
 
 
         async def main() -> None:
-            await client.customers.list()
+            await client.customers.list(
+                limit=10,
+                cursor="AAABjnBU9gBl/0BQt1axI0VniQI=",
+            )
 
 
         asyncio.run(main())
@@ -440,16 +506,31 @@ class AsyncCustomersClient:
         _response = await self._client_wrapper.httpx_client.request(
             "customers",
             method="GET",
+            params={
+                "limit": limit,
+                "cursor": cursor,
+                "sort": sort,
+            },
             request_options=request_options,
         )
         try:
             if 200 <= _response.status_code < 300:
                 return typing.cast(
-                    typing.List[Customer],
+                    CustomersListResponse,
                     parse_obj_as(
-                        type_=typing.List[Customer],  # type: ignore
+                        type_=CustomersListResponse,  # type: ignore
                         object_=_response.json(),
                     ),
+                )
+            if _response.status_code == 422:
+                raise UnprocessableEntityError(
+                    typing.cast(
+                        typing.Optional[typing.Any],
+                        parse_obj_as(
+                            type_=typing.Optional[typing.Any],  # type: ignore
+                            object_=_response.json(),
+                        ),
+                    )
                 )
             _response_json = _response.json()
         except JSONDecodeError:
@@ -460,26 +541,30 @@ class AsyncCustomersClient:
         self,
         *,
         name: str,
+        id: typing.Optional[str] = OMIT,
         metadata: typing.Optional[typing.Dict[str, typing.Optional[str]]] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
         Creates a new customer in the system.
 
         A customer may be created with as little as a `name`.
-        `metadata` key-value pairs and additional `tags` may be attached to a customer.
+        `metadata` key-value pairs and additional `groups` may be attached to a customer.
 
         Parameters
         ----------
         name : str
             An arbitrary string that identifies and/or describes the customer
 
+        id : typing.Optional[str]
+            Unique identifier for the customer
+
         metadata : typing.Optional[typing.Dict[str, typing.Optional[str]]]
             Key-value pairs (`str: str`) to describe the customer
 
-        tags : typing.Optional[typing.Sequence[str]]
-            Collection of ids of tags that describe the customer
+        groups : typing.Optional[typing.Sequence[str]]
+            Collection of ids of groups that describe the customer
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -514,8 +599,9 @@ class AsyncCustomersClient:
             method="POST",
             json={
                 "name": name,
+                "id": id,
                 "metadata": metadata,
-                "tags": tags,
+                "groups": groups,
             },
             request_options=request_options,
             omit=OMIT,
@@ -553,7 +639,7 @@ class AsyncCustomersClient:
         """
         Retrieves details of a specific customer by ID.
 
-        Returns a complete customer object including their metadata and tags.
+        Returns a complete customer object including their metadata and groups.
         The customer must exist in the system.
 
         Parameters
@@ -709,7 +795,7 @@ class AsyncCustomersClient:
         *,
         name: typing.Optional[str] = OMIT,
         metadata: typing.Optional[CustomerMetadataUpdateParams] = OMIT,
-        tags: typing.Optional[CustomerTagUpdateParams] = OMIT,
+        groups: typing.Optional[CustomerGroupUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Customer:
         """
@@ -717,7 +803,7 @@ class AsyncCustomersClient:
 
         Only provided attributes will be updated; others remain unchanged.
         The customer's ID and creation timestamp cannot be modified.
-        Extra metadata and tags can be added or removed independently.
+        Extra metadata and groups can be added or removed independently.
 
         Parameters
         ----------
@@ -729,7 +815,7 @@ class AsyncCustomersClient:
 
         metadata : typing.Optional[CustomerMetadataUpdateParams]
 
-        tags : typing.Optional[CustomerTagUpdateParams]
+        groups : typing.Optional[CustomerGroupUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -743,7 +829,7 @@ class AsyncCustomersClient:
         --------
         import asyncio
 
-        from parlant.client import AsyncParlantClient, CustomerTagUpdateParams
+        from parlant.client import AsyncParlantClient, CustomerGroupUpdateParams
 
         client = AsyncParlantClient(
             base_url="https://yourhost.com/path/to/api",
@@ -754,9 +840,9 @@ class AsyncCustomersClient:
             await client.customers.update(
                 customer_id="ck_IdAXUtp",
                 name="Scooby",
-                tags=CustomerTagUpdateParams(
-                    add=["t9a8g703f4", "tag_456abc"],
-                    remove=["tag_789def", "tag_012ghi"],
+                groups=CustomerGroupUpdateParams(
+                    add=["t9a8g703f4", "group_456abc"],
+                    remove=["group_789def", "group_012ghi"],
                 ),
             )
 
@@ -773,8 +859,10 @@ class AsyncCustomersClient:
                     annotation=CustomerMetadataUpdateParams,
                     direction="write",
                 ),
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=CustomerTagUpdateParams, direction="write"
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups,
+                    annotation=CustomerGroupUpdateParams,
+                    direction="write",
                 ),
             },
             request_options=request_options,

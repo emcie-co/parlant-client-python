@@ -28,15 +28,15 @@ class RelationshipsClient:
         *,
         kind: typing.Optional[RelationshipKindDto] = None,
         indirect: typing.Optional[bool] = None,
-        guideline_id: typing.Optional[str] = None,
-        tag_id: typing.Optional[str] = None,
+        rule_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         tool_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Relationship]:
         """
         List relationships.
 
-        Either `guideline_id` or `tag_id` or `tool_id` must be provided.
+        Either `rule_id` or `group_id` or `tool_id` must be provided.
 
         Parameters
         ----------
@@ -45,9 +45,9 @@ class RelationshipsClient:
         indirect : typing.Optional[bool]
             Whether to include indirect relationships
 
-        guideline_id : typing.Optional[str]
+        rule_id : typing.Optional[str]
 
-        tag_id : typing.Optional[str]
+        group_id : typing.Optional[str]
 
         tool_id : typing.Optional[str]
 
@@ -74,8 +74,8 @@ class RelationshipsClient:
             params={
                 "kind": kind,
                 "indirect": indirect,
-                "guideline_id": guideline_id,
-                "tag_id": tag_id,
+                "rule_id": rule_id,
+                "group_id": group_id,
                 "tool_id": tool_id,
             },
             request_options=request_options,
@@ -108,39 +108,42 @@ class RelationshipsClient:
         self,
         *,
         kind: RelationshipKindDto,
-        source_guideline: typing.Optional[str] = OMIT,
-        source_tag: typing.Optional[str] = OMIT,
+        source_rule: typing.Optional[str] = OMIT,
+        source_group: typing.Optional[str] = OMIT,
         source_tool: typing.Optional[ToolId] = OMIT,
-        target_guideline: typing.Optional[str] = OMIT,
-        target_tag: typing.Optional[str] = OMIT,
+        target_rule: typing.Optional[str] = OMIT,
+        target_group: typing.Optional[str] = OMIT,
         target_tool: typing.Optional[ToolId] = OMIT,
+        group_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Relationship:
         """
         Create a relationship.
 
-        A relationship is a relationship between a guideline and a tag.
-        It can be created between a guideline and a tag, or between two guidelines, or between two tags.
+        A relationship is a relationship between a rule and a group.
+        It can be created between a rule and a group, or between two rules, or between two groups.
 
         Parameters
         ----------
         kind : RelationshipKindDto
 
-        source_guideline : typing.Optional[str]
-            Unique identifier for the guideline
+        source_rule : typing.Optional[str]
+            Unique identifier for the rule
 
-        source_tag : typing.Optional[str]
-            Unique identifier for the tag
+        source_group : typing.Optional[str]
+            Unique identifier for the group
 
         source_tool : typing.Optional[ToolId]
 
-        target_guideline : typing.Optional[str]
-            Unique identifier for the guideline
+        target_rule : typing.Optional[str]
+            Unique identifier for the rule
 
-        target_tag : typing.Optional[str]
-            Unique identifier for the tag
+        target_group : typing.Optional[str]
+            Unique identifier for the group
 
         target_tool : typing.Optional[ToolId]
+
+        group_id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -158,8 +161,8 @@ class RelationshipsClient:
             base_url="https://yourhost.com/path/to/api",
         )
         client.relationships.create(
-            source_guideline="gid_123",
-            target_tag="tid_456",
+            source_rule="gid_123",
+            target_group="tid_456",
             kind="entailment",
         )
         """
@@ -167,17 +170,18 @@ class RelationshipsClient:
             "relationships",
             method="POST",
             json={
-                "source_guideline": source_guideline,
-                "source_tag": source_tag,
+                "source_rule": source_rule,
+                "source_group": source_group,
                 "source_tool": convert_and_respect_annotation_metadata(
                     object_=source_tool, annotation=ToolId, direction="write"
                 ),
-                "target_guideline": target_guideline,
-                "target_tag": target_tag,
+                "target_rule": target_rule,
+                "target_group": target_group,
                 "target_tool": convert_and_respect_annotation_metadata(
                     object_=target_tool, annotation=ToolId, direction="write"
                 ),
                 "kind": kind,
+                "group_id": group_id,
             },
             request_options=request_options,
             omit=OMIT,
@@ -343,15 +347,15 @@ class AsyncRelationshipsClient:
         *,
         kind: typing.Optional[RelationshipKindDto] = None,
         indirect: typing.Optional[bool] = None,
-        guideline_id: typing.Optional[str] = None,
-        tag_id: typing.Optional[str] = None,
+        rule_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         tool_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Relationship]:
         """
         List relationships.
 
-        Either `guideline_id` or `tag_id` or `tool_id` must be provided.
+        Either `rule_id` or `group_id` or `tool_id` must be provided.
 
         Parameters
         ----------
@@ -360,9 +364,9 @@ class AsyncRelationshipsClient:
         indirect : typing.Optional[bool]
             Whether to include indirect relationships
 
-        guideline_id : typing.Optional[str]
+        rule_id : typing.Optional[str]
 
-        tag_id : typing.Optional[str]
+        group_id : typing.Optional[str]
 
         tool_id : typing.Optional[str]
 
@@ -397,8 +401,8 @@ class AsyncRelationshipsClient:
             params={
                 "kind": kind,
                 "indirect": indirect,
-                "guideline_id": guideline_id,
-                "tag_id": tag_id,
+                "rule_id": rule_id,
+                "group_id": group_id,
                 "tool_id": tool_id,
             },
             request_options=request_options,
@@ -431,39 +435,42 @@ class AsyncRelationshipsClient:
         self,
         *,
         kind: RelationshipKindDto,
-        source_guideline: typing.Optional[str] = OMIT,
-        source_tag: typing.Optional[str] = OMIT,
+        source_rule: typing.Optional[str] = OMIT,
+        source_group: typing.Optional[str] = OMIT,
         source_tool: typing.Optional[ToolId] = OMIT,
-        target_guideline: typing.Optional[str] = OMIT,
-        target_tag: typing.Optional[str] = OMIT,
+        target_rule: typing.Optional[str] = OMIT,
+        target_group: typing.Optional[str] = OMIT,
         target_tool: typing.Optional[ToolId] = OMIT,
+        group_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Relationship:
         """
         Create a relationship.
 
-        A relationship is a relationship between a guideline and a tag.
-        It can be created between a guideline and a tag, or between two guidelines, or between two tags.
+        A relationship is a relationship between a rule and a group.
+        It can be created between a rule and a group, or between two rules, or between two groups.
 
         Parameters
         ----------
         kind : RelationshipKindDto
 
-        source_guideline : typing.Optional[str]
-            Unique identifier for the guideline
+        source_rule : typing.Optional[str]
+            Unique identifier for the rule
 
-        source_tag : typing.Optional[str]
-            Unique identifier for the tag
+        source_group : typing.Optional[str]
+            Unique identifier for the group
 
         source_tool : typing.Optional[ToolId]
 
-        target_guideline : typing.Optional[str]
-            Unique identifier for the guideline
+        target_rule : typing.Optional[str]
+            Unique identifier for the rule
 
-        target_tag : typing.Optional[str]
-            Unique identifier for the tag
+        target_group : typing.Optional[str]
+            Unique identifier for the group
 
         target_tool : typing.Optional[ToolId]
+
+        group_id : typing.Optional[str]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -486,8 +493,8 @@ class AsyncRelationshipsClient:
 
         async def main() -> None:
             await client.relationships.create(
-                source_guideline="gid_123",
-                target_tag="tid_456",
+                source_rule="gid_123",
+                target_group="tid_456",
                 kind="entailment",
             )
 
@@ -498,17 +505,18 @@ class AsyncRelationshipsClient:
             "relationships",
             method="POST",
             json={
-                "source_guideline": source_guideline,
-                "source_tag": source_tag,
+                "source_rule": source_rule,
+                "source_group": source_group,
                 "source_tool": convert_and_respect_annotation_metadata(
                     object_=source_tool, annotation=ToolId, direction="write"
                 ),
-                "target_guideline": target_guideline,
-                "target_tag": target_tag,
+                "target_rule": target_rule,
+                "target_group": target_group,
                 "target_tool": convert_and_respect_annotation_metadata(
                     object_=target_tool, annotation=ToolId, direction="write"
                 ),
                 "kind": kind,
+                "group_id": group_id,
             },
             request_options=request_options,
             omit=OMIT,

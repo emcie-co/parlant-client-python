@@ -3,6 +3,8 @@
 from ..core.pydantic_utilities import UniversalBaseModel
 import pydantic
 import typing
+from .composition_mode_dto import CompositionModeDto
+import datetime as dt
 from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 
@@ -10,7 +12,7 @@ class Journey(UniversalBaseModel):
     """
     A journey represents a guided interaction path for specific user scenarios.
 
-    Each journey is triggered by a condition and contains steps to guide the interaction.
+    Each journey is activated by one or more triggers and contains steps to guide the interaction.
     """
 
     id: str = pydantic.Field()
@@ -24,10 +26,22 @@ class Journey(UniversalBaseModel):
     """
 
     description: str
-    conditions: typing.List[str]
-    tags: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    triggers: typing.List[str]
+    groups: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
     """
-    List of tag IDs associated with the journey
+    List of group IDs associated with the journey
+    """
+
+    composition_mode: typing.Optional[CompositionModeDto] = None
+    labels: typing.Optional[typing.List[str]] = pydantic.Field(default=None)
+    """
+    Labels associated with the journey
+    """
+
+    priority: typing.Optional[int] = None
+    modified_utc: dt.datetime = pydantic.Field()
+    """
+    UTC timestamp of the last modification to the journey
     """
 
     if IS_PYDANTIC_V2:

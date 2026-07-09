@@ -27,6 +27,7 @@ class EvaluationsClient:
         self,
         *,
         payloads: typing.Sequence[Payload],
+        agent_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Evaluation:
         """
@@ -38,6 +39,9 @@ class EvaluationsClient:
         ----------
         payloads : typing.Sequence[Payload]
 
+        agent_id : typing.Optional[str]
+            Agent context to use when evaluating agent-dependent propositions such as rule signals.
+
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
 
@@ -48,22 +52,17 @@ class EvaluationsClient:
 
         Examples
         --------
-        from parlant.client import (
-            GuidelineContent,
-            GuidelinePayload,
-            ParlantClient,
-            Payload,
-            ToolId,
-        )
+        from parlant.client import ParlantClient, Payload, RuleContent, RulePayload, ToolId
 
         client = ParlantClient(
             base_url="https://yourhost.com/path/to/api",
         )
         client.evaluations.create(
+            agent_id="a1g2e3n4t5",
             payloads=[
                 Payload(
-                    guideline=GuidelinePayload(
-                        content=GuidelineContent(
+                    rule=RulePayload(
+                        content=RuleContent(
                             condition="when customer asks about pricing",
                         ),
                         tool_ids=[
@@ -83,6 +82,7 @@ class EvaluationsClient:
             "evaluations",
             method="POST",
             json={
+                "agent_id": agent_id,
                 "payloads": convert_and_respect_annotation_metadata(
                     object_=payloads,
                     annotation=typing.Sequence[Payload],
@@ -222,6 +222,7 @@ class AsyncEvaluationsClient:
         self,
         *,
         payloads: typing.Sequence[Payload],
+        agent_id: typing.Optional[str] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Evaluation:
         """
@@ -232,6 +233,9 @@ class AsyncEvaluationsClient:
         Parameters
         ----------
         payloads : typing.Sequence[Payload]
+
+        agent_id : typing.Optional[str]
+            Agent context to use when evaluating agent-dependent propositions such as rule signals.
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -247,9 +251,9 @@ class AsyncEvaluationsClient:
 
         from parlant.client import (
             AsyncParlantClient,
-            GuidelineContent,
-            GuidelinePayload,
             Payload,
+            RuleContent,
+            RulePayload,
             ToolId,
         )
 
@@ -260,10 +264,11 @@ class AsyncEvaluationsClient:
 
         async def main() -> None:
             await client.evaluations.create(
+                agent_id="a1g2e3n4t5",
                 payloads=[
                     Payload(
-                        guideline=GuidelinePayload(
-                            content=GuidelineContent(
+                        rule=RulePayload(
+                            content=RuleContent(
                                 condition="when customer asks about pricing",
                             ),
                             tool_ids=[
@@ -286,6 +291,7 @@ class AsyncEvaluationsClient:
             "evaluations",
             method="POST",
             json={
+                "agent_id": agent_id,
                 "payloads": convert_and_respect_annotation_metadata(
                     object_=payloads,
                     annotation=typing.Sequence[Payload],

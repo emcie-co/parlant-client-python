@@ -8,10 +8,12 @@ from ..core.pydantic_utilities import parse_obj_as
 from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..types.composition_mode_dto import CompositionModeDto
+from ..types.message_output_mode_dto import MessageOutputModeDto
+from ..types.effort_dto import EffortDto
 from ..errors.unprocessable_entity_error import UnprocessableEntityError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.agent_tag_update_params import AgentTagUpdateParams
+from ..types.agent_group_update_params import AgentGroupUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -74,20 +76,24 @@ class AgentsClient:
         self,
         *,
         name: str,
+        id: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        message_output_mode: typing.Optional[MessageOutputModeDto] = OMIT,
+        effort: typing.Optional[EffortDto] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
         Creates a new agent in the system.
 
         The agent will be initialized with the provided name and optional settings.
-        A unique identifier will be automatically generated.
+        A unique identifier will be automatically generated unless a custom ID is provided.
 
         Default behaviors:
         - `name` defaults to `"Unnamed Agent"` if not provided
+        - `id` is auto-generated if not provided
         - `description` defaults to `None`
         - `max_engine_iterations` defaults to `None` (uses system default)
 
@@ -95,6 +101,9 @@ class AgentsClient:
         ----------
         name : str
             The display name of the agent, mainly for management purposes
+
+        id : typing.Optional[str]
+            Unique identifier for the agent
 
         description : typing.Optional[str]
             Detailed description of the agent's purpose and capabilities
@@ -104,8 +113,12 @@ class AgentsClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the agent
+        message_output_mode : typing.Optional[MessageOutputModeDto]
+
+        effort : typing.Optional[EffortDto]
+
+        groups : typing.Optional[typing.Sequence[str]]
+            List of group IDs associated with the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -127,7 +140,9 @@ class AgentsClient:
             description="Technical Support Assistant",
             max_engine_iterations=3,
             composition_mode="fluid",
-            tags=["tag1", "tag2"],
+            message_output_mode="block",
+            effort="medium",
+            groups=["group1", "group2"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -135,10 +150,13 @@ class AgentsClient:
             method="POST",
             json={
                 "name": name,
+                "id": id,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,
-                "tags": tags,
+                "message_output_mode": message_output_mode,
+                "effort": effort,
+                "groups": groups,
             },
             request_options=request_options,
             omit=OMIT,
@@ -309,7 +327,9 @@ class AgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
-        tags: typing.Optional[AgentTagUpdateParams] = OMIT,
+        message_output_mode: typing.Optional[MessageOutputModeDto] = OMIT,
+        effort: typing.Optional[EffortDto] = OMIT,
+        groups: typing.Optional[AgentGroupUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
@@ -334,7 +354,11 @@ class AgentsClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
-        tags : typing.Optional[AgentTagUpdateParams]
+        message_output_mode : typing.Optional[MessageOutputModeDto]
+
+        effort : typing.Optional[EffortDto]
+
+        groups : typing.Optional[AgentGroupUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -357,6 +381,8 @@ class AgentsClient:
             description="Technical Support Assistant",
             max_engine_iterations=3,
             composition_mode="fluid",
+            message_output_mode="block",
+            effort="medium",
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -367,8 +393,10 @@ class AgentsClient:
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=AgentTagUpdateParams, direction="write"
+                "message_output_mode": message_output_mode,
+                "effort": effort,
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups, annotation=AgentGroupUpdateParams, direction="write"
                 ),
             },
             request_options=request_options,
@@ -472,20 +500,24 @@ class AsyncAgentsClient:
         self,
         *,
         name: str,
+        id: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        message_output_mode: typing.Optional[MessageOutputModeDto] = OMIT,
+        effort: typing.Optional[EffortDto] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
         Creates a new agent in the system.
 
         The agent will be initialized with the provided name and optional settings.
-        A unique identifier will be automatically generated.
+        A unique identifier will be automatically generated unless a custom ID is provided.
 
         Default behaviors:
         - `name` defaults to `"Unnamed Agent"` if not provided
+        - `id` is auto-generated if not provided
         - `description` defaults to `None`
         - `max_engine_iterations` defaults to `None` (uses system default)
 
@@ -493,6 +525,9 @@ class AsyncAgentsClient:
         ----------
         name : str
             The display name of the agent, mainly for management purposes
+
+        id : typing.Optional[str]
+            Unique identifier for the agent
 
         description : typing.Optional[str]
             Detailed description of the agent's purpose and capabilities
@@ -502,8 +537,12 @@ class AsyncAgentsClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the agent
+        message_output_mode : typing.Optional[MessageOutputModeDto]
+
+        effort : typing.Optional[EffortDto]
+
+        groups : typing.Optional[typing.Sequence[str]]
+            List of group IDs associated with the agent
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -530,7 +569,9 @@ class AsyncAgentsClient:
                 description="Technical Support Assistant",
                 max_engine_iterations=3,
                 composition_mode="fluid",
-                tags=["tag1", "tag2"],
+                message_output_mode="block",
+                effort="medium",
+                groups=["group1", "group2"],
             )
 
 
@@ -541,10 +582,13 @@ class AsyncAgentsClient:
             method="POST",
             json={
                 "name": name,
+                "id": id,
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,
-                "tags": tags,
+                "message_output_mode": message_output_mode,
+                "effort": effort,
+                "groups": groups,
             },
             request_options=request_options,
             omit=OMIT,
@@ -731,7 +775,9 @@ class AsyncAgentsClient:
         description: typing.Optional[str] = OMIT,
         max_engine_iterations: typing.Optional[int] = OMIT,
         composition_mode: typing.Optional[CompositionModeDto] = OMIT,
-        tags: typing.Optional[AgentTagUpdateParams] = OMIT,
+        message_output_mode: typing.Optional[MessageOutputModeDto] = OMIT,
+        effort: typing.Optional[EffortDto] = OMIT,
+        groups: typing.Optional[AgentGroupUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Agent:
         """
@@ -756,7 +802,11 @@ class AsyncAgentsClient:
 
         composition_mode : typing.Optional[CompositionModeDto]
 
-        tags : typing.Optional[AgentTagUpdateParams]
+        message_output_mode : typing.Optional[MessageOutputModeDto]
+
+        effort : typing.Optional[EffortDto]
+
+        groups : typing.Optional[AgentGroupUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -784,6 +834,8 @@ class AsyncAgentsClient:
                 description="Technical Support Assistant",
                 max_engine_iterations=3,
                 composition_mode="fluid",
+                message_output_mode="block",
+                effort="medium",
             )
 
 
@@ -797,8 +849,10 @@ class AsyncAgentsClient:
                 "description": description,
                 "max_engine_iterations": max_engine_iterations,
                 "composition_mode": composition_mode,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags, annotation=AgentTagUpdateParams, direction="write"
+                "message_output_mode": message_output_mode,
+                "effort": effort,
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups, annotation=AgentGroupUpdateParams, direction="write"
                 ),
             },
             request_options=request_options,

@@ -28,16 +28,16 @@ class ContextVariablesClient:
     def list(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[ContextVariable]:
         """
-        Lists all context variables set for the provided tag or all context variables if no tag is provided
+        Lists all context variables set for the provided group or all context variables if no group is provided
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter context variables by
+        group_id : typing.Optional[str]
+            The group ID to filter context variables by
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -60,7 +60,7 @@ class ContextVariablesClient:
             "context-variables",
             method="GET",
             params={
-                "tag_id": tag_id,
+                "group_id": group_id,
             },
             request_options=request_options,
         )
@@ -105,7 +105,7 @@ class ContextVariablesClient:
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
         freshness_rules: typing.Optional[str] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -129,8 +129,8 @@ class ContextVariablesClient:
         freshness_rules : typing.Optional[str]
             Cron expression defining the freshness rules
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tags associated with the context variable
+        groups : typing.Optional[typing.Sequence[str]]
+            List of groups associated with the context variable
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -167,7 +167,7 @@ class ContextVariablesClient:
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
                 "freshness_rules": freshness_rules,
-                "tags": tags,
+                "groups": groups,
             },
             request_options=request_options,
             omit=OMIT,
@@ -209,16 +209,16 @@ class ContextVariablesClient:
     def delete_many(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes all context variables for the provided tag
+        Deletes all context variables for the provided group
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter context variables by
+        group_id : typing.Optional[str]
+            The group ID to filter context variables by
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -240,7 +240,7 @@ class ContextVariablesClient:
             "context-variables",
             method="DELETE",
             params={
-                "tag_id": tag_id,
+                "group_id": group_id,
             },
             request_options=request_options,
         )
@@ -282,7 +282,7 @@ class ContextVariablesClient:
         """
         Retrieves a context variable's details and optionally its values.
 
-        Can return all customer or tag values for this variable type if include_values=True.
+        Can return all customer or group values for this variable type if include_values=True.
 
         Parameters
         ----------
@@ -427,7 +427,7 @@ class ContextVariablesClient:
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
         freshness_rules: typing.Optional[str] = OMIT,
-        tags: typing.Optional[ContextVariableTagsUpdateParams] = OMIT,
+        groups: typing.Optional[ContextVariableTagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -451,7 +451,7 @@ class ContextVariablesClient:
         freshness_rules : typing.Optional[str]
             Cron expression defining the freshness rules
 
-        tags : typing.Optional[ContextVariableTagsUpdateParams]
+        groups : typing.Optional[ContextVariableTagsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -477,9 +477,9 @@ class ContextVariablesClient:
                 tool_name="balance_checker",
             ),
             freshness_rules="0 8,20 * * *",
-            tags=ContextVariableTagsUpdateParams(
-                add=["tag:123", "tag:456"],
-                remove=["tag:789", "tag:012"],
+            groups=ContextVariableTagsUpdateParams(
+                add=["group:123", "group:456"],
+                remove=["group:789", "group:012"],
             ),
         )
         """
@@ -493,8 +493,8 @@ class ContextVariablesClient:
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
                 "freshness_rules": freshness_rules,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags,
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups,
                     annotation=ContextVariableTagsUpdateParams,
                     direction="write",
                 ),
@@ -544,7 +544,7 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
-        Retrieves a customer or tag value for the provided context variable
+        Retrieves a customer or group value for the provided context variable
 
         Parameters
         ----------
@@ -560,7 +560,7 @@ class ContextVariablesClient:
         Returns
         -------
         ContextVariableValue
-            Retrieved context value for the customer or tag
+            Retrieved context value for the customer or group
 
         Examples
         --------
@@ -622,7 +622,7 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
-        Updates a customer or tag value for the provided context variable
+        Updates a customer or group value for the provided context variable
 
         Parameters
         ----------
@@ -640,7 +640,7 @@ class ContextVariablesClient:
         Returns
         -------
         ContextVariableValue
-            Context value successfully updated for the customer or tag
+            Context value successfully updated for the customer or group
 
         Examples
         --------
@@ -711,7 +711,7 @@ class ContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes a customer or tag value for the provided context variable
+        Deletes a customer or group value for the provided context variable
 
         Parameters
         ----------
@@ -781,16 +781,16 @@ class AsyncContextVariablesClient:
     async def list(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[ContextVariable]:
         """
-        Lists all context variables set for the provided tag or all context variables if no tag is provided
+        Lists all context variables set for the provided group or all context variables if no group is provided
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter context variables by
+        group_id : typing.Optional[str]
+            The group ID to filter context variables by
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -821,7 +821,7 @@ class AsyncContextVariablesClient:
             "context-variables",
             method="GET",
             params={
-                "tag_id": tag_id,
+                "group_id": group_id,
             },
             request_options=request_options,
         )
@@ -866,7 +866,7 @@ class AsyncContextVariablesClient:
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
         freshness_rules: typing.Optional[str] = OMIT,
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -890,8 +890,8 @@ class AsyncContextVariablesClient:
         freshness_rules : typing.Optional[str]
             Cron expression defining the freshness rules
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tags associated with the context variable
+        groups : typing.Optional[typing.Sequence[str]]
+            List of groups associated with the context variable
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -936,7 +936,7 @@ class AsyncContextVariablesClient:
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
                 "freshness_rules": freshness_rules,
-                "tags": tags,
+                "groups": groups,
             },
             request_options=request_options,
             omit=OMIT,
@@ -978,16 +978,16 @@ class AsyncContextVariablesClient:
     async def delete_many(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes all context variables for the provided tag
+        Deletes all context variables for the provided group
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter context variables by
+        group_id : typing.Optional[str]
+            The group ID to filter context variables by
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1017,7 +1017,7 @@ class AsyncContextVariablesClient:
             "context-variables",
             method="DELETE",
             params={
-                "tag_id": tag_id,
+                "group_id": group_id,
             },
             request_options=request_options,
         )
@@ -1059,7 +1059,7 @@ class AsyncContextVariablesClient:
         """
         Retrieves a context variable's details and optionally its values.
 
-        Can return all customer or tag values for this variable type if include_values=True.
+        Can return all customer or group values for this variable type if include_values=True.
 
         Parameters
         ----------
@@ -1220,7 +1220,7 @@ class AsyncContextVariablesClient:
         description: typing.Optional[str] = OMIT,
         tool_id: typing.Optional[ToolId] = OMIT,
         freshness_rules: typing.Optional[str] = OMIT,
-        tags: typing.Optional[ContextVariableTagsUpdateParams] = OMIT,
+        groups: typing.Optional[ContextVariableTagsUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariable:
         """
@@ -1244,7 +1244,7 @@ class AsyncContextVariablesClient:
         freshness_rules : typing.Optional[str]
             Cron expression defining the freshness rules
 
-        tags : typing.Optional[ContextVariableTagsUpdateParams]
+        groups : typing.Optional[ContextVariableTagsUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -1275,9 +1275,9 @@ class AsyncContextVariablesClient:
                     tool_name="balance_checker",
                 ),
                 freshness_rules="0 8,20 * * *",
-                tags=ContextVariableTagsUpdateParams(
-                    add=["tag:123", "tag:456"],
-                    remove=["tag:789", "tag:012"],
+                groups=ContextVariableTagsUpdateParams(
+                    add=["group:123", "group:456"],
+                    remove=["group:789", "group:012"],
                 ),
             )
 
@@ -1294,8 +1294,8 @@ class AsyncContextVariablesClient:
                     object_=tool_id, annotation=ToolId, direction="write"
                 ),
                 "freshness_rules": freshness_rules,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags,
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups,
                     annotation=ContextVariableTagsUpdateParams,
                     direction="write",
                 ),
@@ -1345,7 +1345,7 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
-        Retrieves a customer or tag value for the provided context variable
+        Retrieves a customer or group value for the provided context variable
 
         Parameters
         ----------
@@ -1361,7 +1361,7 @@ class AsyncContextVariablesClient:
         Returns
         -------
         ContextVariableValue
-            Retrieved context value for the customer or tag
+            Retrieved context value for the customer or group
 
         Examples
         --------
@@ -1431,7 +1431,7 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> ContextVariableValue:
         """
-        Updates a customer or tag value for the provided context variable
+        Updates a customer or group value for the provided context variable
 
         Parameters
         ----------
@@ -1449,7 +1449,7 @@ class AsyncContextVariablesClient:
         Returns
         -------
         ContextVariableValue
-            Context value successfully updated for the customer or tag
+            Context value successfully updated for the customer or group
 
         Examples
         --------
@@ -1528,7 +1528,7 @@ class AsyncContextVariablesClient:
         request_options: typing.Optional[RequestOptions] = None,
     ) -> None:
         """
-        Deletes a customer or tag value for the provided context variable
+        Deletes a customer or group value for the provided context variable
 
         Parameters
         ----------

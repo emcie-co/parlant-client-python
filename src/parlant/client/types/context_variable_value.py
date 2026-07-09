@@ -9,10 +9,10 @@ from ..core.pydantic_utilities import IS_PYDANTIC_V2
 
 class ContextVariableValue(UniversalBaseModel):
     """
-    Represents the actual stored value for a specific customer's or tag's context.
+    Represents the actual stored value for a specific customer's or group's context.
 
     This could be their subscription details, feature usage history,
-    preferences, or any other customer or tag information that helps
+    preferences, or any other customer or group information that helps
     personalize the agent's responses.
     """
 
@@ -21,7 +21,7 @@ class ContextVariableValue(UniversalBaseModel):
     Unique identifier for the variable value
     """
 
-    last_modified: dt.datetime = pydantic.Field()
+    modified_utc: dt.datetime = pydantic.Field()
     """
     Timestamp of the last modification
     """

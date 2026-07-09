@@ -12,7 +12,7 @@ class Customer(UniversalBaseModel):
     Represents a customer in the system.
 
     Customers are entities that interact with agents through sessions. Each customer
-    can have metadata stored in the metadata field and can be tagged for categorization.
+    can have metadata stored in the metadata field and can be grouped for categorization.
     """
 
     id: str = pydantic.Field()
@@ -35,9 +35,9 @@ class Customer(UniversalBaseModel):
     Key-value pairs (`str: str`) to describe the customer
     """
 
-    tags: typing.List[str] = pydantic.Field()
+    groups: typing.List[str] = pydantic.Field()
     """
-    Collection of ids of tags that describe the customer
+    Collection of ids of groups that describe the customer
     """
 
     if IS_PYDANTIC_V2:

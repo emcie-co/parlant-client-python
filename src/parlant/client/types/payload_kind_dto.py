@@ -2,4 +2,4 @@
 
 import typing
 
-PayloadKindDto = typing.Literal["guideline"]
+PayloadKindDto = typing.Literal["rule"]

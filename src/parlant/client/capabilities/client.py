@@ -10,7 +10,7 @@ from json.decoder import JSONDecodeError
 from ..core.api_error import ApiError
 from ..core.jsonable_encoder import jsonable_encoder
 from ..errors.not_found_error import NotFoundError
-from ..types.capability_tag_update_params import CapabilityTagUpdateParams
+from ..types.capability_group_update_params import CapabilityGroupUpdateParams
 from ..core.serialization import convert_and_respect_annotation_metadata
 from ..core.client_wrapper import AsyncClientWrapper
 
@@ -25,7 +25,7 @@ class CapabilitiesClient:
     def list(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Capability]:
         """
@@ -36,8 +36,8 @@ class CapabilitiesClient:
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter capabilities by
+        group_id : typing.Optional[str]
+            The group ID to filter capabilities by
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -60,7 +60,7 @@ class CapabilitiesClient:
             "capabilities",
             method="GET",
             params={
-                "tag_id": tag_id,
+                "group_id": group_id,
             },
             request_options=request_options,
         )
@@ -94,13 +94,13 @@ class CapabilitiesClient:
         title: str,
         description: str,
         signals: typing.Sequence[str],
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Capability:
         """
         Creates a new capability in the system.
 
-        The capability will be initialized with the provided title, description, signals, and optional tags.
+        The capability will be initialized with the provided title, description, signals, and optional groups.
         A unique identifier will be automatically generated.
 
         Default behaviors:
@@ -117,8 +117,8 @@ class CapabilitiesClient:
         signals : typing.Sequence[str]
             Example signals that this capability can handle
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the capability
+        groups : typing.Optional[typing.Sequence[str]]
+            List of group IDs associated with the capability
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -142,7 +142,7 @@ class CapabilitiesClient:
                 "My phone is broken",
                 "I need a replacement while my phone is being repaired",
             ],
-            tags=["tag1", "tag2"],
+            groups=["group1", "group2"],
         )
         """
         _response = self._client_wrapper.httpx_client.request(
@@ -152,7 +152,7 @@ class CapabilitiesClient:
                 "title": title,
                 "description": description,
                 "signals": signals,
-                "tags": tags,
+                "groups": groups,
             },
             request_options=request_options,
             omit=OMIT,
@@ -330,7 +330,7 @@ class CapabilitiesClient:
         title: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         signals: typing.Optional[typing.Sequence[str]] = OMIT,
-        tags: typing.Optional[CapabilityTagUpdateParams] = OMIT,
+        groups: typing.Optional[CapabilityGroupUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Capability:
         """
@@ -353,7 +353,7 @@ class CapabilitiesClient:
         signals : typing.Optional[typing.Sequence[str]]
             Example signals that this capability can handle
 
-        tags : typing.Optional[CapabilityTagUpdateParams]
+        groups : typing.Optional[CapabilityGroupUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -387,9 +387,9 @@ class CapabilitiesClient:
                 "title": title,
                 "description": description,
                 "signals": signals,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags,
-                    annotation=CapabilityTagUpdateParams,
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups,
+                    annotation=CapabilityGroupUpdateParams,
                     direction="write",
                 ),
             },
@@ -438,7 +438,7 @@ class AsyncCapabilitiesClient:
     async def list(
         self,
         *,
-        tag_id: typing.Optional[str] = None,
+        group_id: typing.Optional[str] = None,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> typing.List[Capability]:
         """
@@ -449,8 +449,8 @@ class AsyncCapabilitiesClient:
 
         Parameters
         ----------
-        tag_id : typing.Optional[str]
-            The tag ID to filter capabilities by
+        group_id : typing.Optional[str]
+            The group ID to filter capabilities by
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -481,7 +481,7 @@ class AsyncCapabilitiesClient:
             "capabilities",
             method="GET",
             params={
-                "tag_id": tag_id,
+                "group_id": group_id,
             },
             request_options=request_options,
         )
@@ -515,13 +515,13 @@ class AsyncCapabilitiesClient:
         title: str,
         description: str,
         signals: typing.Sequence[str],
-        tags: typing.Optional[typing.Sequence[str]] = OMIT,
+        groups: typing.Optional[typing.Sequence[str]] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Capability:
         """
         Creates a new capability in the system.
 
-        The capability will be initialized with the provided title, description, signals, and optional tags.
+        The capability will be initialized with the provided title, description, signals, and optional groups.
         A unique identifier will be automatically generated.
 
         Default behaviors:
@@ -538,8 +538,8 @@ class AsyncCapabilitiesClient:
         signals : typing.Sequence[str]
             Example signals that this capability can handle
 
-        tags : typing.Optional[typing.Sequence[str]]
-            List of tag IDs associated with the capability
+        groups : typing.Optional[typing.Sequence[str]]
+            List of group IDs associated with the capability
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -568,7 +568,7 @@ class AsyncCapabilitiesClient:
                     "My phone is broken",
                     "I need a replacement while my phone is being repaired",
                 ],
-                tags=["tag1", "tag2"],
+                groups=["group1", "group2"],
             )
 
 
@@ -581,7 +581,7 @@ class AsyncCapabilitiesClient:
                 "title": title,
                 "description": description,
                 "signals": signals,
-                "tags": tags,
+                "groups": groups,
             },
             request_options=request_options,
             omit=OMIT,
@@ -775,7 +775,7 @@ class AsyncCapabilitiesClient:
         title: typing.Optional[str] = OMIT,
         description: typing.Optional[str] = OMIT,
         signals: typing.Optional[typing.Sequence[str]] = OMIT,
-        tags: typing.Optional[CapabilityTagUpdateParams] = OMIT,
+        groups: typing.Optional[CapabilityGroupUpdateParams] = OMIT,
         request_options: typing.Optional[RequestOptions] = None,
     ) -> Capability:
         """
@@ -798,7 +798,7 @@ class AsyncCapabilitiesClient:
         signals : typing.Optional[typing.Sequence[str]]
             Example signals that this capability can handle
 
-        tags : typing.Optional[CapabilityTagUpdateParams]
+        groups : typing.Optional[CapabilityGroupUpdateParams]
 
         request_options : typing.Optional[RequestOptions]
             Request-specific configuration.
@@ -840,9 +840,9 @@ class AsyncCapabilitiesClient:
                 "title": title,
                 "description": description,
                 "signals": signals,
-                "tags": convert_and_respect_annotation_metadata(
-                    object_=tags,
-                    annotation=CapabilityTagUpdateParams,
+                "groups": convert_and_respect_annotation_metadata(
+                    object_=groups,
+                    annotation=CapabilityGroupUpdateParams,
                     direction="write",
                 ),
             },
